@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>SahodNow — Statement details</title>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <div class="app-shell no-nav">
+    <div class="page-header">
+      <button class="back-btn" id="btn-back" aria-label="Back">
+        <svg width="20" height="20" viewBox="0 0 20 20"><path d="M12 4l-6 6 6 6" stroke="#141413" stroke-width="1.5" fill="none"/></svg>
+      </button>
+      <div>
+        <h2>Statement details</h2>
+        <p class="text-muted" style="margin:4px 0 0;font-size:13px;" id="page-subtitle"></p>
+      </div>
+    </div>
+
+    <div class="page-content" style="padding-top:8px;">
+      <div id="bill-current-main"></div>
+    </div>
+
+    <div class="overlay" id="repay-overlay">
+      <div class="sheet">
+        <div class="sheet-handle"></div>
+        <h2 style="margin-bottom:8px;">Repay</h2>
+        <p class="text-muted" style="margin-bottom:24px;">Amount: <strong id="repay-amount">—</strong></p>
+        <p class="form-label">Pay with</p>
+        <div class="chip-group" style="margin-bottom:24px;">
+          <button class="chip selected">GCash</button>
+          <button class="chip">Maya</button>
+          <button class="chip">Bank</button>
+        </div>
+        <button class="btn btn-primary" id="btn-paid">Payment complete</button>
+        <button class="btn btn-secondary" style="margin-top:12px;" onclick="AppState.hideOverlay('repay-overlay')">Cancel</button>
+      </div>
+    </div>
+  </div>
+  <script src="js/app.js"></script>
+  <script>
+    if (!AppState.requireApproved()) throw '';
+    AppState.bootstrapDemoSession();
+
+    const params = new URLSearchParams(location.search);
+    const isOverdueView = params.get('state') === 'overdue';
+    const refDate = isOverdueView ? AppState.getBillReferenceDate() : new Date();
+    const dueKey = params.get('due');
+    const mainEl = document.getElementById('bill-current-main');
+    const billHomeHref = `bill.html${isOverdueView ? '?state=overdue' : ''}`;
+
+    document.getElementById('btn-back').addEventListener('click', () => AppState.go(billHomeHref));
+
+    const cycle = dueKey
+      ? AppState.getBillCycle(dueKey, refDate)
+      : AppState.getPriorityBill(refDate);
+
+    if (!cycle || !cycle.items.length) {
+      mainEl.innerHTML = `
+        <div style="text-align:center;padding:48px 0;">
+          <p style="font-size:48px;margin-bottom:16px;">📋</p>
+          <h3 style="margin-bottom:8px;">No statement due</h3>
+          <p class="text-muted">This billing period has already been paid.</p>
+          <button class="btn btn-secondary" style="margin-top:24px;" onclick="AppState.go('bill.html')">Back</button>
+        </div>`;
+      throw '';
+    }
+
+    document.getElementById('page-subtitle').textContent = `Due ${cycle.dueLabel}`;
+
+    const overdue = (() => {
+      const today = new Date(refDate);
+      today.setHours(0, 0, 0, 0);
+      const due = new Date(cycle.dueDate);
+      due.setHours(0, 0, 0, 0);
+      return today > due;
+    })();
+    let displayTotal = cycle.total;
+    let penaltyHtml = '';
+
+    if (overdue || isOverdueView) {
+      const today = new Date(refDate);
+      today.setHours(0, 0, 0, 0);
+      const due = new Date(cycle.dueDate);
+      due.setHours(0, 0, 0, 0);
+      const overdueDays = Math.max(1, Math.floor((today - due) / 86400000));
+      const principalBase = cycle.items.reduce((s, it) => s + (Number(it.principal) || 0), 0);
+      const penalty = AppState.computeBillPenalty(cycle.total, overdueDays, principalBase);
+      displayTotal = penalty.totalDue;
+      penaltyHtml = `
+        <div class="bill-statement-penalty">
+          <div class="plan-row"><span class="text-muted">Bill amount</span><span>${AppState.formatPHP(cycle.total)}</span></div>
+          <div class="plan-row"><span class="text-muted">Penalty (${overdueDays} days)</span><span>${AppState.formatPHP(penalty.penaltyAccrued)}</span></div>
+        </div>`;
+    }
+
+    const itemsHtml = cycle.items.map(it =>
+      AppState.renderBillLoanRow(it, {
+        amount: it.amount,
+        amountLabel: `Inst. ${it.period}/${it.termMonths}`,
+        from: 'bill-current',
+        clickable: false,
+        statusText: overdue || isOverdueView ? 'Overdue' : '',
+        statusClass: overdue || isOverdueView ? 'overdue' : ''
+      })
+    ).join('');
+
+    mainEl.innerHTML = `
+      <div class="bill-hero${overdue || isOverdueView ? ' bill-hero--overdue' : ''}" style="margin-bottom:20px;">
+        <p class="bill-hero-label">${overdue || isOverdueView ? 'Total overdue' : 'Statement total'}</p>
+        <p class="bill-hero-amount">${AppState.formatPHP(displayTotal)}</p>
+        <p class="bill-hero-meta">${cycle.items.length} installment${cycle.items.length === 1 ? '' : 's'} in this statement</p>
+        ${penaltyHtml}
+        <button class="btn btn-consent" type="button" id="btn-repay-statement">Repay</button>
+      </div>
+      <p class="eyebrow" style="margin-bottom:12px;"><span class="dot">•</span> Breakdown by loan</p>
+      <div class="bill-order-list">${itemsHtml}</div>`;
+
+    document.getElementById('btn-repay-statement').addEventListener('click', () => {
+      document.getElementById('repay-amount').textContent = AppState.formatPHP(displayTotal);
+      AppState.showOverlay('repay-overlay');
+    });
+
+    document.getElementById('btn-paid').addEventListener('click', () => {
+      AppState.hideOverlay('repay-overlay');
+      AppState.payCurrentStatement(refDate, cycle.dueKey);
+      alert('Payment successful.');
+      AppState.go('bill.html');
+    });
+  </script>
+</body>
+</html>

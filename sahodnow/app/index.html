@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>SahodNow — Welcome</title>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <div class="app-shell no-nav" id="splash-shell" style="align-items:center;justify-content:center;padding:48px 24px;">
+    <div id="splash-loading">
+      <div style="text-align:center;margin-bottom:48px;">
+        <div style="width:80px;height:80px;border-radius:50%;background:var(--ink);margin:0 auto 24px;display:flex;align-items:center;justify-content:center;">
+          <span style="color:var(--canvas);font-size:32px;font-weight:500;">KM</span>
+        </div>
+        <h1 style="margin-bottom:8px;">SahodNow</h1>
+        <p class="text-muted">Better credit for salaried workers</p>
+      </div>
+      <div class="spinner"></div>
+      <p class="text-muted" style="margin-top:16px;">Loading…</p>
+    </div>
+    <div id="splash-exit" class="app-exit-state" style="display:none;">
+      <div style="width:64px;height:64px;border-radius:50%;background:var(--canvas);margin:0 auto 20px;display:flex;align-items:center;justify-content:center;font-size:28px;" aria-hidden="true">👋</div>
+      <h2>You've left SahodNow</h2>
+      <p class="text-muted" style="margin-top:8px;line-height:1.5;">Without permission we can't assess your limit or keep your account safe. You can agree anytime when you open the app again.</p>
+    </div>
+  </div>
+
+  <!-- Privacy & Permissions -->
+  <div class="overlay show" id="privacy-overlay">
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <p class="eyebrow"><span class="dot">•</span> Privacy & Permissions</p>
+      <h2 style="margin:12px 0 16px;">Before we begin</h2>
+      <p class="text-muted" style="margin-bottom:16px;">
+        SahodNow needs your consent to collect device information, location (approximate), and usage data for credit assessment, fraud prevention, and attribution per Philippine Data Privacy Act (RA 10173).
+      </p>
+      <ul style="font-size:14px;color:var(--muted);margin:0 0 16px 20px;line-height:1.8;">
+        <li>Device ID &amp; app install source</li>
+        <li>Network &amp; carrier information</li>
+        <li>Camera (for KYC verification only)</li>
+        <li>SMS (OTP verification only)</li>
+      </ul>
+      <div class="consent-row">
+        <input type="checkbox" id="agree-privacy">
+        <label for="agree-privacy">I have read and agree to the <a href="#">Privacy Policy</a> and <a href="#">Terms of Service</a></label>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-secondary" id="btn-decline">Decline</button>
+        <button class="btn btn-consent" id="btn-accept" disabled>Agree &amp; Continue</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Retention — shown after first Decline -->
+  <div class="overlay overlay--stack" id="privacy-retention-overlay">
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <p class="eyebrow"><span class="dot">•</span> Your privacy matters</p>
+      <h2 style="margin:12px 0 16px;">We only ask to help you borrow</h2>
+      <p class="privacy-retain-lead">
+        Permissions let us <strong>verify it's you</strong> and <strong>set a fair credit limit</strong>. That's the only reason we collect them.
+      </p>
+      <ul class="privacy-retain-points">
+        <li>
+          <span class="privacy-retain-icon" aria-hidden="true">🛡️</span>
+          <div>
+            <strong>For your limit only</strong>
+            Device &amp; usage data go straight into your credit assessment — nothing else.
+          </div>
+        </li>
+        <li>
+          <span class="privacy-retain-icon" aria-hidden="true">🔒</span>
+          <div>
+            <strong>Never sold. Never shared.</strong>
+            Your info stays inside SahodNow. We don't pass it to advertisers or other companies.
+          </div>
+        </li>
+        <li>
+          <span class="privacy-retain-icon" aria-hidden="true">✓</span>
+          <div>
+            <strong>You're in control</strong>
+            Camera &amp; SMS are only used when you verify ID or log in — you tap to allow each time.
+          </div>
+        </li>
+      </ul>
+      <div class="btn-row">
+        <button class="btn btn-secondary" id="btn-exit-app">Exit App</button>
+        <button class="btn btn-consent" id="btn-retention-agree">Agree</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+  <script>
+    const agree = document.getElementById('agree-privacy');
+    const btnAccept = document.getElementById('btn-accept');
+    const privacyOverlay = document.getElementById('privacy-overlay');
+    const retentionOverlay = document.getElementById('privacy-retention-overlay');
+    const splashLoading = document.getElementById('splash-loading');
+    const splashExit = document.getElementById('splash-exit');
+
+    function acceptPrivacy() {
+      agree.checked = true;
+      btnAccept.disabled = false;
+      AppState.set(AppState.KEYS.privacy, true);
+      privacyOverlay.classList.remove('show');
+      retentionOverlay.classList.remove('show');
+      setTimeout(() => AppState.routeEntry(), 600);
+    }
+
+    function showRetention() {
+      retentionOverlay.classList.add('show');
+    }
+
+    function exitApp() {
+      privacyOverlay.classList.remove('show');
+      retentionOverlay.classList.remove('show');
+      splashLoading.style.display = 'none';
+      splashExit.style.display = 'block';
+      document.title = 'SahodNow — Goodbye';
+    }
+
+    agree.addEventListener('change', () => { btnAccept.disabled = !agree.checked; });
+    btnAccept.addEventListener('click', acceptPrivacy);
+    document.getElementById('btn-decline').addEventListener('click', showRetention);
+    document.getElementById('btn-retention-agree').addEventListener('click', acceptPrivacy);
+    document.getElementById('btn-exit-app').addEventListener('click', exitApp);
+
+    if (AppState.isPrivacyAccepted()) {
+      AppState.routeEntry();
+    }
+  </script>
+</body>
+</html>

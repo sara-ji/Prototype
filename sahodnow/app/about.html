@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>SahodNow — About us</title>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <div class="app-shell no-nav">
+    <div class="page-header">
+      <button class="back-btn" onclick="AppState.go('profile.html')" aria-label="Back">
+        <svg width="20" height="20" viewBox="0 0 20 20"><path d="M12 4l-6 6 6 6" stroke="#141413" stroke-width="1.5" fill="none"/></svg>
+      </button>
+      <h2>About us</h2>
+    </div>
+
+    <div class="page-content" style="padding-top:8px;">
+      <div class="about-hero">
+        <h3>SahodNow</h3>
+        <p>Better offer for salaried workers in the Philippines — fair pricing, clear terms, and repayments that fit your payday.</p>
+      </div>
+
+      <p class="settings-section-title">Why SahodNow</p>
+      <ul class="about-advantage-list">
+        <li class="about-advantage-item">
+          <span class="about-advantage-icon" aria-hidden="true">💼</span>
+          <div>
+            <strong>Built for salaried workers</strong>
+            <p>Products and limits designed around stable employment and predictable pay cycles.</p>
+          </div>
+        </li>
+        <li class="about-advantage-item">
+          <span class="about-advantage-icon" aria-hidden="true">📅</span>
+          <div>
+            <strong>Repayments on your schedule</strong>
+            <p>Align due dates with your payroll so installments are easier to manage.</p>
+          </div>
+        </li>
+        <li class="about-advantage-item">
+          <span class="about-advantage-icon" aria-hidden="true">🔒</span>
+          <div>
+            <strong>Secure &amp; transparent</strong>
+            <p>Encrypted data handling, clear fees, and no hidden charges in your loan plan.</p>
+          </div>
+        </li>
+        <li class="about-advantage-item">
+          <span class="about-advantage-icon" aria-hidden="true">⚡</span>
+          <div>
+            <strong>Fast digital journey</strong>
+            <p>Apply, verify, and receive funds through a streamlined mobile experience.</p>
+          </div>
+        </li>
+        <li class="about-advantage-item">
+          <span class="about-advantage-icon" aria-hidden="true">🤝</span>
+          <div>
+            <strong>Responsible lending</strong>
+            <p>Credit decisions based on your profile — we lend what you can reasonably repay.</p>
+          </div>
+        </li>
+      </ul>
+
+      <div class="card" style="margin-top:20px;">
+        <p class="form-label" style="margin-bottom:8px;">Company</p>
+        <p class="text-muted" style="margin:0;line-height:1.55;font-size:14px;">
+          SahodNow is operated by a licensed lending partner in the Philippines.
+          Loan terms, rates, and eligibility are subject to credit review and regulatory requirements.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+  <script>
+    if (!AppState.isPrivacyAccepted()) AppState.go('index.html');
+  </script>
+</body>
+</html>

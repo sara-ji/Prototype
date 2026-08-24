@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>SahodNow — Disbursement Success</title>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <div class="app-shell no-nav">
+    <div class="page-content" style="padding-top:80px;text-align:center;">
+      <div class="success-icon">✓</div>
+      <h2 style="margin-bottom:8px;">Funds on the way!</h2>
+      <p class="text-muted" style="margin-bottom:32px;">Your loan has been approved and disbursed.</p>
+
+      <div class="card" style="text-align:left;margin-bottom:32px;">
+        <div class="plan-row">
+          <span class="text-muted">Disbursed amount</span>
+          <span style="font-weight:500;font-size:20px;" id="disb-amount">₱20,000</span>
+        </div>
+        <div class="plan-row">
+          <span class="text-muted">Payout account</span>
+          <span id="disb-payout">GCash ·••• 4521</span>
+        </div>
+        <div class="plan-row">
+          <span class="text-muted">Reference no.</span>
+          <span>CL20260609001234</span>
+        </div>
+        <div class="plan-row">
+          <span class="text-muted">Status</span>
+          <span style="color:#2E7D32;font-weight:500;">Disbursed</span>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" onclick="AppState.go('bill.html')">View Repayment Schedule</button>
+      <button class="btn btn-secondary" style="margin-top:12px;" onclick="AppState.go('home.html')">Back to Home</button>
+    </div>
+  </div>
+  <script src="js/app.js"></script>
+  <script>
+    if (!AppState.requireApproved()) throw '';
+    AppState.clearLoanFlowState();
+    const amount = AppState.getLoanAmount();
+    // 放款成功：写入一笔借款订单（账单制：每月 20 号出账/还款）
+    AppState.addLoan({
+      amount,
+      payoutDisplay: AppState.getPayoutDisplay(),
+      appliedAt: AppState.getLoanAppliedAt() || Date.now(),
+      disbursedAt: Date.now(),
+      termMonths: 3
+    });
+    document.getElementById('disb-amount').textContent = AppState.formatPHP(amount);
+    document.getElementById('disb-payout').textContent = AppState.getPayoutDisplay();
+  </script>
+</body>
+</html>

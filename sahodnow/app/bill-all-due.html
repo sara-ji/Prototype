@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>SahodNow — All due bills</title>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <div class="app-shell no-nav">
+    <div class="page-header">
+      <button class="back-btn" id="btn-back" aria-label="Back">
+        <svg width="20" height="20" viewBox="0 0 20 20"><path d="M12 4l-6 6 6 6" stroke="#141413" stroke-width="1.5" fill="none"/></svg>
+      </button>
+      <div>
+        <h2>All due bills</h2>
+        <p class="text-muted" style="margin:4px 0 0;font-size:13px;">Outstanding billing periods</p>
+      </div>
+    </div>
+
+    <div class="page-content" style="padding-top:8px;">
+      <div id="all-due-list"></div>
+    </div>
+
+    <div class="overlay" id="repay-overlay">
+      <div class="sheet">
+        <div class="sheet-handle"></div>
+        <h2 style="margin-bottom:8px;">Repay</h2>
+        <p class="text-muted" style="margin-bottom:24px;">Amount: <strong id="repay-amount">—</strong></p>
+        <p class="form-label">Pay with</p>
+        <div class="chip-group" style="margin-bottom:24px;">
+          <button class="chip selected">GCash</button>
+          <button class="chip">Maya</button>
+          <button class="chip">Bank</button>
+        </div>
+        <div class="card" style="text-align:center;margin-bottom:24px;">
+          <p class="text-muted" style="margin-bottom:8px;">Scan QR or enter reference</p>
+          <div style="width:160px;height:160px;background:var(--canvas);margin:16px auto;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:64px;">▦</div>
+          <p style="font-weight:500;letter-spacing:2px;">REF-8847291056</p>
+        </div>
+        <button class="btn btn-primary" id="btn-paid">Payment complete</button>
+        <button class="btn btn-secondary" style="margin-top:12px;" onclick="AppState.hideOverlay('repay-overlay')">Cancel</button>
+      </div>
+    </div>
+  </div>
+  <script src="js/app.js"></script>
+  <script>
+    if (!AppState.requireApproved()) throw '';
+    AppState.bootstrapDemoSession();
+
+    const isOverdueView = new URLSearchParams(location.search).get('state') === 'overdue';
+    const billHomeHref = `bill.html${isOverdueView ? '?state=overdue' : ''}`;
+    const refDate = isOverdueView ? AppState.getBillReferenceDate() : new Date();
+    const cycles = AppState.getPayableBillCycles(refDate);
+    const listEl = document.getElementById('all-due-list');
+    const today = new Date(refDate);
+    today.setHours(0, 0, 0, 0);
+    let repayDueKey = null;
+
+    document.getElementById('btn-back').addEventListener('click', () => AppState.go(billHomeHref));
+
+    if (!cycles.length) {
+      listEl.innerHTML = `
+        <div style="text-align:center;padding:48px 0;">
+          <p class="text-muted">No outstanding bills.</p>
+          <button class="btn btn-secondary" style="margin-top:24px;" type="button" id="btn-empty-back">Back</button>
+        </div>`;
+      document.getElementById('btn-empty-back')?.addEventListener('click', () => AppState.go(billHomeHref));
+      throw '';
+    }
+
+    listEl.innerHTML = cycles.map((cycle, idx) => {
+      const due = new Date(cycle.dueDate);
+      due.setHours(0, 0, 0, 0);
+      const overdueDays = today > due ? Math.floor((today - due) / 86400000) : 0;
+      const isOverdue = overdueDays > 0;
+      const principalBase = cycle.items.reduce((s, it) => s + (Number(it.principal) || 0), 0);
+      const penalty = isOverdue
+        ? AppState.computeBillPenalty(cycle.total, overdueDays, principalBase)
+        : null;
+      const total = isOverdue ? penalty.totalDue : cycle.total;
+      const statusText = isOverdue
+        ? `${overdueDays} day${overdueDays === 1 ? '' : 's'} overdue`
+        : idx === 0 ? 'Current' : 'Upcoming';
+      const statusClass = isOverdue ? 'overdue' : '';
+
+      return `
+        <div class="bill-due-card${isOverdue ? ' bill-due-card--overdue' : ''}">
+          <div class="bill-due-card__head">
+            <div>
+              <p class="bill-due-card__date">Due ${cycle.dueLabel}</p>
+              <p class="bill-due-card__meta">${cycle.items.length} installment${cycle.items.length === 1 ? '' : 's'}</p>
+            </div>
+            <div class="bill-due-card__amount">
+              <strong>${AppState.formatPHP(total)}</strong>
+              <span class="status${statusClass ? ' ' + statusClass : ''}">${statusText}</span>
+            </div>
+          </div>
+          <button
+            type="button"
+            class="btn ${isOverdue ? 'btn-consent' : 'btn-primary'} bill-due-card__repay"
+            data-repay="${total}"
+            data-due-key="${cycle.dueKey}"
+          >${isOverdue ? 'Repay now' : 'Repay'}</button>
+        </div>`;
+    }).join('');
+
+    listEl.querySelectorAll('[data-repay]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        repayDueKey = btn.dataset.dueKey;
+        document.getElementById('repay-amount').textContent = AppState.formatPHP(Number(btn.dataset.repay));
+        AppState.showOverlay('repay-overlay');
+      });
+    });
+
+    document.getElementById('btn-paid').addEventListener('click', () => {
+      AppState.hideOverlay('repay-overlay');
+      AppState.payCurrentStatement(refDate, repayDueKey);
+      alert('Payment successful.');
+      location.reload();
+    });
+  </script>
+</body>
+</html>

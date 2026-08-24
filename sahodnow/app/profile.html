@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>SahodNow — Profile</title>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <div class="app-shell">
+    <div class="page-header page-header--split">
+      <div class="page-header-main">
+        <h2>Profile</h2>
+      </div>
+      <div class="header-actions" id="header-actions"></div>
+    </div>
+
+    <div class="page-content">
+      <div class="profile-hero">
+        <div class="avatar" id="avatar">?</div>
+        <div class="profile-hero-meta">
+          <span class="profile-tier profile-tier--standard" id="profile-tier" style="display:none;">Standard</span>
+          <p class="profile-phone" id="profile-phone">Log in to view</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <ul class="menu-list" id="profile-menu">
+          <li class="menu-item" data-action="cards">
+            <span class="menu-item-left">
+              <span class="menu-item-icon" aria-hidden="true">💳</span>
+              <span>My bank cards</span>
+            </span>
+            <span class="menu-item-chevron">›</span>
+          </li>
+          <li class="menu-item" data-action="support" data-guest-allow>
+            <span class="menu-item-left">
+              <span class="menu-item-icon" aria-hidden="true">🎧</span>
+              <span>Customer service</span>
+            </span>
+            <span class="menu-item-chevron">›</span>
+          </li>
+          <li class="menu-item" data-action="terms" data-guest-allow>
+            <span class="menu-item-left">
+              <span class="menu-item-icon" aria-hidden="true">📄</span>
+              <span>Terms</span>
+            </span>
+            <span class="menu-item-chevron">›</span>
+          </li>
+          <li class="menu-item" data-action="about" data-guest-allow>
+            <span class="menu-item-left">
+              <span class="menu-item-icon" aria-hidden="true">👤</span>
+              <span>About us</span>
+            </span>
+            <span class="menu-item-chevron">›</span>
+          </li>
+          <li class="menu-item" data-action="settings">
+            <span class="menu-item-left">
+              <span class="menu-item-icon" aria-hidden="true">⚙️</span>
+              <span>Settings</span>
+            </span>
+            <span class="menu-item-chevron">›</span>
+          </li>
+        </ul>
+      </div>
+
+      <button class="btn btn-primary" style="margin-top:32px;display:none;" id="btn-login" data-guest-allow>Log in</button>
+      <button class="btn btn-secondary" style="margin-top:32px;display:none;" id="btn-logout">Sign Out</button>
+
+      <div id="demo-actions" style="display:none;">
+        <button class="btn btn-secondary demo-action-btn" id="btn-reset">Reset demo data</button>
+        <button class="btn btn-secondary demo-action-btn" id="btn-demo-no-kyc">Register, no KYC</button>
+        <button class="btn btn-secondary demo-action-btn" id="btn-demo-approved">Approved, no loan</button>
+        <button class="btn btn-secondary demo-action-btn" id="btn-demo-first-loan">First loan</button>
+      </div>
+    </div>
+
+    <div id="bottom-nav"></div>
+  </div>
+  <script src="js/app.js"></script>
+  <script>
+    if (!AppState.isPrivacyAccepted()) AppState.go('index.html');
+
+    const TIER_KEY = 'ph_account_tier';
+
+    function maskPhone(phone) {
+      if (!phone) return '';
+      const trimmed = phone.trim();
+      if (trimmed.startsWith('+63')) {
+        const parts = trimmed.split(/\s+/);
+        if (parts.length >= 4) {
+          return parts[0] + ' ' + parts[1] + ' *** ' + parts[parts.length - 1];
+        }
+        if (parts.length === 3) {
+          return parts[0] + ' ' + parts[1] + ' *** ' + parts[2].slice(-4);
+        }
+      }
+      return trimmed.replace(/(\d{2,4})\d+(\d{4})/, '$1 *** $2');
+    }
+
+    function isPremierTier() {
+      return AppState.get(TIER_KEY) === 'premier';
+    }
+
+    function applyTierUI(premier) {
+      const tierEl = document.getElementById('profile-tier');
+      const avatarEl = document.getElementById('avatar');
+      tierEl.style.display = '';
+      tierEl.textContent = premier ? 'Premier' : 'Standard';
+      tierEl.className = 'profile-tier ' + (premier ? 'profile-tier--premier' : 'profile-tier--standard');
+      avatarEl.classList.toggle('avatar--premier', premier);
+      avatarEl.classList.remove('avatar--guest');
+    }
+
+    const menuActions = {
+      cards: () => AppState.go('payout-accounts.html'),
+      support: () => AppState.go('support.html?from=profile'),
+      terms: () => AppState.go('terms.html'),
+      about: () => AppState.go('about.html'),
+      settings: () => AppState.go('settings.html')
+    };
+
+    document.getElementById('profile-menu').addEventListener('click', e => {
+      const item = e.target.closest('.menu-item');
+      if (!item) return;
+      const fn = menuActions[item.dataset.action];
+      if (fn) fn();
+    });
+
+    const isGuest = !AppState.isLoggedIn();
+    // Header actions — profile context
+    AppState.initHomeHeaderActions({
+      guest: isGuest,
+      from: 'profile'
+    });
+
+    if (isGuest) {
+      AppState.initGuestNav('profile');
+      document.getElementById('avatar').textContent = '?';
+      document.getElementById('avatar').classList.add('avatar--guest');
+      document.getElementById('profile-phone').textContent = 'Log in to view';
+      document.getElementById('profile-tier').style.display = 'none';
+      document.getElementById('btn-login').style.display = '';
+      document.getElementById('btn-login').onclick = () => AppState.go('login.html');
+      AppState.bindGuestLoginGate(document.querySelector('.page-content'));
+    } else {
+      AppState.initNav('profile');
+      const user = AppState.getUser();
+      if (user) {
+        document.getElementById('profile-phone').textContent = maskPhone(user.phone || '+63 917 123 4567');
+        document.getElementById('avatar').textContent = (user.name || 'U')[0].toUpperCase();
+      }
+      applyTierUI(isPremierTier());
+      document.getElementById('btn-logout').style.display = '';
+      document.getElementById('demo-actions').style.display = '';
+
+      document.getElementById('btn-logout').addEventListener('click', () => {
+        AppState.logout();
+        AppState.set(AppState.KEYS.privacy, true);
+        AppState.go('home-guest.html');
+      });
+      document.getElementById('btn-reset').addEventListener('click', () => {
+        if (confirm('Reset all demo data?')) AppState.resetAllDemoData();
+      });
+      document.getElementById('btn-demo-no-kyc').addEventListener('click', () => {
+        AppState.demoRegisterNoKyc();
+      });
+      document.getElementById('btn-demo-approved').addEventListener('click', () => {
+        AppState.demoApprovedNoLoan();
+        AppState.go('home.html');
+      });
+      document.getElementById('btn-demo-first-loan').addEventListener('click', () => {
+        AppState.demoFirstLoan();
+      });
+    }
+  </script>
+</body>
+</html>

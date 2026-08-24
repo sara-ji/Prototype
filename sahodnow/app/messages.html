@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>SahodNow — Messages</title>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <div class="app-shell no-nav">
+    <div class="page-header">
+      <button class="back-btn" id="btn-back" aria-label="Back">
+        <svg width="20" height="20" viewBox="0 0 20 20"><path d="M12 4l-6 6 6 6" stroke="#141413" stroke-width="1.5" fill="none"/></svg>
+      </button>
+      <h2>Messages</h2>
+    </div>
+
+    <div class="page-content" style="padding-top:8px;">
+      <div class="message-toolbar">
+        <p class="text-muted" style="margin:0;font-size:14px;" id="message-summary">Notifications from SahodNow</p>
+        <button type="button" class="btn btn-secondary" id="btn-mark-read" style="width:auto;padding:8px 14px;font-size:13px;">Mark all read</button>
+      </div>
+      <div class="message-list" id="message-list"></div>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+  <script>
+    if (!AppState.requireAuth()) throw '';
+
+    const params = new URLSearchParams(location.search);
+    const backTarget = params.get('from') === 'home' ? 'home.html' : 'profile.html';
+    document.getElementById('btn-back').addEventListener('click', () => AppState.go(backTarget));
+
+    const listEl = document.getElementById('message-list');
+    const summaryEl = document.getElementById('message-summary');
+    const markReadBtn = document.getElementById('btn-mark-read');
+
+    function renderMessages() {
+      const messages = AppState.getMessages();
+      const unread = messages.filter(m => !m.read).length;
+      summaryEl.textContent = unread
+        ? `${unread} unread notification${unread === 1 ? '' : 's'}`
+        : 'All caught up';
+
+      if (!messages.length) {
+        listEl.innerHTML = '<div class="message-empty"><p>No messages yet.</p></div>';
+        markReadBtn.disabled = true;
+        return;
+      }
+
+      listEl.innerHTML = messages.map(msg => `
+        <button type="button" class="message-item${msg.read ? '' : ' unread'}" data-id="${msg.id}">
+          <div class="message-item__head">
+            <span class="message-item__title">${msg.title}</span>
+            ${msg.read ? '' : '<span class="message-item__dot" aria-hidden="true"></span>'}
+          </div>
+          <p class="message-item__body">${msg.body}</p>
+          <span class="message-item__time">${msg.time}</span>
+        </button>
+      `).join('');
+
+      markReadBtn.disabled = unread === 0;
+
+      listEl.querySelectorAll('.message-item').forEach(btn => {
+        btn.addEventListener('click', () => {
+          AppState.markMessageRead(btn.dataset.id);
+          renderMessages();
+        });
+      });
+    }
+
+    markReadBtn.addEventListener('click', () => {
+      AppState.markAllMessagesRead();
+      renderMessages();
+    });
+
+    renderMessages();
+  </script>
+</body>
+</html>

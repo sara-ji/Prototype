@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>SahodNow — Link Payout Account</title>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <div class="app-shell no-nav">
+    <div class="page-header">
+      <button class="back-btn" id="btn-back" aria-label="Back">
+        <svg width="20" height="20" viewBox="0 0 20 20"><path d="M12 4l-6 6 6 6" stroke="#141413" stroke-width="1.5" fill="none"/></svg>
+      </button>
+      <div>
+        <h2>Link payout account</h2>
+      </div>
+    </div>
+
+    <div class="page-content">
+      <p class="text-muted" id="bind-intro" style="margin-bottom:20px;font-size:14px;">
+        Funds will be sent to this account after loan approval and disbursement.
+      </p>
+
+      <div class="tab-bar" role="tablist" aria-label="Payout method">
+        <button type="button" class="tab-item active" id="tab-ewallet" role="tab" aria-selected="true">E-wallet</button>
+        <button type="button" class="tab-item" id="tab-bank" role="tab" aria-selected="false">Bank account</button>
+      </div>
+
+      <div id="panel-ewallet">
+        <div class="form-group">
+          <label class="form-label">E-wallet provider</label>
+          <div class="chip-row" id="ewallet-chips">
+            <button type="button" class="chip-option selected" data-value="GCash">GCash</button>
+            <button type="button" class="chip-option" data-value="Maya">Maya</button>
+            <button type="button" class="chip-option" data-value="GrabPay">GrabPay</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Registered mobile number</label>
+          <input class="form-input" id="ewallet-no" type="tel" inputmode="numeric" placeholder="09XX XXX XXXX" maxlength="11">
+          <p class="form-error" id="ewallet-error" style="display:none;"></p>
+        </div>
+      </div>
+
+      <div id="panel-bank" style="display:none;">
+        <div class="form-group">
+          <label class="form-label">Bank</label>
+          <select class="form-input form-select" id="bank-name">
+            <option value="">Select bank</option>
+            <option>BDO Unibank</option>
+            <option>Bank of the Philippine Islands (BPI)</option>
+            <option>Metrobank</option>
+            <option>Landbank</option>
+            <option>UnionBank</option>
+            <option>China Bank</option>
+            <option>Security Bank</option>
+            <option>RCBC</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Account number</label>
+          <input class="form-input" id="bank-no" type="tel" inputmode="numeric" placeholder="Enter account number">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Account name</label>
+          <input class="form-input" id="bank-holder" placeholder="Name as shown on bank records">
+        </div>
+        <p class="text-muted" style="font-size:13px;margin-top:-4px;">Supports InstaPay and PESONet transfers.</p>
+        <p class="form-error" id="bank-error" style="display:none;"></p>
+      </div>
+
+      <button type="button" class="btn btn-primary" id="btn-link" style="margin-top:8px;">Link account</button>
+      <p id="bind-success" class="payout-bind-success" style="display:none;">✓ Account linked successfully</p>
+    </div>
+  </div>
+  <script src="js/app.js"></script>
+  <script>
+    if (!AppState.requireAuth()) throw '';
+
+    const params = new URLSearchParams(location.search);
+    const from = params.get('from') || 'home';
+    const dest = params.get('dest') || from;
+    const isFirstBind = !AppState.isPayoutBound();
+
+    if (!isFirstBind && !AppState.isPayoutAddVerified()) {
+      AppState.goPayoutAdd({ from, dest });
+      throw '';
+    }
+
+    if (isFirstBind) {
+      document.getElementById('bind-intro').innerHTML =
+        'Funds will be sent to this account after loan approval and disbursement. First-time linking does <strong>not</strong> require face verification.';
+    } else {
+      document.getElementById('bind-intro').textContent =
+        'Add another account for disbursement. Face verification completed.';
+    }
+
+    let activeTab = 'ewallet';
+    let ewalletProvider = 'GCash';
+
+    const tabEwallet = document.getElementById('tab-ewallet');
+    const tabBank = document.getElementById('tab-bank');
+    const panelEwallet = document.getElementById('panel-ewallet');
+    const panelBank = document.getElementById('panel-bank');
+    const ewalletError = document.getElementById('ewallet-error');
+    const bankError = document.getElementById('bank-error');
+    const ewalletInput = document.getElementById('ewallet-no');
+
+    function showError(el, msg) {
+      el.textContent = msg;
+      el.style.display = msg ? 'block' : 'none';
+    }
+
+    function switchTab(tab) {
+      activeTab = tab;
+      const isEwallet = tab === 'ewallet';
+      tabEwallet.classList.toggle('active', isEwallet);
+      tabBank.classList.toggle('active', !isEwallet);
+      tabEwallet.setAttribute('aria-selected', isEwallet ? 'true' : 'false');
+      tabBank.setAttribute('aria-selected', !isEwallet ? 'true' : 'false');
+      panelEwallet.style.display = isEwallet ? 'block' : 'none';
+      panelBank.style.display = isEwallet ? 'none' : 'block';
+      showError(ewalletError, '');
+      showError(bankError, '');
+    }
+
+    function finishBind() {
+      AppState.clearPayoutAddVerified();
+      const successEl = document.getElementById('bind-success');
+      successEl.style.display = 'block';
+      document.getElementById('btn-link').disabled = true;
+      setTimeout(() => {
+        if (from === 'payout-accounts') {
+          AppState.go(`payout-accounts.html?from=${encodeURIComponent(dest)}`);
+        } else {
+          AppState.returnFromPayoutBind(dest);
+        }
+      }, 700);
+    }
+
+    document.getElementById('btn-back').addEventListener('click', () => {
+      AppState.clearPayoutAddVerified();
+      if (from === 'payout-accounts') {
+        AppState.go(`payout-accounts.html?from=${encodeURIComponent(dest)}`);
+      } else if (AppState.isPayoutBound()) {
+        AppState.goPayoutManage(dest);
+      } else {
+        AppState.returnFromPayoutBind(dest);
+      }
+    });
+
+    tabEwallet.addEventListener('click', () => switchTab('ewallet'));
+    tabBank.addEventListener('click', () => switchTab('bank'));
+    Auth.bindChipGroup(document.getElementById('ewallet-chips'), v => { ewalletProvider = v; });
+
+    ewalletInput.addEventListener('input', () => {
+      ewalletInput.value = ewalletInput.value.replace(/\D/g, '').slice(0, 11);
+      showError(ewalletError, '');
+    });
+
+    ['bank-no', 'bank-holder', 'bank-name'].forEach(id => {
+      document.getElementById(id).addEventListener('input', () => showError(bankError, ''));
+      document.getElementById(id).addEventListener('change', () => showError(bankError, ''));
+    });
+
+    document.getElementById('btn-link').addEventListener('click', () => {
+      showError(ewalletError, '');
+      showError(bankError, '');
+
+      if (activeTab === 'ewallet') {
+        const phone = ewalletInput.value.replace(/\D/g, '');
+        if (!/^09\d{9}$/.test(phone)) {
+          showError(ewalletError, 'Enter a valid 11-digit mobile number starting with 09');
+          return;
+        }
+        AppState.addPayoutAccount({ type: 'ewallet', provider: ewalletProvider, accountNo: phone }, { select: true });
+      } else {
+        const bank = document.getElementById('bank-name').value;
+        const acc = document.getElementById('bank-no').value.replace(/\D/g, '');
+        const holder = document.getElementById('bank-holder').value.trim();
+        if (!bank) {
+          showError(bankError, 'Please select your bank');
+          return;
+        }
+        if (acc.length < 8) {
+          showError(bankError, 'Enter a valid account number');
+          return;
+        }
+        if (!holder) {
+          showError(bankError, 'Enter the account holder name');
+          return;
+        }
+        AppState.addPayoutAccount({ type: 'bank', provider: bank, accountNo: acc, holder }, { select: true });
+      }
+      finishBind();
+    });
+  </script>
+</body>
+</html>

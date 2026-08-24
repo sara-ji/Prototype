@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>SahodNow — Home</title>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <!--
+    已登录用户首页（动态页）
+    根据 localStorage 中的 kycStep / loanFlowState 切换展示区块，同一 URL 承载多种状态：
+    - 未完成 KYC：state-kyc
+    - 戳额审核中：state-reviewing
+    - 戳额被拒：state-credit-rejected（无额度）
+    - 额度失效：state-credit-expired（游客卡形态，主动重新戳额）
+    - 戳额成功：state-approved + 额度卡
+  -->
+  <div class="app-shell">
+    <div class="page-header page-header--split">
+      <div class="page-header-main home-brand">
+        <h2 class="home-brand-name">SahodNow</h2>
+        <p class="home-brand-tagline">Better offer for salaried workers</p>
+      </div>
+      <div class="header-actions" id="header-actions"></div>
+    </div>
+
+    <div class="page-content">
+
+      <!-- ===== 状态 A：未完成 KYC（kycStep !== 'approved'）===== -->
+      <div id="state-kyc" style="display:none;">
+        <!-- 主卡：额度锁定，点击跳转当前 KYC 步骤页 -->
+        <div class="card-ink home-unlock-card" onclick="continueKyc()">
+          <span class="home-unlock-badge">Almost yours</span>
+          <p class="limit-label">Maximum amount</p>
+          <p class="limit-amount">₱10,000</p>
+          <p class="home-kyc-current" id="kyc-current-prompt">Complete your profile to start evaluation</p>
+          <div class="home-kyc-progress home-kyc-progress--on-dark" id="kyc-progress"></div>
+          <p class="home-kyc-summary" id="kyc-step-summary">About 5 minutes to unlock your limit</p>
+          <span class="cta-hint">Continue →</span>
+        </div>
+      </div>
+
+      <!-- ===== 状态 B：戳额审核中（kycStep === 'reviewing'）===== -->
+      <div id="state-reviewing" style="display:none;">
+        <div class="card-ink home-review-card" onclick="AppState.go('review.html')">
+          <span class="home-unlock-badge home-review-badge">Under review</span>
+          <p class="limit-label">Maximum amount</p>
+          <p class="home-review-pending" id="home-review-status">Pending approval</p>
+          <p class="home-unlock-prompt" id="home-review-sub">Assessing your profile.</p>
+          <p class="review-countdown" id="home-review-countdown">10s</p>
+          <span class="cta-hint">View assessment status →</span>
+        </div>
+      </div>
+
+      <!-- ===== 状态 B2：戳额被拒（kycStep === 'rejected'）— 无授信额度 ===== -->
+      <div id="state-credit-rejected" style="display:none;">
+        <div class="card-ink home-review-card home-credit-rejected-card" id="credit-rejected-card">
+          <span class="home-unlock-badge home-rejected-badge">Not approved</span>
+          <h3 class="home-credit-rejected-title">We couldn't offer credit this time</h3>
+          <p class="home-unlock-prompt" id="home-reject-reason">Your application didn't meet our requirements right now.</p>
+          <p class="home-credit-rejected-cooldown" id="home-reject-cooldown">Reapply after 30 days</p>
+          <span class="cta-hint" id="home-reject-cta">View details →</span>
+        </div>
+        <button type="button" class="btn btn-primary home-reapply-btn" id="btn-home-reapply" style="display:none;margin-top:16px;width:100%;">Apply again</button>
+      </div>
+
+      <!-- ===== 状态 B3：额度失效（kycStep === 'expired'）— 游客营销卡形态，主动重新戳额 ===== -->
+      <div id="state-credit-expired" style="display:none;">
+        <div class="guest-hero-card guest-hero-card--expired" onclick="AppState.startCreditReassessment()">
+          <div class="guest-hero-amount">
+            <span class="home-expired-badge">Limit expired</span>
+            <p class="guest-hero-label">Maximum amount</p>
+            <p class="guest-hero-value" id="expired-hero-value">Up to ₱10,000</p>
+          </div>
+          <div class="guest-hero-body">
+            <ul class="guest-feature-list">
+              <li class="guest-feature-item">
+                <span class="guest-feature-icon guest-feature-icon--term" aria-hidden="true">
+                  <svg viewBox="0 0 32 32" fill="none">
+                    <rect x="6" y="8" width="20" height="18" rx="3" stroke="currentColor" stroke-width="1.6"/>
+                    <path d="M6 13h20M11 6v4M21 6v4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                    <path d="M11 18h4M11 22h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                  </svg>
+                </span>
+                <div class="guest-feature-text">
+                  <span class="guest-feature-label">Loan term</span>
+                  <strong>1–3 months</strong>
+                </div>
+              </li>
+              <li class="guest-feature-item">
+                <span class="guest-feature-icon guest-feature-icon--rate" aria-hidden="true">
+                  <svg viewBox="0 0 32 32" fill="none">
+                    <path d="M8 22l6-8 4 5 6-10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="16" cy="16" r="11" stroke="currentColor" stroke-width="1.6"/>
+                    <path d="M12 11h8M20 11l-2 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+                <div class="guest-feature-text">
+                  <span class="guest-feature-label">Monthly rate</span>
+                  <p class="guest-feature-rate">
+                    <strong>0.5%–1%</strong>
+                    <span class="guest-rate-badge guest-rate-badge--uplift" id="expired-rate-badge">Limit may be higher</span>
+                  </p>
+                </div>
+              </li>
+            </ul>
+            <div class="guest-slogan-banner guest-slogan-banner--expired">
+              <span class="guest-slogan-icon" aria-hidden="true">
+                <svg viewBox="0 0 40 40" fill="none">
+                  <path d="M20 6l3.2 9.8H34l-8.4 6.1 3.2 9.8L20 25.6 11.2 31.7l3.2-9.8L6 15.8h10.8L20 6z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+                </svg>
+              </span>
+              <div class="guest-slogan-text">
+                <p class="guest-slogan-headline" id="expired-uplift-headline">Your limit may have increased</p>
+                <p class="guest-slogan-sub" id="expired-uplift-sub">Tap to check your latest offer</p>
+              </div>
+            </div>
+            <span class="guest-hero-cta">Check your latest limit →</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== 状态 C：KYC 已通过（kycStep === 'approved'）===== -->
+      <div id="state-approved" style="display:none;">
+        <div class="card-ink home-limit-card" id="limit-card">
+          <div class="home-limit-top">
+            <p class="limit-label">Available limit</p>
+            <p class="limit-amount" id="limit-available">₱10,000</p>
+            <div class="limit-breakdown">
+              <div class="limit-breakdown-item">
+                <label>Used</label>
+                <strong id="limit-used">₱0</strong>
+              </div>
+              <div class="limit-breakdown-item">
+                <label>Total limit</label>
+                <strong id="limit-total">₱10,000</strong>
+              </div>
+            </div>
+          </div>
+          <div id="limit-card-borrow" class="home-limit-borrow">
+            <span class="cta-hint">Borrow now →</span>
+          </div>
+          <div id="limit-card-flow" class="home-limit-flow-wrap" style="display:none;"></div>
+        </div>
+      </div>
+
+      <img class="home-guest-banner" src="images/guest-promo-banner.svg" alt="Bridge the gap until payday. Your go-to for urgent cash." width="686" height="160">
+
+      <p class="eyebrow home-trust-heading"><span class="dot">•</span> Why SahodNow</p>
+      <div class="home-trust-row">
+        <div class="home-trust-badge">
+          <div class="trust-icon">🛡️</div>
+          <strong>SEC registered</strong>
+          <span>Licensed lending partner</span>
+        </div>
+        <div class="home-trust-badge">
+          <div class="trust-icon">🔒</div>
+          <strong>Your data stays private</strong>
+          <span>Used for verification only</span>
+        </div>
+        <div class="home-trust-badge">
+          <div class="trust-icon">📅</div>
+          <strong>Clear monthly bills</strong>
+          <span>Pay once per month</span>
+        </div>
+        <div class="home-trust-badge">
+          <div class="trust-icon">📊</div>
+          <strong>Transparent pricing</strong>
+          <span>No hidden fees</span>
+        </div>
+      </div>
+
+      <!-- 原型演示：底部切换条，快速预览各首页状态（?prototype= 注入 session） -->
+      <div id="home-state-switcher"></div>
+    </div>
+
+    <div id="bottom-nav"></div>
+  </div>
+  <script src="js/app.js"></script>
+  <script>
+    // ---------- 1. 准入校验 ----------
+    // 未同意隐私 → 启动页；未登录 → 游客首页
+    if (!AppState.isPrivacyAccepted()) AppState.go('index.html');
+
+    // 原型演示：URL 带 ?prototype=kyc|approved|listing-review 等时，写入对应 session 后在本页渲染
+    const proto = new URLSearchParams(location.search).get('prototype');
+    if (proto) AppState.applyHomePrototypeState(proto);
+
+    if (!AppState.isLoggedIn()) AppState.go('home-guest.html');
+
+    // ---------- 2. 读取 KYC 进度，决定展示「未完成 KYC」还是「已通过」大区块 ----------
+    const KYC_CURRENT = Auth.KYC_STEP_PROMPTS;
+
+    const kyc = AppState.get(AppState.KEYS.kycStep) || 'basic';
+    AppState.checkAndExpireCredit();
+    const kycResolved = AppState.get(AppState.KEYS.kycStep) || kyc;
+
+    const isApproved = kycResolved === 'approved';
+    const isReviewing = kycResolved === 'reviewing';
+    const isCreditRejected = kycResolved === 'rejected';
+    const isCreditExpired = kycResolved === 'expired';
+    document.getElementById('state-kyc').style.display = (!isApproved && !isReviewing && !isCreditRejected && !isCreditExpired) ? 'block' : 'none';
+    document.getElementById('state-reviewing').style.display = isReviewing ? 'block' : 'none';
+    document.getElementById('state-credit-rejected').style.display = isCreditRejected ? 'block' : 'none';
+    document.getElementById('state-credit-expired').style.display = isCreditExpired ? 'block' : 'none';
+    document.getElementById('state-approved').style.display = isApproved ? 'block' : 'none';
+
+    /** 从未完成 KYC 区块跳转：按当前步骤进入对应 kyc-*.html */
+    function continueKyc() {
+      const step = AppState.get(AppState.KEYS.kycStep) || 'basic';
+      if (step === 'enhance') AppState.go('kyc-enhance.html');
+      else if (['basic', 'id', 'liveness', 'contact'].includes(step)) {
+        AppState.go('kyc-' + step + '.html');
+      }
+    }
+
+    // ---------- 3a. 未完成 KYC：渲染进度条与文案 ----------
+    if (!isApproved && !isReviewing && !isCreditRejected && !isCreditExpired) {
+      const isEnhance = kyc === 'enhance';
+      const idx = isEnhance ? Auth.STEPS.length : Auth.STEPS.indexOf(kyc);
+      document.getElementById('kyc-progress').innerHTML = Auth.STEPS.map((s, i) => {
+        let cls = 'home-kyc-step';
+        if (isEnhance || i < idx) cls += ' done';
+        else if (i === idx) cls += ' active';
+        return `<div class="${cls}"></div>`;
+      }).join('');
+      document.getElementById('kyc-current-prompt').textContent =
+        KYC_CURRENT[kyc] || KYC_CURRENT.basic;
+      document.getElementById('kyc-step-summary').textContent = isEnhance
+        ? 'Almost there · see your limit in minutes'
+        : 'About 5 minutes to unlock your limit';
+    } else if (isReviewing) {
+      AppState.bindCreditReviewCountdown({
+        el: document.getElementById('home-review-countdown'),
+        onCountdownEnd: () => {
+          document.getElementById('home-review-countdown').style.display = 'none';
+          document.getElementById('home-review-status').textContent = 'Still reviewing';
+          document.getElementById('home-review-sub').textContent = 'We\'ll update you when your result is ready.';
+        }
+      });
+      if (AppState.isCreditReviewCountdownDone()) {
+        document.getElementById('home-review-countdown').style.display = 'none';
+        document.getElementById('home-review-status').textContent = 'Still reviewing';
+        document.getElementById('home-review-sub').textContent = 'We\'ll update you when your result is ready.';
+      }
+    } else if (isCreditRejected) {
+      const meta = AppState.getCreditRejectMeta();
+      document.getElementById('home-reject-reason').textContent = meta.reason;
+      document.getElementById('home-reject-cooldown').textContent = AppState.formatCreditReapplyLabel(meta);
+      const card = document.getElementById('credit-rejected-card');
+      const reapplyBtn = document.getElementById('btn-home-reapply');
+      if (meta.canReapply) {
+        reapplyBtn.style.display = 'block';
+        document.getElementById('home-reject-cta').textContent = 'View rejection details →';
+        card.onclick = () => AppState.go('credit-rejected.html');
+        reapplyBtn.onclick = () => AppState.reapplyCredit();
+      } else {
+        card.onclick = () => AppState.go('credit-rejected.html');
+      }
+    } else if (isCreditExpired) {
+      document.getElementById('expired-hero-value').textContent = AppState.getExpiredLimitHeadline();
+      const premier = AppState.get(AppState.KEYS.creditTier) === 'premier';
+      document.getElementById('expired-rate-badge').textContent = premier ? 'Premier rates may apply' : 'Limit may be higher';
+      document.getElementById('expired-uplift-headline').textContent = 'Your limit may have increased';
+      document.getElementById('expired-uplift-sub').textContent = 'Tap to check your latest offer';
+    } else {
+      // ---------- 3b. 已通过 KYC：上=账户信息，下=Borrow 或新借款简要状态 ----------
+      const limit = AppState.getCreditLimit();
+      const used = AppState.get(AppState.KEYS.loanAmount) || 0;
+      const available = limit - used;
+      const fmt = v => AppState.formatPHP(v);
+      const flowMeta = AppState.getLoanFlowMeta();
+
+      document.getElementById('limit-total').textContent = fmt(limit);
+      document.getElementById('limit-used').textContent = fmt(used);
+      document.getElementById('limit-available').textContent = fmt(available);
+
+      const borrowFooter = document.getElementById('limit-card-borrow');
+      const flowFooter = document.getElementById('limit-card-flow');
+
+      if (flowMeta) {
+        borrowFooter.style.display = 'none';
+        flowFooter.style.display = 'block';
+        if (flowMeta.state === 'listing-rejected') {
+          flowFooter.innerHTML = AppState.renderHomeListingRejectedPanel();
+          flowFooter.onclick = () => AppState.go('listing-rejected.html');
+        } else {
+          flowFooter.innerHTML = AppState.renderHomeLoanFlowFooter(flowMeta);
+          flowFooter.onclick = () => AppState.go(flowMeta.href);
+        }
+      } else {
+        borrowFooter.style.display = 'block';
+        flowFooter.style.display = 'none';
+        flowFooter.innerHTML = '';
+        flowFooter.onclick = null;
+        borrowFooter.onclick = () => AppState.startBorrow();
+      }
+    }
+
+    // ---------- 4. 底部导航 & 顶栏 & 原型状态切换条 ----------
+    AppState.initNav('home');
+    AppState.initHomeHeaderActions({ guest: false, unread: true });
+    AppState.initHomeStateSwitcher(AppState.getHomePrototypeSwitcherId());
+  </script>
+</body>
+</html>

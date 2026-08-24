@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>SahodNow — Home (Premier)</title>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <div class="app-shell app-shell--premium">
+    <div class="page-header page-header--split">
+      <div class="page-header-main home-brand">
+        <h2 class="home-brand-name">SahodNow</h2>
+        <p class="home-brand-tagline">Premier credit for top borrowers</p>
+      </div>
+      <div class="header-actions" id="header-actions"></div>
+    </div>
+
+    <div class="page-content">
+      <div class="card-ink home-limit-card home-limit-card--premium" id="limit-card">
+        <span class="home-unlock-badge home-unlock-badge--premier">Premier</span>
+        <div class="home-limit-top">
+          <p class="limit-label">Available limit</p>
+          <p class="limit-amount" id="limit-available">₱38,000</p>
+          <div class="limit-breakdown">
+            <div class="limit-breakdown-item">
+              <label>Used</label>
+              <strong id="limit-used">₱12,000</strong>
+            </div>
+            <div class="limit-breakdown-item">
+              <label>Total limit</label>
+              <div class="limit-total-with-uplift">
+                <strong id="limit-total">₱50,000</strong>
+                <span class="home-limit-uplift" id="limit-uplift">+ ₱40,000</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="home-limit-rate" aria-label="Premier monthly rate">
+          <span class="home-limit-rate-label">
+            Monthly rate
+            <span class="home-rate-discount">−50%</span>
+          </span>
+          <span class="home-limit-rate-value">
+            <s class="home-rate-compare">12%</s>
+            <span class="home-rate-current">6%</span>
+          </span>
+        </div>
+        <div id="limit-card-borrow" class="home-limit-borrow">
+          <span class="cta-hint">Borrow now →</span>
+        </div>
+      </div>
+
+      <img class="home-guest-banner" src="images/guest-promo-banner.svg" alt="Bridge the gap until payday. Your go-to for urgent cash." width="686" height="160">
+
+      <p class="eyebrow home-trust-heading"><span class="dot">•</span> Why SahodNow</p>
+      <div class="home-trust-row">
+        <div class="home-trust-badge">
+          <div class="trust-icon">🛡️</div>
+          <strong>SEC registered</strong>
+          <span>Licensed lending partner</span>
+        </div>
+        <div class="home-trust-badge">
+          <div class="trust-icon">🔒</div>
+          <strong>Your data stays private</strong>
+          <span>Used for verification only</span>
+        </div>
+        <div class="home-trust-badge">
+          <div class="trust-icon">📅</div>
+          <strong>Clear monthly bills</strong>
+          <span>Pay once per month</span>
+        </div>
+        <div class="home-trust-badge">
+          <div class="trust-icon">📊</div>
+          <strong>Transparent pricing</strong>
+          <span>No hidden fees</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="bottom-nav"></div>
+  </div>
+  <script src="js/app.js"></script>
+  <script>
+    const TOTAL = 50000;
+    const USED = 12000;
+    const UPLIFT = 40000;
+    const fmt = v => AppState.formatPHP(v);
+
+    document.getElementById('limit-total').textContent = fmt(TOTAL);
+    document.getElementById('limit-used').textContent = fmt(USED);
+    document.getElementById('limit-available').textContent = fmt(TOTAL - USED);
+    document.getElementById('limit-uplift').textContent = '+ ' + fmt(UPLIFT);
+
+    document.getElementById('limit-card-borrow').onclick = () => {
+      AppState.go('order-premium.html');
+    };
+
+    AppState.initNav('home');
+    AppState.initHomeHeaderActions({ guest: false, unread: true });
+  </script>
+</body>
+</html>

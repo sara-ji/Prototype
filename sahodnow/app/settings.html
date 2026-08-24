@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>SahodNow — Setting</title>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <div class="app-shell no-nav">
+    <div class="page-header">
+      <button class="back-btn" id="btn-back" aria-label="Back">
+        <svg width="20" height="20" viewBox="0 0 20 20"><path d="M12 4l-6 6 6 6" stroke="#141413" stroke-width="1.5" fill="none"/></svg>
+      </button>
+      <h2>Setting</h2>
+    </div>
+
+    <div class="page-content" style="padding-top:8px;">
+      <div class="card">
+        <ul class="menu-list">
+          <li class="menu-item" id="settings-pin-row">
+            <span id="settings-pin-label">Set PIN</span>
+            <span class="menu-item-chevron">›</span>
+          </li>
+          <li class="menu-item menu-item--static">
+            <span>Version</span>
+            <span class="menu-item-value" id="app-version">1.0.0</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+  <script>
+    if (!AppState.requireAuth()) throw '';
+
+    document.getElementById('btn-back').addEventListener('click', () => AppState.go('profile.html'));
+
+    const user = AppState.getUser();
+    const phone = (user?.phone || '').replace(/\D/g, '').slice(-10);
+    const hasPin = phone.length === 10 && Auth.hasDevicePin(phone);
+
+    document.getElementById('settings-pin-label').textContent = hasPin ? 'Reset PIN' : 'Set PIN';
+
+    document.getElementById('settings-pin-row').addEventListener('click', () => {
+      if (!phone || phone.length !== 10) {
+        AppState.go('login.html');
+        return;
+      }
+      // Set / Reset PIN 均先 OTP 验证身份
+      AppState.go(`otp.html?phone=${encodeURIComponent(phone)}&flow=reset-pin&return=settings`);
+    });
+  </script>
+</body>
+</html>

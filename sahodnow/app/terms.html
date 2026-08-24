@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>SahodNow — Terms</title>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <div class="app-shell no-nav">
+    <div class="page-header">
+      <button class="back-btn" id="btn-back" aria-label="Back">
+        <svg width="20" height="20" viewBox="0 0 20 20"><path d="M12 4l-6 6 6 6" stroke="#141413" stroke-width="1.5" fill="none"/></svg>
+      </button>
+      <h2>Terms</h2>
+    </div>
+
+    <div class="page-content" style="padding-top:8px;">
+      <div class="card">
+        <ul class="menu-list">
+          <li class="menu-item" id="row-privacy">
+            <span>Privacy policy</span>
+            <span class="menu-item-chevron">›</span>
+          </li>
+          <li class="menu-item" id="row-tos">
+            <span>Term of service</span>
+            <span class="menu-item-chevron">›</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+  <script>
+    if (!AppState.isPrivacyAccepted()) AppState.go('index.html');
+
+    document.getElementById('btn-back').addEventListener('click', () => AppState.go('profile.html'));
+    document.getElementById('row-privacy').addEventListener('click', () => AppState.go('privacy-policy.html'));
+    document.getElementById('row-tos').addEventListener('click', () => AppState.go('terms-of-service.html'));
+  </script>
+</body>
+</html>

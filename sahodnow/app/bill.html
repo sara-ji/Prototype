@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>SahodNow — Bills</title>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <div class="app-shell">
+    <div class="page-header page-header--split">
+      <div class="page-header-main">
+        <h2>Bills</h2>
+      </div>
+      <div class="header-actions" id="header-actions"></div>
+    </div>
+    <div class="page-content" id="bill-content">
+      <div id="bill-main"></div>
+      <div id="bill-empty" class="bill-empty-state" style="display:none;"></div>
+      <div class="bill-prototype-switch" id="bill-state-switch" aria-label="Bill state prototypes"></div>
+    </div>
+    <div class="overlay" id="repay-overlay">
+      <div class="sheet">
+        <div class="sheet-handle"></div>
+        <h2 style="margin-bottom:8px;">Repay</h2>
+        <p class="text-muted" style="margin-bottom:24px;">Amount: <strong id="repay-amount">—</strong></p>
+        <p class="form-label">Pay with</p>
+        <div class="chip-group" style="margin-bottom:24px;">
+          <button class="chip selected">GCash</button>
+          <button class="chip">Maya</button>
+          <button class="chip">Bank</button>
+        </div>
+        <div class="card" style="text-align:center;margin-bottom:24px;">
+          <p class="text-muted" style="margin-bottom:8px;">Scan QR or enter reference</p>
+          <div style="width:160px;height:160px;background:var(--canvas);margin:16px auto;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:64px;">▦</div>
+          <p style="font-weight:500;letter-spacing:2px;">REF-8847291056</p>
+        </div>
+        <button class="btn btn-primary" id="btn-paid">Payment complete</button>
+        <button class="btn btn-secondary" style="margin-top:12px;" onclick="AppState.hideOverlay('repay-overlay')">Cancel</button>
+      </div>
+    </div>
+
+    <div id="bottom-nav"></div>
+  </div>
+  <script src="js/app.js"></script>
+  <script>
+    if (!AppState.isPrivacyAccepted()) AppState.go('index.html');
+
+    const isGuest = !AppState.isLoggedIn();
+    const mainEl = document.getElementById('bill-main');
+    const emptyEl = document.getElementById('bill-empty');
+    const isOverdueView = new URLSearchParams(location.search).get('state') === 'overdue';
+    let repayDueKey = null;
+
+    function getRefDate() {
+      return isOverdueView ? AppState.getBillReferenceDate() : new Date();
+    }
+
+    function renderBillStateSwitch() {
+      const el = document.getElementById('bill-state-switch');
+      if (!el || isGuest) return;
+      el.innerHTML = `
+        <p class="bill-prototype-switch-label">Bill state · Prototype</p>
+        <div class="bill-prototype-switch-track">
+          <a href="bill.html" class="bill-prototype-pill${isOverdueView ? '' : ' active'}">Normal</a>
+          <a href="bill.html?state=overdue" class="bill-prototype-pill${isOverdueView ? ' active' : ''}">Overdue</a>
+        </div>`;
+    }
+
+    if (isGuest) {
+      AppState.initGuestNav('bill');
+      AppState.initHomeHeaderActions({ guest: true });
+      mainEl.style.display = 'none';
+      emptyEl.style.display = 'block';
+      emptyEl.innerHTML = `
+        <p style="font-size:48px;margin-bottom:16px;">🔒</p>
+        <h3 style="margin-bottom:8px;">Sign in to view bills</h3>
+        <p class="text-muted" style="margin-bottom:24px;">View due amounts and repayment schedule.</p>
+        <button type="button" class="btn btn-primary" data-guest-allow onclick="AppState.go('login.html')">Log in</button>`;
+      AppState.bindGuestLoginGate(document.getElementById('bill-content'));
+    } else {
+      AppState.bootstrapDemoSession();
+      AppState.initNav('bill');
+      AppState.initHomeHeaderActions({ guest: false, unread: true });
+      renderBillStateSwitch();
+      renderMain();
+
+      document.getElementById('btn-paid').addEventListener('click', () => {
+        AppState.hideOverlay('repay-overlay');
+        AppState.payCurrentStatement(getRefDate(), repayDueKey);
+        alert('Payment successful.');
+        location.reload();
+      });
+    }
+
+    function renderMain() {
+      const ref = getRefDate();
+      const hasBill = !!AppState.getPriorityBill(ref);
+      document.getElementById('bill-content').classList.toggle('bill-content--empty', !hasBill);
+
+      AppState.renderBillHub({
+        mainEl,
+        emptyEl,
+        referenceDate: ref,
+        onRepay: (amount, dueKey) => {
+          repayDueKey = dueKey;
+          document.getElementById('repay-amount').textContent = AppState.formatPHP(amount);
+          AppState.showOverlay('repay-overlay');
+        }
+      });
+    }
+  </script>
+</body>
+</html>

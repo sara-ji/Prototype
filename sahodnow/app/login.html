@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>SahodNow — Phone Number</title>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <div class="app-shell no-nav">
+    <div class="page-header">
+      <button class="back-btn" onclick="AppState.go('home-guest.html')" aria-label="Back">
+        <svg width="20" height="20" viewBox="0 0 20 20"><path d="M12 4l-6 6 6 6" stroke="#141413" stroke-width="1.5" fill="none"/></svg>
+      </button>
+      <h2>Phone number</h2>
+    </div>
+
+    <div class="page-content">
+      <p class="text-muted" style="margin-bottom:24px;">
+        Enter your phone number. We'll send a verification code by SMS.
+      </p>
+
+      <div class="form-group">
+        <div style="display:flex;gap:8px;">
+          <input class="form-input" style="width:72px;flex-shrink:0;text-align:center;" value="+63" readonly aria-label="Country code">
+          <div class="phone-input-wrap">
+            <input class="form-input" type="tel" id="phone-input" placeholder="9XX XXX XXXX" inputmode="numeric" autocomplete="tel-national" maxlength="12" aria-label="Phone number">
+            <button type="button" class="phone-clear" id="phone-clear" aria-label="Clear">×</button>
+          </div>
+        </div>
+        <p class="form-error" id="phone-error"></p>
+      </div>
+
+      <div class="consent-row" id="consent-block">
+        <input type="checkbox" id="agree-terms">
+        <label for="agree-terms" class="consent-label">
+          I agree to the
+          <a href="#" onclick="AppState.showOverlay('terms-overlay');return false;">Terms of Service</a>
+          and
+          <a href="#" onclick="AppState.showOverlay('privacy-overlay');return false;">Privacy Policy</a>
+        </label>
+      </div>
+      <p class="form-error" id="consent-error"></p>
+
+      <button class="btn btn-primary" id="btn-continue" disabled>Get verification code</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="terms-overlay">
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <h2>Terms of Service</h2>
+      <div class="agreement-text" style="margin-top:16px;">
+        <p>SahodNow Lending Inc. provides revolving credit services in the Philippines under applicable SEC regulations.</p>
+        <p style="margin-top:12px;">By using this service you agree to comply with all applicable laws, provide accurate information, and accept our fee schedule.</p>
+      </div>
+      <button class="btn btn-primary" onclick="AppState.hideOverlay('terms-overlay')">Close</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="privacy-overlay">
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <h2>Privacy Policy</h2>
+      <div class="agreement-text" style="margin-top:16px;">
+        <p>We process personal data in accordance with the Data Privacy Act of 2012 (RA 10173). Your information is used for identity verification, credit assessment, and service delivery.</p>
+      </div>
+      <button class="btn btn-primary" onclick="AppState.hideOverlay('privacy-overlay')">Close</button>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+  <script>
+    if (!AppState.isPrivacyAccepted()) AppState.go('index.html');
+    if (AppState.isLoggedIn()) AppState.go('home.html');
+
+    const phoneInput = document.getElementById('phone-input');
+    const phoneClear = document.getElementById('phone-clear');
+    const phoneError = document.getElementById('phone-error');
+    const consentError = document.getElementById('consent-error');
+    const agreeTerms = document.getElementById('agree-terms');
+    const btnContinue = document.getElementById('btn-continue');
+    const BTN_LABEL = 'Get verification code';
+
+    function updateClearBtn() {
+      phoneClear.classList.toggle('show', phoneInput.value.length > 0);
+    }
+
+    function validatePhone() {
+      const v = Auth.validatePhone(phoneInput.value);
+      phoneError.textContent = v.ok ? '' : v.msg;
+      phoneError.classList.toggle('show', !v.ok && phoneInput.value.length > 0);
+      btnContinue.disabled = !v.ok;
+      return v;
+    }
+
+    phoneInput.addEventListener('input', () => {
+      const digits = phoneInput.value.replace(/\D/g, '').slice(0, 10);
+      phoneInput.value = Auth.formatDisplay(digits);
+      updateClearBtn();
+      consentError.classList.remove('show');
+      validatePhone();
+    });
+
+    phoneClear.addEventListener('click', () => {
+      phoneInput.value = '';
+      phoneError.classList.remove('show');
+      updateClearBtn();
+      btnContinue.disabled = true;
+      phoneInput.focus();
+    });
+
+    agreeTerms.addEventListener('change', () => consentError.classList.remove('show'));
+
+    btnContinue.addEventListener('click', async () => {
+      const v = validatePhone();
+      if (!v.ok) return;
+
+      btnContinue.disabled = true;
+      btnContinue.textContent = 'Please wait…';
+
+      try {
+        const result = await Auth.checkPhone(v.phone);
+
+        if (!result.registered && !agreeTerms.checked) {
+          consentError.textContent = 'Please agree to the Terms of Service and Privacy Policy to continue.';
+          consentError.classList.add('show');
+          btnContinue.disabled = false;
+          btnContinue.textContent = BTN_LABEL;
+          return;
+        }
+
+        if (result.registered && Auth.hasDevicePin(v.phone)) {
+          AppState.go('pin-login.html?phone=' + encodeURIComponent(v.phone));
+          return;
+        }
+
+        btnContinue.textContent = 'Sending code…';
+        const scene = Auth.otpScene(result.flow);
+        await Auth.sendOtp(v.phone, scene);
+        AppState.go('otp.html?phone=' + encodeURIComponent(v.phone) + '&flow=' + result.flow);
+      } catch (e) {
+        phoneError.textContent = 'Something went wrong. Please try again.';
+        phoneError.classList.add('show');
+        btnContinue.disabled = false;
+        btnContinue.textContent = BTN_LABEL;
+      }
+    });
+
+    const draft = AppState.get('ph_login_phone_draft');
+    if (draft) {
+      phoneInput.value = Auth.formatDisplay(String(draft).replace(/\D/g, '').slice(0, 10));
+      updateClearBtn();
+      validatePhone();
+      AppState.set('ph_login_phone_draft', null);
+    }
+
+    phoneInput.focus();
+  </script>
+</body>
+</html>

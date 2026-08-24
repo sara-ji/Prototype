@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>SahodNow — Loan details</title>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <div class="app-shell no-nav">
+    <div class="page-header">
+      <button class="back-btn" id="btn-back" aria-label="Back">
+        <svg width="20" height="20" viewBox="0 0 20 20"><path d="M12 4l-6 6 6 6" stroke="#141413" stroke-width="1.5" fill="none"/></svg>
+      </button>
+      <div>
+        <h2>Loan details</h2>
+      </div>
+    </div>
+
+    <div class="page-content" style="padding-top:8px;">
+      <div class="card" style="margin-bottom:16px;">
+        <div class="plan-row">
+          <span class="text-muted">Agreement no.</span>
+          <span style="font-weight:500;" id="loan-id">—</span>
+        </div>
+        <div class="plan-row">
+          <span class="text-muted">Disbursement date</span>
+          <span style="font-weight:500;" id="loan-disbursed">—</span>
+        </div>
+        <div class="plan-row">
+          <span class="text-muted">Principal amount</span>
+          <span style="font-weight:500;" id="loan-principal">—</span>
+        </div>
+        <div class="plan-row">
+          <span class="text-muted">Installment term</span>
+          <span style="font-weight:500;" id="loan-installments">—</span>
+        </div>
+        <div class="plan-row">
+          <span class="text-muted">Disbursement account</span>
+          <span style="font-weight:500;" id="loan-payout">—</span>
+        </div>
+        <div class="plan-row">
+          <span class="text-muted">Outstanding balance</span>
+          <span style="font-weight:500;" id="loan-outstanding">—</span>
+        </div>
+        <div class="plan-row">
+          <span class="text-muted">Loan status</span>
+          <span style="font-weight:500;" id="loan-status">—</span>
+        </div>
+        <div class="plan-row" id="row-settled" style="display:none;">
+          <span class="text-muted">Settlement date</span>
+          <span style="font-weight:500;" id="loan-settled">—</span>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:16px;">
+        <p class="form-label" style="margin-bottom:4px;">Installment schedule</p>
+        <p class="text-muted" style="margin:0 0 12px;font-size:13px;line-height:1.45;" id="schedule-caption">
+          Each installment has its own due date. The first period may be shorter or longer than later periods.
+        </p>
+        <div id="schedule-list"></div>
+      </div>
+
+      <button type="button" class="btn btn-primary" id="btn-settle" style="display:none;">Early payoff</button>
+      <p class="text-muted" id="settle-hint" style="margin-top:12px;font-size:12px;line-height:1.4;display:none;">
+        Pay remaining balance in full.
+      </p>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+  <script>
+    if (!AppState.requireApproved()) throw '';
+
+    const params = new URLSearchParams(location.search);
+    const id = params.get('id') || '';
+    const from = params.get('from') || 'bill';
+    const backMap = {
+      'bill-current': 'bill-current.html',
+      'bill-all': 'bill-all.html',
+      'bill-all-due': 'bill-all-due.html',
+      'bill-history': 'bill-history.html',
+      bill: 'bill.html'
+    };
+    document.getElementById('btn-back').addEventListener('click', () => {
+      AppState.go(backMap[from] || 'bill.html');
+    });
+
+    const loan = AppState.getLoanById(id);
+    if (!loan) {
+      alert('Loan not found.');
+      AppState.go('bill.html');
+      throw '';
+    }
+
+    const schedule = AppState.getLoanSchedule(loan);
+    const installmentLabel = AppState.formatInstallmentTerm(loan);
+    const isClosed = loan.status === 'settled';
+
+    document.getElementById('loan-id').textContent = loan.id;
+    document.getElementById('loan-disbursed').textContent = AppState.formatDate(loan.disbursedAt);
+    document.getElementById('loan-principal').textContent = AppState.formatPHP(loan.principal);
+    document.getElementById('loan-installments').textContent = installmentLabel;
+    document.getElementById('loan-payout').textContent = loan.payoutDisplay;
+    document.getElementById('loan-outstanding').textContent = isClosed
+      ? AppState.formatPHP(0)
+      : AppState.formatPHP(AppState.getLoanRemainingAmount(loan));
+    document.getElementById('loan-status').textContent = isClosed ? 'Closed' : 'Active';
+
+    if (isClosed) {
+      document.getElementById('row-settled').style.display = 'flex';
+      document.getElementById('loan-settled').textContent = AppState.formatDate(loan.settledAt || loan.disbursedAt);
+    }
+
+    const firstDue = schedule[0];
+    const caption = firstDue?.daysInPeriod != null
+      ? `${installmentLabel} · first due ${firstDue.dueLabel} (${firstDue.daysInPeriod}-day period)`
+      : installmentLabel;
+    document.getElementById('schedule-caption').textContent = caption;
+
+    const currentPeriod = isClosed ? null : AppState.getLoanCurrentPeriod(loan);
+    document.getElementById('schedule-list').innerHTML = AppState.renderRepayTimeline(schedule, {
+      currentPeriod,
+      allPaid: isClosed
+    });
+
+    if (loan.status === 'active' && AppState.getLoanRemainingPeriods(loan) > 0) {
+      document.getElementById('btn-settle').style.display = 'block';
+      document.getElementById('settle-hint').style.display = 'block';
+    }
+
+    document.getElementById('btn-settle').addEventListener('click', () => {
+      if (!confirm('Pay off this loan early?')) return;
+      AppState.settleLoan(loan.id);
+      alert('Loan closed.');
+      AppState.go(backMap[from] || 'bill.html');
+    });
+  </script>
+</body>
+</html>

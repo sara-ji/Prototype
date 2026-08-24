@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>SahodNow — Enter PIN</title>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <div class="app-shell no-nav">
+    <div class="page-header">
+      <button class="back-btn" id="btn-back" aria-label="Back">
+        <svg width="20" height="20" viewBox="0 0 20 20"><path d="M12 4l-6 6 6 6" stroke="#141413" stroke-width="1.5" fill="none"/></svg>
+      </button>
+      <h2>Enter PIN</h2>
+    </div>
+
+    <div class="page-content">
+      <p class="text-muted" style="margin-bottom:8px;">Welcome back</p>
+      <p style="font-weight:500;font-size:18px;margin:0 0 28px;" id="pin-phone-display">+63 917 123 4567</p>
+
+      <div class="form-group">
+        <label class="form-label">6-digit PIN</label>
+        <div class="otp-group" id="pin-login-group">
+          <input class="otp-input" type="password" maxlength="6" inputmode="numeric" pattern="[0-9]*" autocomplete="current-password" aria-label="PIN digit 1">
+          <input class="otp-input" type="password" maxlength="1" inputmode="numeric" pattern="[0-9]*" aria-label="PIN digit 2">
+          <input class="otp-input" type="password" maxlength="1" inputmode="numeric" pattern="[0-9]*" aria-label="PIN digit 3">
+          <input class="otp-input" type="password" maxlength="1" inputmode="numeric" pattern="[0-9]*" aria-label="PIN digit 4">
+          <input class="otp-input" type="password" maxlength="1" inputmode="numeric" pattern="[0-9]*" aria-label="PIN digit 5">
+          <input class="otp-input" type="password" maxlength="1" inputmode="numeric" pattern="[0-9]*" aria-label="PIN digit 6">
+        </div>
+      </div>
+
+      <p class="form-error" id="pin-login-error" style="text-align:center;margin-top:12px;"></p>
+
+      <button class="btn btn-primary" id="btn-sign-in" disabled style="margin-top:24px;">Sign in</button>
+
+      <div class="pin-login-alt" style="text-align:center;margin-top:24px;">
+        <button type="button" class="link-action" id="btn-otp-login">Sign in with verification code</button>
+        <p style="margin:12px 0 0;">
+          <button type="button" class="link-action" id="btn-forgot-pin">Forgot PIN?</button>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+  <script>
+    const params = new URLSearchParams(location.search);
+    const fromFlow = params.has('phone');
+    const isPreview = !fromFlow;
+    const phone = (params.get('phone') || Auth.DEMO_REGISTERED).replace(/\D/g, '');
+    const activePhone = phone.length === 10 ? phone : Auth.DEMO_REGISTERED;
+
+    if (!isPreview) {
+      if (!AppState.isPrivacyAccepted()) AppState.go('index.html');
+      if (AppState.isLoggedIn()) AppState.go('home.html');
+      if (phone.length !== 10) AppState.go('login.html');
+    }
+
+    document.getElementById('pin-phone-display').textContent = '+63 ' + Auth.formatDisplay(activePhone);
+
+    document.getElementById('btn-back').addEventListener('click', () => {
+      if (isPreview) return;
+      AppState.set('ph_login_phone_draft', activePhone);
+      AppState.go('login.html');
+    });
+
+    const btnSignIn = document.getElementById('btn-sign-in');
+    const pinError = document.getElementById('pin-login-error');
+    const BTN_LABEL = 'Sign in';
+    let failCount = 0;
+    const MAX_FAILS = 5;
+
+    const getPin = Auth.bindOtpInputs(document.getElementById('pin-login-group'), code => {
+      btnSignIn.disabled = code.length !== 6;
+      pinError.classList.remove('show');
+      pinError.textContent = '';
+    });
+
+    async function goResetPinOtp() {
+      if (isPreview) {
+        AppState.go('otp.html?phone=' + encodeURIComponent(activePhone) + '&flow=reset-pin&prototype=1');
+        return;
+      }
+      await Auth.sendOtp(activePhone, Auth.otpScene('reset-pin'), 'sms');
+      AppState.go('otp.html?phone=' + encodeURIComponent(activePhone) + '&flow=reset-pin');
+    }
+
+    async function goOtpLogin() {
+      const fromPin = '&from=pin-login';
+      const preview = isPreview ? '&prototype=1' : '';
+      if (isPreview) {
+        AppState.go('otp.html?phone=' + encodeURIComponent(activePhone) + '&flow=login' + fromPin + preview);
+        return;
+      }
+      await Auth.sendOtp(activePhone, Auth.otpScene('login'), 'sms');
+      AppState.go('otp.html?phone=' + encodeURIComponent(activePhone) + '&flow=login' + fromPin);
+    }
+
+    async function submitPin() {
+      const pin = getPin();
+      if (pin.length !== 6) return;
+
+      if (isPreview) {
+        btnSignIn.disabled = true;
+        btnSignIn.textContent = 'Please wait…';
+        setTimeout(() => {
+          btnSignIn.disabled = false;
+          btnSignIn.textContent = BTN_LABEL;
+        }, 600);
+        return;
+      }
+
+      btnSignIn.disabled = true;
+      btnSignIn.textContent = 'Please wait…';
+
+      const result = await Auth.verifyPin(activePhone, pin);
+      if (!result.success) {
+        failCount += 1;
+        pinError.textContent = result.msg;
+        pinError.classList.add('show');
+        btnSignIn.disabled = false;
+        btnSignIn.textContent = BTN_LABEL;
+
+        if (failCount >= MAX_FAILS) {
+          pinError.textContent = 'Too many attempts. Please reset your PIN with a verification code.';
+          setTimeout(goResetPinOtp, 1200);
+        }
+        return;
+      }
+
+      AppState.login({ phone: '+63' + activePhone, name: 'Juan Dela Cruz' });
+      Auth.routeAfterLogin();
+    }
+
+    btnSignIn.addEventListener('click', submitPin);
+
+    document.getElementById('btn-forgot-pin').addEventListener('click', async () => {
+      btnSignIn.disabled = true;
+      await goResetPinOtp();
+    });
+
+    document.getElementById('btn-otp-login').addEventListener('click', async () => {
+      btnSignIn.disabled = true;
+      await goOtpLogin();
+    });
+
+    document.getElementById('pin-login-group').querySelector('.otp-input').focus();
+  </script>
+</body>
+</html>

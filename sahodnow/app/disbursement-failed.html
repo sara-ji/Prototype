@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>SahodNow — Disbursement Failed</title>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <div class="app-shell no-nav">
+    <div class="page-header">
+      <button class="back-btn" onclick="AppState.go('home.html')" aria-label="Back to Home">
+        <svg width="20" height="20" viewBox="0 0 20 20"><path d="M12 4l-6 6 6 6" stroke="#141413" stroke-width="1.5" fill="none"/></svg>
+      </button>
+      <div>
+        <h2>Disbursement failed</h2>
+      </div>
+    </div>
+
+    <div class="page-content" style="padding-top:16px;">
+      <div style="text-align:center;margin-bottom:28px;">
+        <div class="fail-icon">✕</div>
+        <h2 style="margin-bottom:8px;">Disbursement failed</h2>
+        <p class="text-muted" style="max-width:300px;margin:0 auto;">
+          We couldn't transfer funds to your payout account. Please update your account and try again.
+        </p>
+      </div>
+
+      <div class="card" style="margin-bottom:16px;">
+        <div class="plan-row">
+          <span class="text-muted">Applied at</span>
+          <span style="font-weight:500;" id="fail-applied">—</span>
+        </div>
+        <div class="plan-row">
+          <span class="text-muted">Amount</span>
+          <span style="font-weight:500;" id="fail-amount">—</span>
+        </div>
+        <div class="plan-row">
+          <span class="text-muted">Payout account</span>
+          <span id="fail-payout">—</span>
+        </div>
+        <div class="plan-row">
+          <span class="text-muted">Current status</span>
+          <span style="font-weight:500;">Disbursement failed</span>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:24px;">
+        <p class="form-label" style="margin-bottom:12px;">Change payout account</p>
+        <div class="form-group" style="margin-bottom:12px;">
+          <label class="form-label">Payout method</label>
+          <select class="form-input form-select" id="payout-method">
+            <option>GCash</option>
+            <option>Maya</option>
+            <option>Bank account</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom:16px;">
+          <label class="form-label">Account number</label>
+          <input class="form-input" id="account-no" placeholder="Enter account number">
+        </div>
+        <button type="button" class="btn btn-secondary" id="btn-update-payout" style="width:100%;">Update account</button>
+        <p id="update-success" class="text-muted" style="display:none;margin-top:12px;text-align:center;color:#2E7D32;">✓ Account updated</p>
+      </div>
+
+      <button type="button" class="btn btn-primary" id="btn-retry">Retry disbursement</button>
+      <button type="button" class="btn btn-secondary" style="margin-top:12px;" onclick="AppState.go('home.html')">Back to Home</button>
+    </div>
+  </div>
+  <script src="js/app.js"></script>
+  <script>
+    if (!AppState.requireApproved()) throw '';
+    AppState.setLoanFlowState('disbursement-failed');
+
+    const amount = AppState.getLoanAmount();
+    document.getElementById('fail-applied').textContent = AppState.formatDateTime(AppState.getLoanAppliedAt());
+    document.getElementById('fail-amount').textContent = AppState.formatPHP(amount);
+    document.getElementById('fail-payout').textContent = AppState.getPayoutDisplay();
+
+    document.getElementById('btn-update-payout').addEventListener('click', () => {
+      const acc = document.getElementById('account-no').value.trim();
+      if (!acc) {
+        document.getElementById('account-no').focus();
+        return;
+      }
+      const method = document.getElementById('payout-method').value;
+      const text = `${method} ·••• ${acc.slice(-4)}`;
+      AppState.setPayoutDisplay(text);
+      document.getElementById('fail-payout').textContent = text;
+      document.getElementById('update-success').style.display = 'block';
+    });
+
+    document.getElementById('btn-retry').addEventListener('click', () => {
+      AppState.setLoanFlowState('disbursement-review');
+      AppState.go('disbursement-review.html?amount=' + amount);
+    });
+  </script>
+</body>
+</html>

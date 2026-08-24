@@ -1,0 +1,6 @@
+[
+  { "sectionId": "m2-home-listing-rejected", "label": "H-4. 发标被拒", "tag": "home.html · Declined · 7 天冷却", "file": "home.html", "xf": "listing-rejected", "n": 91 },
+  { "sectionId": "m2-listing-rejected", "label": "LR-1. 发标被拒详情", "tag": "listing-rejected.html", "file": "listing-rejected.html", "xf": null, "n": 21 },
+  { "sectionId": "m2-home-disbursement-failed", "label": "H-5. 放款失败", "tag": "home.html · Failed · 换卡重试", "file": "home.html", "xf": "disbursement-failed", "n": 92 },
+  { "sectionId": "m2-disbursement-failed", "label": "DF-1. 放款失败详情", "tag": "disbursement-failed.html · 更新账户", "file": "disbursement-failed.html", "xf": null, "n": 22 }
+]

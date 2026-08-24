@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>SahodNow — E-Wallet bill</title>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <div class="app-shell no-nav">
+    <div class="page-header">
+      <button class="back-btn" id="btn-back" aria-label="Back">
+        <svg width="20" height="20" viewBox="0 0 20 20"><path d="M12 4l-6 6 6 6" stroke="#141413" stroke-width="1.5" fill="none"/></svg>
+      </button>
+      <div>
+        <h2>E-Wallet bill</h2>
+        <p class="page-header-sub">PDF · last 3 months</p>
+      </div>
+    </div>
+
+    <div class="page-content enhance-detail">
+      <p class="enhance-note">E-wallet statements (e.g. GCash) are <strong>PDF only</strong> for the <strong>last 3 months</strong>.</p>
+
+      <div class="upload-zone" id="ewallet-upload">
+        <p style="font-size:24px;margin-bottom:4px;">📱</p>
+        <p style="font-size:14px;">Upload e-wallet statement (PDF)</p>
+        <p class="text-muted" style="font-size:12px;margin-top:4px;">GCash recommended · PDF only</p>
+      </div>
+      <input type="file" accept="application/pdf,.pdf" hidden id="ewallet-file">
+
+      <div class="pdf-password-block" id="pwd-block" style="display:none;">
+        <label class="form-label" for="pdf-pwd">PDF password</label>
+        <input class="form-input" type="password" id="pdf-pwd" placeholder="Enter PDF password" autocomplete="off">
+        <p class="text-muted enhance-upload-hint">If the PDF has a password, please submit your password for a higher credit limit.</p>
+      </div>
+
+      <div class="enhance-detail-footer">
+        <button type="button" class="btn btn-primary" id="btn-save" disabled>Save</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+  <script>
+    if (!AppState.requireAuth()) throw '';
+
+    const KEY = 'gcash';
+    const saved = AppState.getEnhanceItems()[KEY] || {};
+    let fileName = saved.fileName || '';
+
+    document.getElementById('btn-back').addEventListener('click', () => AppState.go('kyc-enhance.html'));
+
+    function isPdf(file) {
+      const name = (file.name || '').toLowerCase();
+      return file.type === 'application/pdf' || name.endsWith('.pdf');
+    }
+
+    function setDoneUI(name) {
+      const zone = document.getElementById('ewallet-upload');
+      zone.classList.add('done');
+      zone.innerHTML = `<p style="font-size:28px;">✓</p>
+        <p style="font-size:14px;">Uploaded</p>
+        <p class="text-muted" style="font-size:12px;margin-top:4px;">${name || 'document.pdf'}</p>`;
+      document.getElementById('pwd-block').style.display = 'block';
+      document.getElementById('btn-save').disabled = false;
+    }
+
+    document.getElementById('ewallet-upload').addEventListener('click', () => {
+      document.getElementById('ewallet-file').click();
+    });
+
+    document.getElementById('ewallet-file').addEventListener('change', () => {
+      const file = document.getElementById('ewallet-file').files?.[0];
+      if (!file) return;
+      if (!isPdf(file)) {
+        const zone = document.getElementById('ewallet-upload');
+        zone.classList.remove('done');
+        zone.innerHTML = `<p style="font-size:24px;margin-bottom:4px;">📱</p>
+          <p style="font-size:14px;">Upload PDF only</p>
+          <p class="form-error show" style="display:block;margin-top:8px;">Please upload a PDF file.</p>`;
+        fileName = '';
+        document.getElementById('pwd-block').style.display = 'none';
+        document.getElementById('btn-save').disabled = true;
+      } else {
+        fileName = file.name;
+        setDoneUI(fileName);
+      }
+      document.getElementById('ewallet-file').value = '';
+    });
+
+    document.getElementById('btn-save').addEventListener('click', () => {
+      if (!fileName) return;
+      AppState.setEnhanceItem(KEY, {
+        done: true,
+        fileName,
+        hasPassword: !!document.getElementById('pdf-pwd').value
+      });
+      AppState.go('kyc-enhance.html');
+    });
+
+    if (saved.done && saved.fileName) {
+      setDoneUI(saved.fileName);
+    }
+  </script>
+</body>
+</html>

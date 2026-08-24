@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>SahodNow — Borrow</title>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <div class="app-shell no-nav">
+    <div class="page-header">
+      <button class="back-btn" onclick="AppState.exitBorrow()" aria-label="Back">
+        <svg width="20" height="20" viewBox="0 0 20 20"><path d="M12 4l-6 6 6 6" stroke="#141413" stroke-width="1.5" fill="none"/></svg>
+      </button>
+      <div>
+        <h2>Borrow</h2>
+      </div>
+    </div>
+
+    <div class="page-content">
+      <div class="card" style="margin-bottom:16px;">
+        <label class="form-label">Loan amount</label>
+        <p style="font-size:36px;font-weight:500;letter-spacing:-0.02em;" id="amount-display">₱5,000</p>
+        <input type="range" class="amount-slider" id="amount-slider" min="500" max="10000" step="100" value="5000">
+        <div style="display:flex;justify-content:space-between;" class="text-muted">
+          <span>₱1,000</span>
+          <span id="max-amount">₱10,000</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Installments</label>
+        <div class="chip-group" id="term-chips">
+          <button type="button" class="chip" data-periods="1">1</button>
+          <button type="button" class="chip" data-periods="2">2</button>
+          <button type="button" class="chip selected" data-periods="3">3</button>        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="form-label-bar">
+          <label class="form-label">Repayment date</label>
+          <span class="form-label-hint" id="due-date-hint"></span>
+        </div>
+        <div class="chip-group" id="date-chips">
+          <button type="button" class="chip selected" data-due="disburse">Disbursement day</button>
+          <button type="button" class="chip" data-due="15">15th</button>
+          <button type="button" class="chip" data-due="30">30th</button>
+        </div>
+      </div>
+
+      <div class="order-summary">
+        <div class="order-summary-row">
+          <span class="label">Monthly rate</span>
+          <span class="value">12%</span>
+        </div>
+        <div class="order-summary-row order-summary-row--first-due">
+          <span class="label">
+            <span class="form-label-row">First installment due              <button type="button" class="help-btn" id="btn-interest-help" aria-label="Repayment terms">?</button>
+            </span>
+          </span>
+          <div class="order-first-due-right">
+            <p class="order-first-amount" id="sum-first-amount">₱2,472</p>
+            <button type="button" class="order-plan-link" id="btn-view-plan">Repayment plan ›</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <p class="form-label" style="margin:0;">Payout account</p>
+            <p style="font-weight:500;margin-top:4px;" id="payout-display">GCash ·••• 4521</p>
+          </div>
+          <button type="button" class="btn btn-secondary" style="width:auto;padding:8px 16px;min-height:40px;font-size:14px;" id="btn-change-payout">Change</button>
+        </div>
+      </div>
+
+      <button type="button" class="btn btn-primary" id="btn-confirm">Confirm Borrow</button>
+    </div>
+  </div>
+
+  <!-- Repayment terms -->
+  <div class="overlay" id="interest-overlay">
+    <div class="sheet sheet-half">
+      <div class="sheet-handle"></div>
+      <h3 class="id-more-sheet-title">Repayment terms</h3>
+      <p class="id-more-sheet-desc">How we calculate your loan, early payoff, and late fees.</p>
+      <div class="interest-rules-text">
+        <section class="interest-rules-section">
+          <h4>Interest calculation</h4>
+          <ul>
+            <li>Equal principal &amp; equal interest — the same principal each installment; interest is based on your original loan amount.</li>
+            <li>First installment: daily interest for the actual days until your first due date (10–40 days) on the full principal.</li>
+            <li>Later installments: fixed monthly interest on the full principal, plus the service fee shown in your plan.</li>
+            <li>If fewer than 10 days remain to the next due date, your first payment moves to the following billing period.</li>
+          </ul>
+        </section>
+        <section class="interest-rules-section">
+          <h4>Early repayment</h4>
+          <p>If you pay off your loan early, the <strong>full principal, interest, and fees</strong> for all remaining installments are still charged. There is no discount for early payoff at this time.</p>
+        </section>
+        <section class="interest-rules-section">
+          <h4>Late payment penalties</h4>
+          <ul>
+            <li>Penalty interest: <strong>0.16% per day</strong>, up to <strong>5% per month</strong>.</li>
+            <li>Total penalties are capped at <strong>1× your loan principal</strong>.</li>
+          </ul>
+        </section>
+      </div>
+      <button type="button" class="btn btn-secondary" style="margin-top:20px;" onclick="AppState.hideOverlay('interest-overlay')">Got it</button>
+    </div>
+  </div>
+
+  <!-- Repayment plan -->
+  <div class="overlay" id="plan-overlay">
+    <div class="sheet sheet-half">
+      <div class="sheet-handle"></div>
+      <h3 style="font-size:18px;font-weight:500;margin-bottom:16px;">Repayment plan</h3>
+
+      <div class="plan-sheet-summary">
+        <div class="plan-sheet-stat">
+          <label>Disbursed</label>
+          <strong id="plan-disbursed">₱20,000</strong>
+        </div>
+        <div class="plan-sheet-stat">
+          <label>Total due</label>
+          <strong id="plan-total">₱21,180</strong>
+        </div>
+      </div>
+
+      <div id="plan-installments"></div>
+      <button type="button" class="btn btn-secondary" style="margin-top:8px;" onclick="AppState.hideOverlay('plan-overlay')">Close</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="agreement-overlay">
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <p class="eyebrow"><span class="dot">•</span> Legal</p>
+      <h2 style="margin:8px 0 16px;">Loan Agreement</h2>
+      <div class="agreement-text">
+        <p><strong>REVOLVING CREDIT LOAN AGREEMENT</strong></p>
+        <p style="margin-top:12px;">This Agreement is entered into between SahodNow Lending Inc. (SEC Registration No. CS2019XXXX) and the Borrower identified in the KYC records.</p>
+        <p style="margin-top:12px;"><strong>1. Credit Line.</strong> Borrower is granted a revolving credit facility up to the approved limit. Each draw creates a separate loan subject to the terms selected at disbursement.</p>
+        <p style="margin-top:12px;"><strong>2. Interest &amp; Fees.</strong> Interest and service fees apply as disclosed in the repayment plan and Schedule of Fees.</p>
+        <p style="margin-top:12px;"><strong>3. Repayment.</strong> Borrower shall repay on the fixed due date selected each billing period. Early repayment is permitted without penalty.</p>
+        <p style="margin-top:12px;"><strong>4. Default.</strong> Failure to pay within 7 days of due date constitutes default. SahodNow may report to credit bureaus and engage collection agencies.</p>
+        <p style="margin-top:12px;"><strong>5. Data Privacy.</strong> Personal data processed per RA 10173 and our Privacy Policy.</p>
+      </div>
+      <div class="consent-row">
+        <input type="checkbox" id="agree-loan">
+        <label for="agree-loan">I have read and agree to the Loan Agreement and Schedule of Fees</label>
+      </div>
+      <button type="button" class="btn btn-consent" id="btn-sign" disabled>Sign &amp; Submit Application</button>
+      <button type="button" class="btn btn-secondary" style="margin-top:12px;" onclick="AppState.hideOverlay('agreement-overlay')">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Payout account picker -->
+  <div class="overlay" id="payout-picker-overlay">
+    <div class="sheet sheet-half">
+      <div class="sheet-handle"></div>
+      <h3 class="id-more-sheet-title">Select payout account</h3>
+      <p class="id-more-sheet-desc">Choose where to receive your loan.</p>
+      <div class="payout-picker-list" id="payout-picker-list"></div>
+      <button type="button" class="btn btn-secondary payout-picker-add" id="btn-payout-add-new">Add new account</button>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+  <script>
+    if (!AppState.requireApproved()) throw '';
+
+    const MONTHLY_RATE = 0.12;
+    const DAILY_RATE = MONTHLY_RATE / 30;
+    const FEE_PER_PERIOD = 50;
+
+    const AMOUNT_MIN = 1000;
+    const AMOUNT_MAX = 10000;
+    const AMOUNT_STEP = 100;
+
+    const available = AppState.getAvailableCredit();
+    const slider = document.getElementById('amount-slider');
+    const sliderMax = Math.max(AMOUNT_MIN, Math.min(AMOUNT_MAX, available));
+    slider.min = AMOUNT_MIN;
+    slider.max = sliderMax;
+    slider.step = AMOUNT_STEP;
+    slider.value = Math.min(5000, sliderMax);
+    slider.value = Math.round(slider.value / AMOUNT_STEP) * AMOUNT_STEP;
+    document.getElementById('max-amount').textContent = AppState.formatPHP(sliderMax);
+    function updatePayoutUI() {
+      const bound = AppState.isPayoutBound();
+      document.getElementById('payout-display').textContent =
+        bound ? AppState.getPayoutDisplay() : 'No account linked';
+      document.getElementById('btn-change-payout').textContent = bound ? 'Change' : 'Add';
+    }
+
+    function renderPayoutPicker() {
+      document.getElementById('payout-picker-list').innerHTML =
+        AppState.renderPayoutPickerList({ selectedId: AppState.getSelectedPayoutId() });
+      document.getElementById('payout-picker-list').querySelectorAll('[data-payout-id]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          AppState.setSelectedPayoutId(btn.dataset.payoutId);
+          updatePayoutUI();
+          AppState.hideOverlay('payout-picker-overlay');
+        });
+      });
+    }
+
+    updatePayoutUI();
+    window.addEventListener('pageshow', updatePayoutUI);
+
+    let periods = 3;
+    let dueType = 'disburse';
+
+    function daysInMonth(y, m) {
+      return new Date(y, m + 1, 0).getDate();
+    }
+
+    function daysBetween(a, b) {
+      return Math.max(0, Math.round((b - a) / 86400000));
+    }
+
+    function clampDay(y, m, day) {
+      return Math.min(day, daysInMonth(y, m));
+    }
+
+    function getTargetDay(dueType, disburse) {
+      if (dueType === 'disburse') return disburse.getDate();
+      if (dueType === '15') return 15;
+      return 30;
+    }
+
+    function nextDueFrom(disburse, dueType, afterDate) {
+      const targetDay = getTargetDay(dueType, disburse);
+      let y = afterDate.getFullYear();
+      let m = afterDate.getMonth();
+      let candidate = new Date(y, m, clampDay(y, m, targetDay));
+      if (candidate <= afterDate) {
+        m += 1;
+        if (m > 11) { m = 0; y += 1; }
+        candidate = new Date(y, m, clampDay(y, m, targetDay));
+      }
+      return candidate;
+    }
+
+    function computeFirstDue(disburse, dueType) {
+      let candidate = nextDueFrom(disburse, dueType, disburse);
+      if (daysBetween(disburse, candidate) < 10) {
+        candidate = nextDueFrom(disburse, dueType, candidate);
+      }
+      return candidate;
+    }
+
+    function nextPeriodDue(prevDue, disburse, dueType) {
+      return nextDueFrom(disburse, dueType, prevDue);
+    }
+
+    function getOrdinal(n) {
+      const s = ['th', 'st', 'nd', 'rd'];
+      const v = n % 100;
+      return s[(v - 20) % 10] || s[v] || s[0];
+    }
+
+    function getDueDay(dueType, disburse) {
+      if (dueType === 'disburse') return disburse.getDate();
+      if (dueType === '15') return 15;
+      return 30;
+    }
+
+    function getDueHint(dueType, disburse) {
+      const day = getDueDay(dueType, disburse);
+      return `${day}${getOrdinal(day)} each month`;
+    }
+
+    function getDueLabel(dueType, disburse) {
+      const day = getDueDay(dueType, disburse);
+      return `${day}${getOrdinal(day)}`;
+    }
+
+    function buildBillSchedule(principal, periodCount, dueType) {
+      const disburse = new Date();
+      disburse.setHours(0, 0, 0, 0);
+
+      const firstDue = computeFirstDue(disburse, dueType);
+      let firstPeriodDays = daysBetween(disburse, firstDue);
+      firstPeriodDays = Math.max(10, Math.min(40, firstPeriodDays));
+
+      // Equal principal & equal interest (等本等息)
+      const equalPrincipal = Math.floor(principal / periodCount);
+      const equalPeriodInterest = Math.round(principal * MONTHLY_RATE);
+
+      const plan = [];
+
+      for (let i = 1; i <= periodCount; i++) {
+        let dueDate;
+        let periodDays;
+        let interest;
+        const principalPart = i === periodCount
+          ? principal - equalPrincipal * (periodCount - 1)
+          : equalPrincipal;
+        const fee = FEE_PER_PERIOD;
+
+        if (i === 1) {
+          dueDate = firstDue;
+          periodDays = firstPeriodDays;
+          interest = Math.round(principal * DAILY_RATE * periodDays);
+        } else {
+          const prevDue = plan[i - 2].dueDateObj;
+          dueDate = nextPeriodDue(prevDue, disburse, dueType);
+          periodDays = daysBetween(prevDue, dueDate);
+          interest = equalPeriodInterest;
+        }
+
+        const payment = principalPart + interest + fee;
+
+        plan.push({
+          period: i,
+          dueDateObj: dueDate,
+          dueDate: AppState.formatDueDate(dueDate),
+          periodDays,
+          isFirst: i === 1,
+          payment,
+          principal: principalPart,
+          interest,
+          fee
+        });
+      }
+
+      return {
+        plan,
+        disburse,
+        disbursedAmount: principal,
+        totalRepayment: plan.reduce((s, p) => s + p.payment, 0),
+        firstPayment: plan[0].payment,
+        dueLabel: getDueLabel(dueType, disburse)
+      };
+    }
+
+    function renderPlanSheet(schedule) {
+      document.getElementById('plan-disbursed').textContent = AppState.formatPHP(schedule.disbursedAmount);
+      document.getElementById('plan-total').textContent = AppState.formatPHP(schedule.totalRepayment);
+      document.getElementById('plan-installments').innerHTML = AppState.renderRepayTimeline(
+        schedule.plan.map(p => ({
+          period: p.period,
+          dueShort: AppState.formatDueShort(p.dueDateObj),
+          payment: p.payment,
+          principal: p.principal,
+          interestFees: p.interest + p.fee,
+          state: p.period === 1 ? 'current' : 'upcoming'
+        }))
+      );
+    }
+
+    function updatePlan() {
+      const amount = Number(slider.value);
+      const schedule = buildBillSchedule(amount, periods, dueType);
+
+      document.getElementById('amount-display').textContent = AppState.formatPHP(amount);
+      document.getElementById('due-date-hint').textContent = getDueHint(dueType, schedule.disburse);
+      document.getElementById('sum-first-amount').textContent = AppState.formatPHP(schedule.firstPayment);
+
+      renderPlanSheet(schedule);
+    }
+
+    slider.addEventListener('input', updatePlan);
+
+    document.querySelectorAll('#term-chips .chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.querySelectorAll('#term-chips .chip').forEach(c => c.classList.remove('selected'));
+        chip.classList.add('selected');
+        periods = Number(chip.dataset.periods);
+        updatePlan();
+      });
+    });
+
+    document.querySelectorAll('#date-chips .chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.querySelectorAll('#date-chips .chip').forEach(c => c.classList.remove('selected'));
+        chip.classList.add('selected');
+        dueType = chip.dataset.due;
+        updatePlan();
+      });
+    });
+
+    document.getElementById('btn-interest-help').addEventListener('click', e => {
+      e.stopPropagation();
+      AppState.showOverlay('interest-overlay');
+    });
+
+    document.getElementById('interest-overlay').addEventListener('click', e => {
+      if (e.target.id === 'interest-overlay') AppState.hideOverlay('interest-overlay');
+    });
+
+    document.getElementById('btn-view-plan').addEventListener('click', () => {
+      AppState.showOverlay('plan-overlay');
+    });
+
+    document.getElementById('plan-overlay').addEventListener('click', e => {
+      if (e.target.id === 'plan-overlay') AppState.hideOverlay('plan-overlay');
+    });
+
+    document.getElementById('btn-change-payout').addEventListener('click', () => {
+      if (!AppState.isPayoutBound()) {
+        AppState.goPayoutManage('order');
+        return;
+      }
+      renderPayoutPicker();
+      AppState.showOverlay('payout-picker-overlay');
+    });
+
+    document.getElementById('payout-picker-overlay').addEventListener('click', e => {
+      if (e.target.id === 'payout-picker-overlay') AppState.hideOverlay('payout-picker-overlay');
+    });
+
+    document.getElementById('btn-payout-add-new').addEventListener('click', () => {
+      AppState.hideOverlay('payout-picker-overlay');
+      AppState.goPayoutAdd({ from: 'order', dest: 'order' });
+    });
+
+    document.getElementById('btn-confirm').addEventListener('click', () => {
+      AppState.showOverlay('agreement-overlay');
+    });
+
+    document.getElementById('agree-loan').addEventListener('change', e => {
+      document.getElementById('btn-sign').disabled = !e.target.checked;
+    });
+
+    document.getElementById('btn-sign').addEventListener('click', () => {
+      const amount = Number(slider.value);
+      AppState.set(AppState.KEYS.loanAmount, amount);
+      const selected = AppState.getSelectedPayoutAccount();
+      if (selected) AppState.setSelectedPayoutId(selected.id);
+      AppState.setLoanAppliedAt(Date.now());
+      AppState.setLoanFlowState('listing-review');
+      AppState.hideOverlay('agreement-overlay');
+      AppState.go('listing-review.html?amount=' + amount);
+    });
+
+    updatePlan();
+  </script>
+</body>
+</html>

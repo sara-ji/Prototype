@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>SahodNow — Payout Accounts</title>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <div class="app-shell no-nav">
+    <div class="page-header">
+      <button class="back-btn" id="btn-back" aria-label="Back">
+        <svg width="20" height="20" viewBox="0 0 20 20"><path d="M12 4l-6 6 6 6" stroke="#141413" stroke-width="1.5" fill="none"/></svg>
+      </button>
+      <div>
+        <h2>Payout accounts</h2>
+      </div>
+    </div>
+
+    <div class="page-content">
+      <p class="text-muted" style="margin-bottom:20px;font-size:14px;">
+        Manage accounts for loan disbursement. The selected account is used when you borrow.
+      </p>
+
+      <div class="payout-account-list" id="account-list" role="listbox" aria-label="Payout accounts"></div>
+
+      <button type="button" class="btn btn-primary" id="btn-add" style="margin-top:24px;">Add account</button>
+    </div>
+  </div>
+  <script src="js/app.js"></script>
+  <script>
+    if (!AppState.requireAuth()) throw '';
+
+    const params = new URLSearchParams(location.search);
+    const dest = params.get('from') || 'home';
+
+    function renderList() {
+      const list = document.getElementById('account-list');
+      const accounts = AppState.getPayoutAccounts();
+      const selectedId = AppState.getSelectedPayoutId();
+      if (!accounts.length) {
+        list.innerHTML = '<p class="text-muted" style="text-align:center;padding:24px 0;">No accounts linked yet.</p>';
+        return;
+      }
+      list.innerHTML = accounts.map(acc => {
+        const subtitle = acc.type === 'bank' ? 'Bank account' : 'E-wallet';
+        const selected = acc.id === selectedId;
+        return `<button type="button" class="payout-account-card${selected ? ' selected' : ''}" data-id="${acc.id}" role="option" aria-selected="${selected}">
+          <span class="payout-account-card__icon">${acc.type === 'bank' ? '🏦' : '📱'}</span>
+          <span class="payout-account-card__main">
+            <span class="payout-account-card__title">${acc.display}</span>
+            <span class="payout-account-card__sub">${subtitle}</span>
+          </span>
+          ${selected ? '<span class="payout-account-card__badge">Default</span>' : ''}
+        </button>`;
+      }).join('');
+
+      list.querySelectorAll('.payout-account-card').forEach(btn => {
+        btn.addEventListener('click', () => {
+          AppState.setSelectedPayoutId(btn.dataset.id);
+          renderList();
+        });
+      });
+    }
+
+    document.getElementById('btn-back').addEventListener('click', () => {
+      AppState.returnFromPayoutAccounts(dest);
+    });
+
+    document.getElementById('btn-add').addEventListener('click', () => {
+      AppState.goPayoutAdd({ from: 'payout-accounts', dest });
+    });
+
+    renderList();
+    window.addEventListener('pageshow', renderList);
+  </script>
+</body>
+</html>

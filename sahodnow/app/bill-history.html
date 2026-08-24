@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>SahodNow — Statement history</title>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <div class="app-shell no-nav">
+    <div class="page-header">
+      <button class="back-btn" onclick="AppState.go('bill.html')" aria-label="Back">
+        <svg width="20" height="20" viewBox="0 0 20 20"><path d="M12 4l-6 6 6 6" stroke="#141413" stroke-width="1.5" fill="none"/></svg>
+      </button>
+      <div>
+        <h2>Statement history</h2>
+        <p class="text-muted" style="margin:4px 0 0;font-size:13px;">Past monthly statements</p>
+      </div>
+    </div>
+
+    <div class="page-content" style="padding-top:8px;">
+      <div id="history-list"></div>
+      <div id="history-empty" style="display:none;text-align:center;padding:36px 0;">
+        <p style="font-size:44px;margin-bottom:12px;">🧾</p>
+        <h3 style="margin-bottom:8px;">No statements yet</h3>
+        <p class="text-muted">Paid monthly bills will appear here.</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+  <script>
+    if (!AppState.requireApproved()) throw '';
+
+    const listEl = document.getElementById('history-list');
+    const emptyEl = document.getElementById('history-empty');
+    const statements = AppState.getStatementHistory();
+
+    function renderLine(line) {
+      return `
+        <div class="bill-history-line" role="button" tabindex="0"
+          onclick="AppState.go('loan-detail.html?id=${encodeURIComponent(line.loanId)}&from=bill-history')"
+          onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();AppState.go('loan-detail.html?id=${encodeURIComponent(line.loanId)}&from=bill-history')}">
+          <div>
+            <p class="bill-history-line__name">${line.name}</p>
+            <p class="bill-history-line__inst">${line.instText}</p>
+          </div>
+          <div class="bill-history-line__right">
+            <p class="amount">${AppState.formatPHP(line.amount)}</p>
+            <span class="status paid">${line.status}</span>
+          </div>
+        </div>`;
+    }
+
+    if (!statements.length) {
+      emptyEl.style.display = 'block';
+    } else {
+      emptyEl.style.display = 'none';
+      listEl.innerHTML = statements.map((st, idx) => `
+        <div class="bill-history-month">
+          <button type="button" class="bill-history-month__head" aria-expanded="${idx === 0 ? 'true' : 'false'}" data-toggle-month>
+            <div>
+              <p class="bill-history-month__due">Due ${st.dueLabel || st.title}</p>
+              <p class="bill-history-month__paid">Paid · ${st.lines.length} installment${st.lines.length === 1 ? '' : 's'}</p>
+            </div>
+            <div class="bill-history-month__total">
+              <strong>${AppState.formatPHP(st.total)}</strong>
+              <span class="bill-history-month__chevron" aria-hidden="true">›</span>
+            </div>
+          </button>
+          <div class="bill-history-month__body"${idx === 0 ? '' : ' hidden'}>
+            ${(st.lines || []).map(renderLine).join('')}
+          </div>
+        </div>
+      `).join('');
+
+      listEl.querySelectorAll('[data-toggle-month]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const body = btn.nextElementSibling;
+          const open = btn.getAttribute('aria-expanded') === 'true';
+          btn.setAttribute('aria-expanded', open ? 'false' : 'true');
+          body.hidden = open;
+        });
+      });
+    }
+  </script>
+</body>
+</html>

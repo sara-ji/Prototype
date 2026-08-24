@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>SahodNow — PRC ID</title>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <div class="app-shell no-nav">
+    <div class="page-header">
+      <button class="back-btn" id="btn-back" aria-label="Back">
+        <svg width="20" height="20" viewBox="0 0 20 20"><path d="M12 4l-6 6 6 6" stroke="#141413" stroke-width="1.5" fill="none"/></svg>
+      </button>
+      <div>
+        <h2>PRC ID</h2>
+      </div>
+    </div>
+
+    <div class="page-content enhance-detail">
+      <div class="upload-zone" id="prc-upload">
+        <p style="font-size:24px;margin-bottom:4px;">🪪</p>
+        <p style="font-size:14px;">Upload PRC ID photo</p>
+      </div>
+      <p class="enhance-note enhance-note--warn">Requires 100% manual review — this will slow down your limit approval.</p>
+
+      <div class="enhance-detail-footer">
+        <button type="button" class="btn btn-primary" id="btn-save" disabled>Save</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+  <script>
+    if (!AppState.requireAuth()) throw '';
+
+    const KEY = 'prc';
+    const saved = AppState.getEnhanceItems()[KEY] || {};
+    let uploaded = !!saved.done;
+
+    document.getElementById('btn-back').addEventListener('click', () => AppState.go('kyc-enhance.html'));
+
+    function setDoneUI() {
+      const zone = document.getElementById('prc-upload');
+      zone.classList.add('done');
+      zone.innerHTML = '<p style="font-size:28px;">✓</p><p style="font-size:14px;">Uploaded</p>';
+      document.getElementById('btn-save').disabled = false;
+      uploaded = true;
+    }
+
+    document.getElementById('prc-upload').addEventListener('click', function () {
+      if (this.classList.contains('done')) return;
+      setDoneUI();
+    });
+
+    document.getElementById('btn-save').addEventListener('click', () => {
+      if (!uploaded) return;
+      AppState.setEnhanceItem(KEY, { done: true });
+      AppState.go('kyc-enhance.html');
+    });
+
+    if (saved.done) setDoneUI();
+  </script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>SahodNow — Credit Not Approved</title>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <div class="app-shell no-nav">
+    <div class="page-header">
+      <button class="back-btn" onclick="AppState.go('home.html')" aria-label="Back to Home">
+        <svg width="20" height="20" viewBox="0 0 20 20"><path d="M12 4l-6 6 6 6" stroke="#141413" stroke-width="1.5" fill="none"/></svg>
+      </button>
+      <div>
+        <h2>Credit assessment</h2>
+      </div>
+    </div>
+
+    <div class="page-content" style="padding-top:24px;">
+      <div style="text-align:center;">
+        <div class="fail-icon">✕</div>
+        <h2 style="margin-bottom:8px;">Credit not approved</h2>
+        <p class="text-muted review-reject-reason" id="credit-reject-reason" style="max-width:320px;margin:0 auto 24px;"></p>
+      </div>
+
+      <div class="card" style="margin-bottom:24px;">
+        <div class="plan-row">
+          <span class="text-muted">Reviewed on</span>
+          <span style="font-weight:500;" id="credit-rej-date">—</span>
+        </div>
+        <div class="plan-row">
+          <span class="text-muted">Credit limit</span>
+          <span style="font-weight:500;">Not available</span>
+        </div>
+        <div class="plan-row">
+          <span class="text-muted">Reapply from</span>
+          <span style="font-weight:500;" id="credit-rej-reapply">—</span>
+        </div>
+        <div class="plan-row" id="cooldown-row">
+          <span class="text-muted">Cool-down period</span>
+          <span style="font-weight:500;" id="credit-rej-cooldown">—</span>
+        </div>
+      </div>
+
+      <button type="button" class="btn btn-primary" id="btn-reapply" style="display:none;width:100%;margin-bottom:12px;">Apply again</button>
+      <button type="button" class="btn btn-secondary" style="width:100%;" onclick="AppState.go('home.html')">Back to Home</button>
+    </div>
+  </div>
+  <script src="js/app.js"></script>
+  <script>
+    if (!AppState.requireAuth()) throw '';
+    if (AppState.get(AppState.KEYS.kycStep) !== 'rejected') {
+      AppState.go('home.html');
+      throw '';
+    }
+
+    const meta = AppState.getCreditRejectMeta();
+    document.getElementById('credit-reject-reason').textContent = meta.reason;
+    document.getElementById('credit-rej-date').textContent = AppState.formatCreditDate(meta.reviewedAt);
+    document.getElementById('credit-rej-reapply').textContent = AppState.formatCreditDate(meta.reapplyAt);
+    document.getElementById('credit-rej-cooldown').textContent = `${meta.cooldownDays} days`;
+
+    const reapplyBtn = document.getElementById('btn-reapply');
+    if (meta.canReapply) {
+      reapplyBtn.style.display = 'block';
+      reapplyBtn.addEventListener('click', () => AppState.reapplyCredit());
+    }
+  </script>
+</body>
+</html>

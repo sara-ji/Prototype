@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>SahodNow — Customer service</title>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <div class="app-shell no-nav">
+    <div class="page-header">
+      <button class="back-btn" id="btn-back" aria-label="Back">
+        <svg width="20" height="20" viewBox="0 0 20 20"><path d="M12 4l-6 6 6 6" stroke="#141413" stroke-width="1.5" fill="none"/></svg>
+      </button>
+      <h2>Customer service</h2>
+    </div>
+
+    <div class="page-content" style="padding-top:8px;">
+      <p class="support-lead">
+        Need help with your account, loan, or repayment? Reach our support team through the channels below.
+        SahodNow does not offer in-app live chat in phase one.
+      </p>
+
+      <div class="support-contact-card">
+        <div class="support-contact-icon" aria-hidden="true">📞</div>
+        <div class="support-contact-meta" style="flex:1;">
+          <label>Hotline</label>
+          <strong id="support-phone"></strong>
+          <button type="button" class="btn btn-secondary" id="btn-call" style="width:auto;padding:8px 16px;font-size:14px;">Call now</button>
+        </div>
+      </div>
+
+      <div class="support-contact-card">
+        <div class="support-contact-icon" aria-hidden="true">✉️</div>
+        <div class="support-contact-meta" style="flex:1;">
+          <label>Email</label>
+          <strong id="support-email"></strong>
+          <button type="button" class="btn btn-secondary" id="btn-email" style="width:auto;padding:8px 16px;font-size:14px;">Send email</button>
+        </div>
+      </div>
+
+      <p class="support-hours" id="support-hours"></p>
+
+      <div class="card">
+        <p class="form-label" style="margin-bottom:10px;">Before you call</p>
+        <div class="plan-row">
+          <span class="text-muted">Account</span>
+          <span style="font-weight:500;">Registered mobile number</span>
+        </div>
+        <div class="plan-row">
+          <span class="text-muted">Security</span>
+          <span style="font-weight:500;">Never share OTP or PIN</span>
+        </div>
+        <div class="plan-row">
+          <span class="text-muted">Repayment</span>
+          <span style="font-weight:500;">Use official in-app channels only</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+  <script>
+    if (!AppState.isPrivacyAccepted()) AppState.go('index.html');
+
+    const params = new URLSearchParams(location.search);
+    const backTarget = params.get('from') === 'home' ? 'home.html' : 'profile.html';
+    document.getElementById('btn-back').addEventListener('click', () => AppState.go(backTarget));
+
+    const phone = AppState.SUPPORT_PHONE;
+    const email = AppState.SUPPORT_EMAIL;
+    document.getElementById('support-phone').textContent = phone;
+    document.getElementById('support-email').textContent = email;
+    document.getElementById('support-hours').textContent = `Service hours: ${AppState.SUPPORT_HOURS}`;
+
+    document.getElementById('btn-call').addEventListener('click', () => {
+      window.location.href = `tel:${phone.replace(/\s/g, '')}`;
+    });
+
+    document.getElementById('btn-email').addEventListener('click', () => {
+      const user = AppState.getUser();
+      const subject = encodeURIComponent('SahodNow support request');
+      const body = encodeURIComponent(
+        `Hi SahodNow support,\n\nI need help with:\n\nRegistered number: ${user?.phone || ''}\n\n`
+      );
+      window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+    });
+  </script>
+</body>
+</html>

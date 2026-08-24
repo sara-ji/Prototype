@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SahodNow 新 App · 方案确认同步</title>
+  <style>
+    :root {
+      --bg: #f6f4f1;
+      --paper: #ffffff;
+      --ink: #1a1a19;
+      --muted: #6b6560;
+      --line: rgba(26, 26, 25, 0.08);
+      --accent: #cf4500;
+      --accent-soft: #fff4ee;
+      --confirm: #8b6914;
+      --confirm-soft: #faf6eb;
+      --link: #0b57d0;
+      --radius: 14px;
+      --shadow: 0 8px 32px rgba(26, 26, 25, 0.06);
+      --font: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: var(--font);
+      color: var(--ink);
+      background: var(--bg);
+      line-height: 1.65;
+      font-size: 15px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 240px minmax(0, 820px);
+      gap: 32px;
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 32px 24px 80px;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 24px;
+      align-self: start;
+    }
+
+    .sidebar-inner {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 18px 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .sidebar h2 {
+      margin: 0 0 12px;
+      font-size: 13px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .sidebar a {
+      display: block;
+      padding: 7px 10px;
+      margin: 2px 0;
+      color: var(--ink);
+      text-decoration: none;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    .sidebar a:hover { background: var(--bg); }
+
+    main { min-width: 0; }
+
+    .hero {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 32px 36px;
+      box-shadow: var(--shadow);
+      margin-bottom: 24px;
+    }
+
+    .hero .eyebrow {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin: 0 0 10px;
+    }
+
+    .hero h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+
+    .hero .meta {
+      color: var(--muted);
+      font-size: 13px;
+      margin: 0 0 18px;
+    }
+
+    .hero .lede {
+      margin: 0;
+      color: #3d3a37;
+      max-width: 62em;
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 18px;
+    }
+
+    .tag {
+      font-size: 12px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: #9a3412;
+      font-weight: 600;
+    }
+
+    section {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 28px 32px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    section h2 {
+      margin: 0 0 6px;
+      font-size: 20px;
+      letter-spacing: -0.01em;
+    }
+
+    section .section-desc {
+      margin: 0 0 20px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    h3 {
+      margin: 22px 0 10px;
+      font-size: 16px;
+    }
+
+    h3:first-of-type { margin-top: 0; }
+
+    p { margin: 0 0 12px; }
+
+    ul, ol { margin: 0 0 14px; padding-left: 1.25em; }
+    li { margin: 4px 0; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      margin: 12px 0 4px;
+    }
+
+    th, td {
+      border: 1px solid var(--line);
+      padding: 10px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: #faf9f7;
+      font-weight: 600;
+      width: 28%;
+    }
+
+    .highlight-grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .highlight-card {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 16px 18px;
+      background: #fcfbfa;
+    }
+
+    .highlight-card.confirm {
+      border-color: rgba(139, 105, 20, 0.28);
+      background: var(--confirm-soft);
+    }
+
+    .highlight-card h3 {
+      margin: 0 0 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(139, 105, 20, 0.14);
+      color: var(--confirm);
+      letter-spacing: 0.03em;
+    }
+
+    .badge.tbd {
+      background: rgba(107, 101, 96, 0.12);
+      color: var(--muted);
+    }
+
+    .btn-journey {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 16px;
+      padding: 10px 18px;
+      border-radius: 999px;
+      background: var(--accent);
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    .btn-journey:hover { filter: brightness(1.06); }
+
+    .link-card {
+      display: block;
+      padding: 18px 20px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: #faf9f7;
+      text-decoration: none;
+      color: inherit;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .link-card:hover {
+      border-color: rgba(11, 87, 208, 0.25);
+      box-shadow: 0 4px 16px rgba(11, 87, 208, 0.08);
+    }
+
+    .link-card strong {
+      display: block;
+      color: var(--link);
+      margin-bottom: 4px;
+      font-size: 15px;
+    }
+
+    .link-card span {
+      font-size: 13px;
+      color: var(--muted);
+      word-break: break-all;
+    }
+
+    .flow {
+      font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.7;
+      padding: 14px 16px;
+      background: #faf9f7;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      overflow-x: auto;
+      white-space: pre;
+      margin: 12px 0;
+    }
+
+    .note {
+      padding: 12px 14px;
+      border-left: 3px solid var(--accent);
+      background: var(--accent-soft);
+      border-radius: 0 8px 8px 0;
+      font-size: 14px;
+      margin: 14px 0 0;
+    }
+
+    .note.muted {
+      border-left-color: #c8c2bc;
+      background: #f3f1ee;
+      color: var(--muted);
+    }
+
+    .checklist {
+      list-style: none;
+      padding: 0;
+      margin: 10px 0 0;
+    }
+
+    .checklist li {
+      padding: 8px 0;
+      border-bottom: 1px dashed var(--line);
+      font-size: 14px;
+    }
+
+    .checklist li:last-child { border-bottom: none; }
+
+    .footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+      padding: 24px 0 8px;
+    }
+
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; padding: 16px 16px 48px; }
+      .sidebar { position: static; }
+      .hero, section { padding: 22px 20px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-inner">
+        <h2>目录</h2>
+        <a href="#context">产品简介</a>
+        <a href="#audience">目标用户</a>
+        <a href="#stories">用户故事</a>
+        <a href="#journey">用户旅程</a>
+        <a href="#highlights">方案要点</a>
+        <a href="#scope">一期功能范围</a>
+        <a href="#open">待确认项</a>
+      </div>
+    </aside>
+
+    <main>
+      <header class="hero">
+        <p class="eyebrow">Final alignment</p>
+        <h1>SahodNow 新 App · 方案确认同步</h1>
+        <p class="meta">用途：与老板 / 业务方确认最终方案 · 2026-06-17 · 原型品牌名 SahodNow（正式名称待定稿）</p>
+        <p class="lede">
+          参会方已了解项目方向，本文档<strong>不展开背景、价值、经营目标等</strong>，仅用于对齐：为谁做、讲什么故事、走什么流程、哪些方案需要当场拍板
+        </p>
+      </header>
+
+      <section id="context">
+        <h2>产品简介</h2>
+        <ul>
+          <li><strong>产品形态</strong>：独立主体的循环额度 CashLoan，目标上浮客群</li>
+          <li><strong>差异化方向</strong>：相对 JuanHand 大众急用钱定位，面向<strong>有稳定月薪、可证明收入</strong>的工薪客群，强调更优 offer、还款可控、尊享体验。</li>
+         
+        </ul>
+      </section>
+
+      <section id="audience">
+        <h2>1. 目标用户</h2>
+      
+        <table>
+          <tr>
+            <th>是谁</th>
+            <td>菲律宾<strong>工薪阶层</strong>：BPO、零售、餐饮、工厂、小企业职员等，有<strong>稳定月薪</strong>与可预期的还款来源。</td>
+          </tr>
+          <tr>
+            <th>不是什么</th>
+            <td>无收入、学生、高频共债、「只要能借到钱」人群。</td>
+          </tr>
+          <tr>
+            <th>一句话</th>
+            <td>有稳定工资，偶尔周转；要更优 offer、透明定价、可靠品牌与隐私保护。</td>
+          </tr>
+          <tr>
+            <th>典型动机</th>
+            <td>发薪间隔周转、账单衔接（房租/水电/话费/信用卡最低还款）、短期家庭支出、计划内小额分期——本质是<strong>现金流时间差</strong>，非长期失去还款能力。</td>
+          </tr>
+          <tr>
+            <th>核心诉求</th>
+            <td>
+              <ul style="margin:0;padding-left:1.2em;">
+                <li>成本可控，比普通贷款更划算</li>
+                <li>掌控感：还款日 &amp; 月账单清晰，对自己的负债有明确认知</li>
+                <li>优质体验，更少的催收骚扰</li>
+                <li>安全、隐私有保障</li>
+                <li>备用金，额度可成长</li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <th>品牌slogen取向</th>
+            <td>
+              <ul style="margin:0;padding-left:1.2em;">
+                <li>避开「秒批 / 人人能借」式急用钱话术</li>
+                <li><em>Better offer for salaried workers</em></li>
+                <li><strong>发薪前的应急周转</strong></li>
+                <li><em>Bridge the gap until payday</em></li>
+              </ul>
+            </td>
+          </tr>
+        </table>
+      </section>
+
+      <section id="stories">
+        <h2>2. 用户故事</h2>
+
+        <h3>故事主线</h3>
+        <table>
+          <tr><th>主线</th><th>用户故事（摘要）</th><th>关键兑现节点</th></tr>
+          <tr>
+            <td><strong>A · 更优 offer</strong>（拉新主故事）</td>
+            <td>被高息贷伤过的工薪族，希望广告与打开后看到的额度/利率一致，愿意完成填资。</td>
+            <td>戳额结果页 — <strong>广告兑现时刻</strong></td>
+          </tr>
+          <tr>
+            <td><strong>B · 还款可控</strong>（工薪差异化）</td>
+            <td>固定月薪用户希望还款日固定、月账单清楚，借款前看清每期金额。</td>
+            <td>发标还款计划、账单首页</td>
+          </tr>
+          <tr>
+            <td><strong>C · 优客身份</strong>（增信动机）</td>
+            <td>愿上传收入证明换取更高额度或更低利率，觉得多填几步值得。</td>
+            <td>增信页、戳额结果（有/无增信档位差异）</td>
+          </tr>
+          <tr>
+            <td><strong>D · 信任合规</strong>（辅线）</td>
+            <td>首次下载金融 App，需知数据用途与主体正规，才敢授权。</td>
+            <td>隐私弹窗、关于我们 / 持牌主体</td>
+          </tr>
+          <tr>
+            <td><strong>E · 复借留存</strong>（辅线）</td>
+            <td>按时还清后额度恢复、再借更省事，良好记录带来成长权益。</td>
+            <td>还清成功页、首页、再营销（与拉新分池）</td>
+          </tr>
+        </table>
+
+        <div class="note muted">文案锚点详见用户故事文档「全旅程文案锚点」表；禁止承诺清单（秒批、100% 通过、固定提额等）两边共用。</div>
+      </section>
+
+      <section id="journey">
+        <h2>3. 用户旅程</h2>
+        <p class="section-desc">来源：<code>000-用户故事.md</code> §4 旅程总览；页面级原型见下方链接。</p>
+
+        <div class="flow">广告/素材 → 商店/落地页 → 首次打开 → 注册 → 填资&增信 → 戳额结果 → 发标 → 放款 → 还款/复借
+     │            │            │         │         │           │        │       │
+     └────────────┴────────────┴─────────┴─────────┴───────────┴────────┴───────┘
+                         同一套话术 & 视觉语言贯穿</div>
+
+        <div class="note" style="margin:20px 0;padding:16px 18px;background:var(--accent-soft);border:1px solid rgba(207,69,0,0.15);border-radius:var(--radius);">
+          <p style="margin:0 0 10px;font-weight:600;color:var(--accent);">下午讲 User Journey 时建议 Highlight 的主要区别</p>
+          <ol style="margin:0;padding-left:1.25em;">
+            <li><strong>戳额时的增信项</strong> — 基础 KYC 后引导增信；Drools 控制展示 / 必填 / 排序；影响 Standard vs Premier 档位</li>
+            <li><strong>尊享 vs 普通两种用户类型</strong> — 对应不同金融产品：额度、期限、定价、提前结清减免、App 首页卡片展示均不同（原型已分开展示）</li>
+            <li><strong>底层债务设计</strong> — 账单制 vs 订单制<strong>待讨论</strong>；对外话术「多笔借款、每月还 1 次」与底层模型需对齐</li>
+          </ol>
+        </div>
+
+        <a class="btn-journey" href="journey-export.html" target="_blank" rel="noopener">打开用户旅程原型 →</a>
+      </section>
+
+      <section id="highlights">
+        <h2>4. 方案要点（重点需确认）</h2>
+        <div class="highlight-grid">
+          <article class="highlight-card confirm">
+            <h3>4.1 Selling points <span class="badge">需确认</span></h3>
+            <ul>
+              <li><strong>发薪前的应急周转</strong> — 主打场景；<em>Bridge the gap until payday</em></li>
+              <li>针对工薪层的更优 offer — <em>Better offer for salaried workers</em></li>
+              <li>多笔借款，每月只还 1 次 — 账单制，适配发薪节奏</li>
+            </ul>
+          </article>
+
+          <article class="highlight-card confirm">
+            <h3>4.2 权限与数据采集 <span class="badge">需确认</span></h3>
+            <p><strong>填资（用户主动提交）</strong>：基本信息、证件 OCR、活体、联系人、增信材料（见 4.3）。</p>
+            <p><strong>权限获取</strong>：相机、短信、通知、App List（若有）、App 使用统计（若有）、定位（模糊）、日历。</p>
+            <p><strong>数据采集</strong>：短信、App List、App 使用统计、设备信息、定位（模糊）。</p>
+          </article>
+
+          <article class="highlight-card confirm">
+            <h3>4.3 增信项 <span class="badge">需确认</span></h3>
+            <p>增信页在基础 KYC 之后；风险通过 <strong>drools</strong> 决定展示项、是否必填、优先级（可与下表默认策略叠加）。</p>
+
+            <p><strong>必填</strong> — 至少完成 <strong>1 项</strong>（三选一）</p>
+            <table>
+              <tr><th>材料</th><th>说明</th></tr>
+              <tr><td>信用卡</td><td>上传信用卡照片；Visa / Mastercard</td></tr>
+              <tr><td>银行流水</td><td>截图或 PDF；支持 BPI、SeaBank、BDO、UnionBank、Gotyme 等</td></tr>
+              <tr><td>钱包账单</td><td>截图或 PDF，近 3 个月；推荐 GCash <span class="badge tbd">GScore 待确认</span></td></tr>
+            </table>
+
+            <p><strong>选填</strong> — 上传越多，offer 可能越优</p>
+            <table>
+              <tr><th>材料</th><th>说明</th></tr>
+              <tr><td>企业邮箱</td><td>工作邮箱 + 验证码校验</td></tr>
+              <tr><td>PRC 证件</td><td>上传证件照；需人工审核，可能拖慢戳额</td></tr>
+              <tr><td>工资单</td><td>工资单或其他收入证明（截图 / PDF） <span class="badge tbd">风控需要字段 待确认</span></td></tr>
+            </table>
+
+            <p><strong>分流策略（待确认）</strong></p>
+            <ul>
+              <li>强引导填增信；Skip → 普通 offer / 普通产品线</li>
+              <li>完成增信 & 审核通过 → 尊享 / Premier 更优额度与利率（原型已单独展示）</li>
+              <li>材料不合规：打回补件 vs 人工切普通贷 — <strong>【待确认】</strong></li>
+            </ul>
+          </article>
+
+          <article class="highlight-card confirm">
+            <h3>4.4 账单制还款 & 计息方式 <span class="badge">需确认</span></h3>
+            <p><strong>账单制 & 固定还款日</strong></p>
+            <ul>
+              <li>按月账单汇总当期应还；支持查看分期计划（按标的维度展示，支持提前结清订单）、历史账单（每月账单）</li>
+              <li>借款时选择<strong>固定还款日</strong>（可选项：放款日 / 每月 15 日 / 每月 30 日）。</li>
+            </ul>
+            <p><strong>计息方式</strong></p>
+            <ul>
+              <li><strong>等本等息</strong>：每期本金相等；利息按<strong>初始本金</strong>计算。</li>
+              <li><strong>首期</strong>：按实际天数按日计息（10–40 天区间）；距下一还款日不足 10 天则首期顺延至下一账期。</li>
+              <li><strong>后续各期</strong>：每期固定利息（按月利率 × 本金）。</li>
+              <li><strong>核销顺序</strong>：罚--费--息--本</li>
+            </ul>
+          </article>
+
+          <article class="highlight-card confirm">
+            <h3>4.5 提前结清 <span class="badge">需确认</span></h3>
+            <ul>
+              <li><strong>支持提前结清</strong>，但须对该笔标的<strong>全部结清</strong>（非部分还款）。</li>
+              <li><strong>减免规则</strong>（相对 JuanHand「全息费全收」）：</li>
+            </ul>
+            <table>
+              <tr><th>结清时点</th><th>计收规则</th></tr>
+              <tr><td>第 X 期前结清</td><td>本息费<strong>全额收取</strong></td></tr>
+              <tr><td>第 X 期之后提前结清</td><td>针对<strong>未还金额</strong>（剩余本金及对应息费）给予<strong>息费减免</strong></td></tr>
+            </table>
+            <p class="note muted" style="margin-top:12px;">第 X 期具体取值待定，默认>1，即首期不支持提结</p>
+          </article>
+
+          <article class="highlight-card confirm">
+            <h3>4.6 业务隔离 <span class="badge">需确认</span></h3>
+            <p>从<strong>法务合规</strong>与<strong>研发</strong>角度，建议业务<strong>全面隔离</strong>：前台、中台服务与资产均独立建设，不与 JuanHand 共用。</p>
+
+            <table>
+              <tr><th>维度</th><th>优点</th><th>缺点</th></tr>
+              <tr>
+                <td>合规与主体</td>
+                <td>独立主体，长期拆分更清晰、更合规，尤其在<strong>支付渠道</strong>侧；目前尚无明确法律禁止 B2B 代收代付</td>
+                <td><strong>6/30 新规</strong>影响尚不确定</td>
+              </tr>
+              <tr>
+                <td>研发与迭代</td>
+                <td>开发维护更简单，无 JH 历史包袱；后期迭代不受 JuanHand 排期牵制</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td>资金与成本</td>
+                <td>—</td>
+                <td>主体独立后<strong>资金调拨</strong>需单独设计；<strong>支付成本 + 研发成本</strong>待测算</td>
+              </tr>
+              <tr>
+                <td>一期上线</td>
+                <td>—</td>
+                <td>App 上线排期存在不确定性，<strong>依赖支付渠道</strong>就绪进度</td>
+              </tr>
+            </table>
+
+            <p class="note muted" style="margin-top:12px;">若采用全面隔离，<strong>一期支付仅能接入 SKYPAY</strong>。</p>
+
+            <p><strong>其他隔离要点</strong></p>
+            <ul>
+              <li>独立 App / 品牌 / 商店包，与 JuanHand 互不导流、不换皮暗示。</li>
+              <li>协议、客服、知识库、投放素材独立配置。</li>
+              <li>在途订单：同时仅 <strong>1 笔在途借款</strong>（发标终态 / 放款终态后才可再借）。</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section id="scope">
+        <h2>5. 一期功能范围清单</h2>
+        <p class="section-desc">详细功能颗粒度、优先级、与 JH 差异请以企微表格为准；本文不重复维护双份清单。</p>
+
+        <a class="link-card" href="https://doc.weixin.qq.com/sheet/e3_AOUAQQbTANsCNjLW252jeSR09cSEW?scode=AGMA_AdxAAshj0agyoAcIAigYNALU&tab=sjcbyu" target="_blank" rel="noopener">
+          <strong>【企微文档】新 app 评估 →</strong>
+          <span>https://doc.weixin.qq.com/sheet/e3_AOUAQQbTANsCNjLW252jeSR09cSEW?tab=sjcbyu</span>
+        </a>
+      </section>
+
+      <section id="open">
+        <h2>附录 · 待确认项</h2>
+        <p class="section-desc">以下 3 项待会上拍板；<strong>其余方案要点（§4）已确认，无问题</strong>。</p>
+        <table>
+          <tr><th>#</th><th>待确认项</th></tr>
+          <tr>
+            <td>1</td>
+            <td>
+              <strong>注册 / 登录后的跳转策略</strong>
+              <ul style="margin:8px 0 0;padding-left:1.2em;">
+                <li>登录成功后是否<strong>自动跳转填资页</strong>（强势引导完成 KYC）</li>
+                <li>戳额有额度后，是否<strong>自动跳转发标页</strong>？</li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>
+              <strong>是否设置 PIN 码</strong>
+              <ul style="margin:8px 0 0;padding-left:1.2em;">
+                <li>注册 / 登录流程是否要求用户设置 PIN？</li>
+                <li>PIN 对<strong>反欺诈</strong>是否有效、是否值得一期上线成本？</li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>
+              <strong>填资流程的复杂识别</strong>
+              <ul style="margin:8px 0 0;padding-left:1.2em;">
+                <li>一期<strong>暂不做人脸重复校验</strong>等复杂识别能力</li>
+                <li>相关风险由<strong>风控策略包</strong>覆盖；具体字段与规则<strong>线下再对</strong></li>
+              </ul>
+            </td>
+          </tr>
+        </table>
+      </section>
+
+      <p class="footer">SahodNow 新 App 方案确认同步 · 内部使用 · 原型路径 04_原型/ph-loan-app/</p>
+    </main>
+  </div>
+</body>
+</html>

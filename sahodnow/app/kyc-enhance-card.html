@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>SahodNow — Credit card</title>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <div class="app-shell no-nav">
+    <div class="page-header">
+      <button class="back-btn" id="btn-back" aria-label="Back">
+        <svg width="20" height="20" viewBox="0 0 20 20"><path d="M12 4l-6 6 6 6" stroke="#141413" stroke-width="1.5" fill="none"/></svg>
+      </button>
+      <div>
+        <h2>Credit card</h2>
+        <p class="page-header-sub">Visa / Mastercard</p>
+      </div>
+    </div>
+
+    <div class="page-content enhance-detail">
+      <div class="form-group">
+        <label class="form-label">How many credit cards do you have?</label>
+        <div class="chip-row" id="card-count-chips">
+          <button type="button" class="chip-option" data-value="0">0</button>
+          <button type="button" class="chip-option" data-value="1">1</button>
+          <button type="button" class="chip-option" data-value="2">2</button>
+          <button type="button" class="chip-option" data-value="3">3</button>
+          <button type="button" class="chip-option" data-value="4+">4+</button>
+        </div>
+      </div>
+
+      <div id="card-details-panel" style="display:none;">
+        <p class="enhance-note" id="card-multi-note" style="display:none;">Add the one you use most</p>
+        <div class="form-group">
+          <label class="form-label">Card number</label>
+          <div class="input-with-clear">
+            <input class="form-input" id="card-number" type="tel" inputmode="numeric" placeholder="1234 5678 9012 3456" maxlength="19" autocomplete="cc-number">
+            <button type="button" class="input-clear-btn" id="btn-clear-card" aria-label="Clear" hidden>×</button>
+          </div>
+        </div>
+        <div class="upload-zone" id="card-photo-upload">
+          <p style="font-size:28px;margin-bottom:6px;">＋</p>
+          <p style="font-size:14px;">Upload your most used card</p>
+        </div>
+      </div>
+
+      <p class="enhance-note" id="card-zero-note" style="display:none;">You selected 0 cards — complete bank statement or e-wallet bill instead.</p>
+
+      <div class="enhance-detail-footer">
+        <button type="button" class="btn btn-primary" id="btn-save" disabled>Save</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+  <script>
+    if (!AppState.requireAuth()) throw '';
+
+    const KEY = 'card';
+    const saved = AppState.getEnhanceItems()[KEY] || {};
+    let cardCount = saved.cardCount || '';
+    let photoUploaded = !!saved.photoUploaded;
+
+    document.getElementById('btn-back').addEventListener('click', () => AppState.go('kyc-enhance.html'));
+
+    function digits() {
+      return document.getElementById('card-number').value.replace(/\D/g, '');
+    }
+
+    function syncClearBtn() {
+      const btn = document.getElementById('btn-clear-card');
+      btn.hidden = !document.getElementById('card-number').value;
+    }
+
+    function canSave() {
+      if (!cardCount) return false;
+      if (cardCount === '0') return true;
+      const d = digits();
+      return d.length >= 13 && d.length <= 19;
+    }
+
+    function updateSave() {
+      document.getElementById('btn-save').disabled = !canSave();
+    }
+
+    function applyCount(v) {
+      cardCount = v;
+      const panel = document.getElementById('card-details-panel');
+      const zeroNote = document.getElementById('card-zero-note');
+      const multiNote = document.getElementById('card-multi-note');
+      const isZero = v === '0';
+      const isMulti = v === '2' || v === '3' || v === '4+';
+      panel.style.display = isZero ? 'none' : 'block';
+      zeroNote.style.display = isZero ? 'block' : 'none';
+      multiNote.style.display = isMulti ? 'block' : 'none';
+      if (isZero) {
+        document.getElementById('card-number').value = '';
+        syncClearBtn();
+      }
+      updateSave();
+    }
+
+    Auth.bindChipGroup(document.getElementById('card-count-chips'), applyCount);
+
+    document.getElementById('card-number').addEventListener('input', function () {
+      const d = this.value.replace(/\D/g, '').slice(0, 16);
+      this.value = d.replace(/(\d{4})(?=\d)/g, '$1 ').trim();
+      syncClearBtn();
+      updateSave();
+    });
+
+    document.getElementById('btn-clear-card').addEventListener('click', () => {
+      document.getElementById('card-number').value = '';
+      syncClearBtn();
+      updateSave();
+    });
+
+    document.getElementById('card-photo-upload').addEventListener('click', function () {
+      if (this.classList.contains('done')) return;
+      this.classList.add('done');
+      this.innerHTML = '<p style="font-size:28px;">✓</p><p style="font-size:14px;">Photo uploaded</p>';
+      photoUploaded = true;
+    });
+
+    document.getElementById('btn-save').addEventListener('click', () => {
+      if (!canSave()) return;
+      const done = cardCount !== '0';
+      AppState.setEnhanceItem(KEY, {
+        done,
+        cardCount,
+        hasCardNumber: done && digits().length >= 13,
+        photoUploaded: done ? photoUploaded : false
+      });
+      AppState.go('kyc-enhance.html');
+    });
+
+    // restore
+    if (cardCount) {
+      const chip = document.querySelector(`#card-count-chips .chip-option[data-value="${cardCount}"]`);
+      if (chip) {
+        chip.classList.add('selected');
+        applyCount(cardCount);
+      }
+    }
+    if (saved.hasCardNumber && saved.cardCount && saved.cardCount !== '0') {
+      document.getElementById('card-number').value = '1234 5678 9012 3456';
+      syncClearBtn();
+    }
+    if (photoUploaded) {
+      const zone = document.getElementById('card-photo-upload');
+      zone.classList.add('done');
+      zone.innerHTML = '<p style="font-size:28px;">✓</p><p style="font-size:14px;">Photo uploaded</p>';
+    }
+    updateSave();
+  </script>
+</body>
+</html>

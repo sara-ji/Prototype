@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>SahodNow — Disbursement Review</title>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <div class="app-shell no-nav">
+    <div class="page-header">
+      <button class="back-btn" onclick="AppState.go('home.html')" aria-label="Back to Home">
+        <svg width="20" height="20" viewBox="0 0 20 20"><path d="M12 4l-6 6 6 6" stroke="#141413" stroke-width="1.5" fill="none"/></svg>
+      </button>
+      <div>
+        <h2>Application status</h2>
+      </div>
+    </div>
+
+    <div class="page-content" style="padding-top:8px;">
+      <div id="flow-progress"></div>
+
+      <div class="review-summary-card">
+        <div class="plan-row">
+          <span class="text-muted">Applied at</span>
+          <span style="font-weight:500;" id="review-applied">—</span>
+        </div>
+        <div class="plan-row">
+          <span class="text-muted">Applied amount</span>
+          <span style="font-weight:500;" id="review-amount">—</span>
+        </div>
+        <div class="plan-row">
+          <span class="text-muted">Payout account</span>
+          <span id="review-payout">—</span>
+        </div>
+        <div class="plan-row">
+          <span class="text-muted">Current status</span>
+          <span style="font-weight:500;">Disbursement in progress</span>
+        </div>
+      </div>
+
+      <div id="flow-demo-slot"></div>
+    </div>
+  </div>
+  <script src="js/app.js"></script>
+  <script>
+    if (!AppState.requireApproved()) throw '';
+    AppState.setLoanFlowState('disbursement-review');
+    document.getElementById('flow-progress').innerHTML = AppState.renderLoanFlowProgress('disbursement');
+    document.getElementById('review-applied').textContent = AppState.formatDateTime(AppState.getLoanAppliedAt());
+    document.getElementById('review-amount').textContent = AppState.formatPHP(AppState.getLoanAmount());
+    document.getElementById('review-payout').textContent = AppState.getPayoutDisplay();
+    document.getElementById('flow-demo-slot').innerHTML = AppState.renderFlowDemoNav();
+    AppState.initFlowDemoNav();
+  </script>
+</body>
+</html>

@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>SahodNow — Verification Code</title>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <div class="app-shell no-nav">
+    <div class="page-header">
+      <button class="back-btn" id="btn-back" aria-label="Back">
+        <svg width="20" height="20" viewBox="0 0 20 20"><path d="M12 4l-6 6 6 6" stroke="#141413" stroke-width="1.5" fill="none"/></svg>
+      </button>
+      <h2>Verification code</h2>
+    </div>
+
+    <div class="page-content">
+      <p class="text-muted" id="otp-intro">Enter the 6-digit code sent via SMS to</p>
+      <p style="font-weight:500;font-size:18px;margin:4px 0 24px;" id="otp-phone-display">+63 917 123 4567</p>
+      <div class="otp-group" id="otp-group">
+        <input class="otp-input" type="text" maxlength="6" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" aria-label="Digit 1">
+        <input class="otp-input" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" aria-label="Digit 2">
+        <input class="otp-input" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" aria-label="Digit 3">
+        <input class="otp-input" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" aria-label="Digit 4">
+        <input class="otp-input" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" aria-label="Digit 5">
+        <input class="otp-input" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" aria-label="Digit 6">
+      </div>
+
+      <p class="form-error" id="otp-error" style="text-align:center;margin-top:12px;"></p>
+
+      <button class="btn btn-primary" id="btn-verify" disabled style="margin-top:24px;">Continue</button>
+
+      <div class="otp-after-actions">
+        <p class="otp-resend-line text-muted">
+          <span id="resend-wait">Resend SMS in <span id="otp-timer">60</span>s</span>
+          <button type="button" class="link-action inline" id="btn-resend" style="display:none;">Resend SMS</button>
+        </p>
+        <p class="otp-alt-label">Or get code via</p>        <div class="otp-channel-grid">
+          <button type="button" class="otp-channel-btn" id="btn-whatsapp" data-channel="whatsapp">
+            <span class="otp-channel-icon otp-channel-icon--wa" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.435 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            </span>
+            <span class="otp-channel-name">WhatsApp</span>
+            <span class="otp-channel-timer" id="timer-whatsapp" aria-live="polite"></span>
+          </button>
+          <button type="button" class="otp-channel-btn" id="btn-viber" data-channel="viber">
+            <span class="otp-channel-icon otp-channel-icon--viber" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.398.002C9.473.028 5.331.344 3.014 2.467 1.294 4.177.693 6.698.623 8.84c-.07 2.14-.138 6.16 3.832 7.22v1.66s-.023.67.415.804c.53.162 1.186-.34 1.896-.983.392-.36.934-.89 1.34-1.296 3.673.31 6.507-.396 6.826-.496.742-.24 4.947-.78 5.635-6.402.714-5.896-.348-9.61-2.273-11.3C18.396.85 14.066.01 11.398.002zm.056 1.996c2.34-.02 6.096.72 7.88 2.303 1.66 1.47 2.535 4.686 1.916 9.61-.52 4.292-3.76 4.68-4.42 4.894-.3.098-2.832.73-6.044.47 0 0-2.39 2.88-3.135 3.62-.116.116-.24.162-.326.15-.1-.014-.128-.115-.126-.286l.02-2.24C3.837 17.91 3.92 14.45 3.98 12.39c.06-1.89.55-4.006 1.964-5.37C7.57 4.45 11.1 4.02 11.454 4zm-.08 2.58a.335.335 0 00-.234.1 8.12 8.12 0 00-2.324 5.834.337.337 0 00.506.364c.028-.014 2.785-1.532 5.72-1.53a.335.335 0 00.002-.67c-3.28-.02-6.2 1.75-6.232 1.77a7.448 7.448 0 011.96-4.77.335.335 0 00-.238-.098zm5.094 2.535a.406.406 0 00-.29.12 9.85 9.85 0 00-2.33 6.017.406.406 0 00.61.35c.03-.016 3.357-1.828 6.87-1.85a.406.406 0 00-.004-.812c-3.74.024-7.01 1.894-7.044 1.916a8.72 8.72 0 012.018-5.604.406.406 0 00-.29-.137z"/></svg>
+            </span>
+            <span class="otp-channel-name">Viber</span>
+            <span class="otp-channel-timer" id="timer-viber" aria-live="polite"></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="otp-toast" role="status" aria-live="polite"></div>
+
+  <script src="js/app.js"></script>
+  <script>
+    const params = new URLSearchParams(location.search);
+    if (!AppState.isPrivacyAccepted() && params.get('prototype') !== '1') AppState.go('index.html');
+
+    const phone = (params.get('phone') || '').replace(/\D/g, '');
+    const flow = params.get('flow') || 'login';
+
+    if (!phone || phone.length !== 10) AppState.go('login.html');
+
+    AppState.set('ph_otp_context', { phone, flow });
+
+    document.getElementById('otp-phone-display').textContent = '+63 ' + Auth.formatDisplay(phone);
+    document.getElementById('btn-back').addEventListener('click', () => {
+      if (flow === 'reset-pin') {
+        if (params.get('return') === 'settings') {
+          AppState.go('settings.html');
+          return;
+        }
+        if (params.get('prototype') === '1') {
+          AppState.go('pin-login.html');
+          return;
+        }
+        if (Auth.hasDevicePin(phone)) {
+          AppState.go('pin-login.html?phone=' + encodeURIComponent(phone));
+          return;
+        }
+      }
+      if (flow === 'login' && params.get('from') === 'pin-login') {
+        if (params.get('prototype') === '1') {
+          AppState.go('pin-login.html');
+          return;
+        }
+        AppState.go('pin-login.html?phone=' + encodeURIComponent(phone));
+        return;
+      }
+      AppState.go('login.html');
+    });
+
+    if (flow === 'reset-pin') {
+      document.querySelector('.page-header h2').textContent = 'Reset PIN';
+      const intro = document.getElementById('otp-intro');
+      if (intro) intro.textContent = 'Enter the code to verify your identity and reset your PIN for';
+    }
+
+    const btnVerify = document.getElementById('btn-verify');
+    const otpError = document.getElementById('otp-error');
+    const otpIntro = document.getElementById('otp-intro');    const otpGroup = document.getElementById('otp-group');
+    const BTN_LABEL = 'Continue';
+    let timerId = null;
+    let cooldownSec = 0;
+    let activeChannel = 'sms';
+
+    const CHANNEL_LABELS = { sms: 'SMS', whatsapp: 'WhatsApp', viber: 'Viber' };
+    const ALT_CHANNELS = ['whatsapp', 'viber'];
+    const channelBtns = {
+      whatsapp: document.getElementById('btn-whatsapp'),
+      viber: document.getElementById('btn-viber')
+    };
+    const channelTimers = {
+      whatsapp: document.getElementById('timer-whatsapp'),
+      viber: document.getElementById('timer-viber')
+    };
+    const channelGrid = document.querySelector('.otp-channel-grid');
+
+    const getOtpCode = Auth.bindOtpInputs(otpGroup, code => {
+      btnVerify.disabled = code.length !== 6;
+      otpError.classList.remove('show');
+      otpError.style.color = '';
+    });
+
+    function updateIntro(channel) {
+      if (flow === 'reset-pin') {
+        otpIntro.textContent = 'Enter the code to verify your identity and reset your PIN for';
+        return;
+      }
+      const label = CHANNEL_LABELS[channel] || channel;
+      otpIntro.textContent = `Enter the 6-digit code sent via ${label} to`;
+    }
+
+    function updateCooldownUI() {      const onCooldown = cooldownSec > 0;
+      const waitEl = document.getElementById('resend-wait');
+      const resendBtn = document.getElementById('btn-resend');
+      const smsTimerEl = document.getElementById('otp-timer');
+
+      waitEl.style.display = 'none';
+      resendBtn.style.display = 'none';
+      resendBtn.classList.remove('is-cooldown');
+
+      if (onCooldown && activeChannel === 'sms') {
+        waitEl.style.display = 'inline';
+        smsTimerEl.textContent = cooldownSec;
+      } else if (onCooldown && activeChannel && activeChannel !== 'sms') {
+        resendBtn.style.display = 'inline';
+        resendBtn.classList.add('is-cooldown');
+      } else if (!onCooldown) {
+        resendBtn.style.display = 'inline';
+      }
+
+      channelGrid.classList.toggle('is-locked', onCooldown && ALT_CHANNELS.includes(activeChannel));
+
+      ALT_CHANNELS.forEach(ch => {
+        const btn = channelBtns[ch];
+        const timerEl = channelTimers[ch];
+        btn.classList.remove('is-active-channel', 'is-cooldown');
+        btn.disabled = false;
+
+        if (!onCooldown) {
+          timerEl.textContent = '';
+          return;
+        }
+
+        if (activeChannel === ch) {
+          btn.classList.add('is-active-channel');
+          btn.disabled = true;
+          timerEl.textContent = `Resend in ${cooldownSec}s`;
+        } else {
+          btn.classList.add('is-cooldown');
+          timerEl.textContent = '';
+        }
+      });
+
+      if (onCooldown && activeChannel === 'sms') {
+        ALT_CHANNELS.forEach(ch => channelBtns[ch].classList.add('is-cooldown'));
+      }
+    }
+
+    function startCooldown(channel, sec) {
+      activeChannel = channel;
+      cooldownSec = sec;
+      clearInterval(timerId);
+      updateCooldownUI();
+      timerId = setInterval(() => {
+        cooldownSec--;
+        if (cooldownSec <= 0) {
+          clearInterval(timerId);
+          activeChannel = null;
+        }
+        updateCooldownUI();
+      }, 1000);
+    }
+
+    function resetOtpInputs() {
+      otpGroup.querySelectorAll('.otp-input').forEach(i => { i.value = ''; });
+      otpGroup.querySelector('.otp-input').focus();
+      btnVerify.disabled = true;
+    }
+
+    function showToast(message) {
+      const el = document.getElementById('otp-toast');
+      el.textContent = message;
+      el.classList.add('show');
+      clearTimeout(showToast._timer);
+      showToast._timer = setTimeout(() => el.classList.remove('show'), 2500);
+    }
+
+    function showChannelBlocked() {
+      showToast('Please try again after the countdown');
+    }
+
+    async function trySendChannel(channel) {
+      if (cooldownSec > 0 && activeChannel && activeChannel !== channel) {
+        showChannelBlocked();
+        return;
+      }
+      if (cooldownSec > 0 && activeChannel === channel) return;
+
+      await Auth.sendOtp(phone, Auth.otpScene(flow), channel);
+      startCooldown(channel, 60);
+      resetOtpInputs();
+      updateIntro(channel);    }
+
+    document.getElementById('btn-whatsapp').addEventListener('click', () => trySendChannel('whatsapp'));
+    document.getElementById('btn-viber').addEventListener('click', () => trySendChannel('viber'));
+
+    document.getElementById('btn-resend').addEventListener('click', async () => {
+      if (cooldownSec > 0 && activeChannel && activeChannel !== 'sms') {
+        showChannelBlocked();
+        return;
+      }
+      await Auth.sendOtp(phone, Auth.otpScene(flow), 'sms');
+      startCooldown('sms', 60);
+      resetOtpInputs();
+      updateIntro('sms');    });
+
+    btnVerify.addEventListener('click', async () => {
+      const code = getOtpCode();
+      btnVerify.disabled = true;
+      btnVerify.textContent = 'Please wait…';
+
+      const result = await Auth.verifyOtp(phone, code);
+      if (!result.success) {
+        otpError.textContent = 'Incorrect code. Please check and try again.';
+        otpError.style.color = '';
+        otpError.classList.add('show');
+        btnVerify.disabled = false;
+        btnVerify.textContent = BTN_LABEL;
+        return;
+      }
+
+      AppState.set('ph_otp_context', null);
+
+      if (flow === 'register') {
+        AppState.go('password.html?phone=' + encodeURIComponent(phone) + '&flow=register');
+      } else if (flow === 'reset-pin') {
+        Auth.markPinResetVerified(phone);
+        const previewQ = params.get('prototype') === '1' ? '&prototype=1' : '';
+        const returnQ = params.get('return') === 'settings' ? '&return=settings' : '';
+        AppState.go('pin-reset.html?phone=' + encodeURIComponent(phone) + previewQ + returnQ);
+      } else if (flow === 'login') {
+        if (Auth.hasDevicePin(phone)) {
+          AppState.login({ phone: '+63' + phone, name: 'Juan Dela Cruz' });
+          Auth.routeAfterLogin();
+        } else {
+          AppState.go('password.html?phone=' + encodeURIComponent(phone) + '&flow=setup');
+        }
+      }
+    });
+
+    (async function initOtpPage() {
+      const session = AppState.get('ph_otp_session');
+      if (!session || session.phone !== phone) {
+        await Auth.sendOtp(phone, Auth.otpScene(flow), 'sms');
+      }
+      updateIntro('sms');
+      startCooldown('sms', 60);
+      otpGroup.querySelector('.otp-input').focus();
+    })();
+  </script>
+</body>
+</html>

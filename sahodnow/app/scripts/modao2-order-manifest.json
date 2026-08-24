@@ -1,0 +1,12 @@
+[
+  { "sectionId": "m2-17",  "label": "17. 发标 Standard",     "tag": "order.html · 默认",             "file": "order.html",         "xf": null,                   "n": 17 },
+  { "sectionId": "m2-17b", "label": "17b. 选卡半窗",         "tag": "Change · 多卡",                 "file": "order.html",         "xf": "payout-picker-overlay", "n": 17 },
+  { "sectionId": "m2-17c", "label": "17c. 无收款卡",         "tag": "Add · 首次绑卡",                "file": "order.html",         "xf": "no-payout",             "n": 17 },
+  { "sectionId": "m2-18",  "label": "18. 还款计划半窗",      "tag": "Repayment plan",                "file": "order.html",         "xf": "plan-overlay",          "n": 18 },
+  { "sectionId": "m2-18a", "label": "18a. 计息说明半窗",     "tag": "How interest works",            "file": "order.html",         "xf": "interest-overlay",      "n": 18 },
+  { "sectionId": "m2-19",  "label": "19. 协议签署半窗",      "tag": "Loan Agreement · 勾选后提交",   "file": "order.html",         "xf": "agreement-overlay",     "n": 19 },
+  { "sectionId": "m2-29",  "label": "29. 发标 Premier",      "tag": "order-premium.html · 6% 利率",  "file": "order-premium.html", "xf": null,                   "n": 29 },
+  { "sectionId": "m2-29b", "label": "29b. Premier 选卡半窗", "tag": "Change · 多卡",                 "file": "order-premium.html", "xf": "payout-picker-overlay", "n": 29 },
+  { "sectionId": "m2-29c", "label": "29c. Premier 还款计划", "tag": "Repayment plan",               "file": "order-premium.html", "xf": "plan-overlay",          "n": 29 },
+  { "sectionId": "m2-29d", "label": "29d. Premier 协议签署", "tag": "Loan Agreement",                "file": "order-premium.html", "xf": "agreement-overlay",     "n": 29 }
+]

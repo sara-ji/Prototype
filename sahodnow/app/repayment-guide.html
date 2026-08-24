@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>SahodNow — Repayment guide</title>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <div class="app-shell no-nav">
+    <div class="page-header">
+      <button class="back-btn" onclick="AppState.go('bill.html')" aria-label="Back">
+        <svg width="20" height="20" viewBox="0 0 20 20"><path d="M12 4l-6 6 6 6" stroke="#141413" stroke-width="1.5" fill="none"/></svg>
+      </button>
+      <div>
+        <h2>Repayment guide</h2>
+      </div>
+    </div>
+
+    <div class="page-content" style="padding-top:8px;">
+      <div class="card" style="margin-bottom:16px;">
+        <p class="eyebrow" style="margin-bottom:12px;"><span class="dot">•</span> Fixed repayment day</p>
+        <p class="text-muted" style="margin:0;line-height:1.45;">
+          SahodNow uses a fixed repayment schedule. Each month, your statement is generated and payment is due on the <strong>20th</strong>.
+          If you have multiple loans, several installments may be due on the same date.
+        </p>
+      </div>
+
+      <div class="card" style="margin-bottom:16px;">
+        <p class="form-label" style="margin-bottom:12px;">How to repay</p>
+        <div class="plan-row">
+          <span class="text-muted">1</span>
+          <span style="font-weight:500;">Open Bills → Repay</span>
+        </div>
+        <div class="plan-row">
+          <span class="text-muted">2</span>
+          <span style="font-weight:500;">Choose a channel (GCash / Maya / Bank)</span>
+        </div>
+        <div class="plan-row">
+          <span class="text-muted">3</span>
+          <span style="font-weight:500;">Complete payment and confirm in the app</span>
+        </div>
+        <p class="text-muted" style="margin:10px 0 0;font-size:12px;line-height:1.45;">
+          In this prototype, payment confirmation is simulated and does not change balances automatically.
+        </p>
+      </div>
+
+      <div class="card">
+        <p class="form-label" style="margin-bottom:12px;">Safety checklist</p>
+        <div class="plan-row">
+          <span class="text-muted">OTP / PIN</span>
+          <span style="font-weight:500;">Never share</span>
+        </div>
+        <div class="plan-row">
+          <span class="text-muted">Payment link</span>
+          <span style="font-weight:500;">Only from inside the app</span>
+        </div>
+        <div class="plan-row">
+          <span class="text-muted">Personal account</span>
+          <span style="font-weight:500;">Never transfer to individuals</span>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" style="margin-top:16px;" onclick="AppState.go('bill-current.html')">View current statement</button>
+      <button class="btn btn-secondary" style="margin-top:12px;" onclick="AppState.go('bill-all.html')">View all statements</button>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+  <script>
+    if (!AppState.requireApproved()) throw '';
+  </script>
+</body>
+</html>
+

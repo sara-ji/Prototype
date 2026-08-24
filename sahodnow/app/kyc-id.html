@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>SahodNow — ID Information</title>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <div class="app-shell no-nav">
+    <div class="page-header">
+      <button class="back-btn" id="btn-back" aria-label="Back">
+        <svg width="20" height="20" viewBox="0 0 20 20"><path d="M12 4l-6 6 6 6" stroke="#141413" stroke-width="1.5" fill="none"/></svg>
+      </button>
+      <div>
+        <div id="step-label"></div>
+        <h2>ID information</h2>
+      </div>
+    </div>
+
+    <div class="page-content">
+      <div id="progress-bar"></div>
+      <div class="form-section-block">
+        <p class="form-section-title">Select ID type</p>
+        <p class="text-muted form-section-desc">One valid ID is all you need.</p>
+
+        <input type="hidden" id="idType" value="">
+
+        <div class="id-type-list" id="id-top-list"></div>
+
+        <button type="button" class="id-more-toggle" id="btn-more-ids">
+          <span class="id-more-toggle-label">More options</span>
+          <span class="id-more-toggle-right">
+            <span class="id-more-toggle-value" id="more-selected-name"></span>
+            <span class="chevron">›</span>
+          </span>
+        </button>
+      </div>
+
+      <div class="form-section-block id-upload-section" id="upload-section">
+        <p class="form-section-title" id="upload-section-title">Upload your valid ID</p>
+
+        <div class="upload-zone" id="upload-id">          <p style="font-size:32px;margin-bottom:8px;">📷</p>
+          <p>Upload the front side of your ID</p>
+        </div>
+      </div>
+
+      <div class="form-section-block ocr-fields" id="ocr-fields">
+        <p class="form-section-title">Review your details</p>
+        <p class="text-muted form-section-desc">Auto-filled from your ID. Edit if anything looks incorrect.</p>
+
+        <div class="form-group">
+          <label class="form-label">First name (as seen on your ID)</label>
+          <input class="form-input" id="firstName" placeholder="First name">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Middle name <span class="text-muted">(optional)</span></label>
+          <input class="form-input" id="middleName" placeholder="Middle name">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Last name (as seen on your ID)</label>
+          <input class="form-input" id="lastName" placeholder="Last name">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Gender</label>
+          <div class="chip-row" id="gender-chips">
+            <button type="button" class="chip-option" data-value="Female">Female</button>
+            <button type="button" class="chip-option" data-value="Male">Male</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Date of birth (month/day/year)</label>
+          <input class="form-input" type="date" id="dob">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Marital status</label>
+          <input type="hidden" id="marital" value="">
+          <button type="button" class="form-picker-trigger" data-kyc-select="marital" aria-haspopup="dialog">
+            <span class="form-picker-trigger__text text-muted">Select</span>
+            <span class="chevron" aria-hidden="true">›</span>
+          </button>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Mother's maiden name</label>
+          <input class="form-input" id="motherName" placeholder="Mother's maiden name">
+        </div>
+
+        <p class="form-section-title" style="margin-top:32px;">Address information</p>
+
+        <div class="form-group">
+          <label class="form-label">Residential address</label>
+          <input class="form-input" id="addressShort" placeholder="Barangay, City, Province">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Please enter the complete address</label>
+          <input class="form-input" id="addressFull" placeholder="Unit / Street / Barangay / City / Province / ZIP">
+        </div>
+      </div>
+
+      <button class="btn btn-primary" id="btn-next" disabled>Continue</button>
+      <div id="kyc-privacy-note"></div>
+    </div>  </div>
+
+  <!-- More ID types — half-screen sheet -->
+  <div class="overlay" id="kyc-select-overlay">
+    <div class="sheet sheet-half">
+      <div class="sheet-handle"></div>
+      <h3 class="id-more-sheet-title" data-select-title>Select</h3>
+      <div class="kyc-select-list" data-select-list role="listbox"></div>
+    </div>
+  </div>
+
+  <div class="overlay" id="more-ids-overlay">
+    <div class="sheet sheet-half">
+      <div class="sheet-handle"></div>
+      <h3 class="id-more-sheet-title">More ID types</h3>
+      <p class="id-more-sheet-desc">Select another government-issued ID</p>
+      <div class="id-type-list" id="id-more-list"></div>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+  <script>
+    if (!AppState.requireAuth()) throw '';
+    document.getElementById('step-label').innerHTML = Auth.stepLabel(2);
+    document.getElementById('progress-bar').innerHTML = Auth.progressBar('id');
+    Auth.initKycHints();
+    Auth.bindKycExitRetain({
+      step: 'id',
+      mode: 'survey',
+      exitTo: 'home.html',
+      backBtn: '#btn-back'
+    });
+    Auth.bindKycSelectSheets({
+      fields: {
+        marital: {
+          title: 'Marital status',
+          options: ['Single', 'Married', 'Separated', 'Widowed']
+        }
+      }
+    });
+    const ID_TYPES = {
+      top: [
+        { id: 'philsys', name: 'National ID (PhilSys)', badge: 'Recommended' },
+        { id: 'passport', name: 'Philippine Passport' },
+        { id: 'drivers', name: "Driver's License" },
+        { id: 'umid', name: 'UMID' }
+      ],
+      more: [
+        { id: 'prc', name: 'PRC ID' },
+        { id: 'postal', name: 'Postal ID' },
+        { id: 'voters', name: "Voter's ID" },
+        { id: 'sss', name: 'SSS ID' },
+        { id: 'tin', name: 'TIN ID' },
+        { id: 'pagibig', name: 'PAG-IBIG ID' },
+        { id: 'philhealth', name: 'PhilHealth ID' }
+      ]
+    };
+
+    let selectedId = '';
+    let selectedFromMore = false;
+    let idUploaded = false;
+    let gender = '';
+
+    const btnMoreIds = document.getElementById('btn-more-ids');
+    const moreSelectedName = document.getElementById('more-selected-name');
+
+    function renderIdCard(item) {
+      const badge = item.badge
+        ? `<span class="id-type-badge">${item.badge}</span>`
+        : '';
+      return `<button type="button" class="id-type-card" data-id="${item.id}" data-name="${item.name}">
+        <span class="id-type-icon">🪪</span>
+        <span class="id-type-name">${item.name}</span>
+        ${badge}
+      </button>`;
+    }
+
+    document.getElementById('id-top-list').innerHTML = ID_TYPES.top.map(renderIdCard).join('');
+    document.getElementById('id-more-list').innerHTML = ID_TYPES.more.map(renderIdCard).join('');
+
+    function bindIdCards(container) {
+      container.querySelectorAll('.id-type-card').forEach(card => {
+        card.addEventListener('click', () => selectIdType(card));
+      });
+    }
+
+    bindIdCards(document.getElementById('id-top-list'));
+    bindIdCards(document.getElementById('id-more-list'));
+
+    function closeMoreSheet() {
+      AppState.hideOverlay('more-ids-overlay');
+    }
+
+    function isMoreOption(id) {
+      return ID_TYPES.more.some(item => item.id === id);
+    }
+
+    function updateMoreToggle(name, fromMore) {
+      if (fromMore) {
+        btnMoreIds.classList.add('selected');
+        moreSelectedName.textContent = name;
+      } else {
+        btnMoreIds.classList.remove('selected');
+        moreSelectedName.textContent = '';
+      }
+    }
+
+    function selectIdType(card) {
+      document.querySelectorAll('.id-type-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+
+      selectedId = card.dataset.id;
+      selectedFromMore = isMoreOption(selectedId);
+      const name = card.dataset.name;
+
+      document.getElementById('idType').value = name;
+      document.getElementById('upload-section-title').textContent = `Upload your ${name}`;
+      document.getElementById('upload-section').classList.add('show');      updateMoreToggle(name, selectedFromMore);
+      closeMoreSheet();
+
+      idUploaded = false;
+      document.getElementById('ocr-fields').classList.remove('show');
+      document.getElementById('addressShort').value = '';
+      document.getElementById('addressFull').value = '';
+      const uploadEl = document.getElementById('upload-id');
+      uploadEl.classList.remove('done');
+      uploadEl.innerHTML = `
+        <p style="font-size:32px;margin-bottom:8px;">📷</p>
+        <p>Upload the front side of your ID</p>`;
+      validateForm();
+
+      requestAnimationFrame(() => {
+        document.getElementById('upload-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    }
+
+    document.getElementById('btn-more-ids').addEventListener('click', () => {
+      AppState.showOverlay('more-ids-overlay');
+    });
+
+    document.getElementById('more-ids-overlay').addEventListener('click', e => {
+      if (e.target.id === 'more-ids-overlay') closeMoreSheet();
+    });
+
+    function scrollToOcr() {
+      const ocr = document.getElementById('ocr-fields');
+      requestAnimationFrame(() => {
+        const headerH = document.querySelector('.page-header')?.offsetHeight || 72;
+        const top = ocr.getBoundingClientRect().top + window.scrollY - headerH - 12;
+        window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+      });
+    }
+
+    Auth.bindChipGroup(document.getElementById('gender-chips'), v => { gender = v; validateForm(); });
+
+    function validateForm() {
+      const ok = selectedId
+        && idUploaded
+        && document.getElementById('firstName').value.trim()
+        && document.getElementById('lastName').value.trim()
+        && gender
+        && document.getElementById('dob').value
+        && document.getElementById('marital').value
+        && document.getElementById('motherName').value.trim()
+        && document.getElementById('addressShort').value.trim()
+        && document.getElementById('addressFull').value.trim();
+      document.getElementById('btn-next').disabled = !ok;
+    }
+
+    function fillOcrMock() {
+      document.getElementById('firstName').value = 'Juan';
+      document.getElementById('middleName').value = 'Santos';
+      document.getElementById('lastName').value = 'Dela Cruz';
+      document.querySelector('#gender-chips .chip-option[data-value="Male"]').click();
+      document.getElementById('dob').value = '1990-01-15';
+      document.getElementById('marital').value = 'Single';
+      document.getElementById('motherName').value = 'Maria Reyes';
+      document.getElementById('addressShort').value = 'Brgy. San Antonio, Makati City';
+      document.getElementById('addressFull').value = 'Unit 12, Ayala Ave, Brgy. San Antonio, Makati City, Metro Manila 1200';
+      validateForm();
+    }
+
+    document.getElementById('upload-id').addEventListener('click', function() {
+      if (!selectedId || idUploaded) return;
+      this.classList.add('done');
+      this.innerHTML = '<p style="font-size:32px;">✓</p><p>ID uploaded</p><p class="text-muted" style="font-size:13px;margin-top:4px;">Reading your ID…</p>';
+      setTimeout(() => {
+        idUploaded = true;
+        this.innerHTML = '<p style="font-size:32px;">✓</p><p>ID uploaded</p>';
+        const ocr = document.getElementById('ocr-fields');
+        ocr.classList.add('show');
+        fillOcrMock();
+        scrollToOcr();
+      }, 1200);
+    });
+
+    ['firstName', 'lastName', 'dob', 'marital', 'motherName', 'addressShort', 'addressFull'].forEach(id => {
+      document.getElementById(id).addEventListener('input', validateForm);
+      document.getElementById(id).addEventListener('change', validateForm);
+    });
+
+    document.getElementById('btn-next').addEventListener('click', () => {
+      AppState.set(AppState.KEYS.kycStep, 'liveness');
+      AppState.go('kyc-liveness.html');
+    });
+  </script>
+</body>
+</html>

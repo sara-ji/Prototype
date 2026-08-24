@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>SahodNow — Credit Assessment</title>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <div class="app-shell no-nav">
+    <div class="page-header">
+      <button class="back-btn" id="btn-back" aria-label="Back">
+        <svg width="20" height="20" viewBox="0 0 20 20"><path d="M12 4l-6 6 6 6" stroke="#141413" stroke-width="1.5" fill="none"/></svg>
+      </button>
+      <h2>Credit Assessment</h2>
+    </div>
+
+    <div class="page-content">
+      <!-- 审核中：10s 倒计时 + spinner -->
+      <div class="review-status" id="review-pending">
+        <div class="spinner" id="review-spinner"></div>
+        <h3 style="margin-bottom:8px;">Review in progress</h3>
+        <p class="text-muted" style="margin-bottom:4px;font-size:14px;">We're assessing your profile. This usually takes a moment.</p>
+        <p class="review-countdown review-countdown--page" id="review-countdown">10s</p>
+      </div>
+
+      <!-- 10s 后仍未出结果：沙漏等待 -->
+      <div class="review-status" id="review-waiting" style="display:none;">
+        <div class="review-hourglass" aria-hidden="true">
+          <div class="review-hourglass-frame"></div>
+          <div class="review-hourglass-sand review-hourglass-sand--top"></div>
+          <div class="review-hourglass-sand review-hourglass-sand--stream"></div>
+          <div class="review-hourglass-sand review-hourglass-sand--bottom"></div>
+        </div>
+        <h3 style="margin-bottom:8px;">Still reviewing</h3>
+        <p class="text-muted" style="font-size:14px;">Your application is in the queue. We'll notify you as soon as we have a result.</p>
+      </div>
+
+      <!-- 审核通过 · Standard -->
+      <div class="review-status" id="review-approved-standard" style="display:none;">
+        <div class="success-icon">✓</div>
+        <span class="review-tier-badge">Standard</span>
+        <h3 style="margin-bottom:8px;">Credit approved!</h3>
+        <p class="text-muted" style="margin-bottom:8px;">Your revolving credit line is ready.</p>
+        <p class="review-approved-limit" id="approved-limit-standard">₱10,000</p>
+        <p class="review-redirect-hint" id="redirect-hint-standard">Redirecting to borrow in <strong>5s</strong>…</p>
+      </div>
+
+      <!-- 审核通过 · Premier -->
+      <div class="review-status" id="review-approved-premier" style="display:none;">
+        <div class="success-icon success-icon--premier">★</div>
+        <span class="review-tier-badge review-tier-badge--premier">Premier</span>
+        <h3 style="margin-bottom:8px;">Welcome to Premier!</h3>
+        <p class="text-muted" style="margin-bottom:12px;">You've unlocked our best offer.</p>
+        <p class="review-approved-limit" id="approved-limit-premier">₱50,000</p>
+        <div class="review-premier-perks">
+          <div class="review-premier-perk"><strong>Up to 50% off</strong><span>Lower monthly rate — 6% vs 12%</span></div>
+          <div class="review-premier-perk"><strong>Higher limit</strong><span>Up to ₱50,000 revolving credit</span></div>
+          <div class="review-premier-perk"><strong>Priority support</strong><span>Faster review on future applications</span></div>
+        </div>
+        <p class="review-redirect-hint" id="redirect-hint-premier">Redirecting to borrow in <strong>5s</strong>…</p>
+      </div>
+
+      <!-- 审核被拒 -->
+      <div class="review-status" id="review-rejected" style="display:none;">
+        <div class="fail-icon">✕</div>
+        <h3 style="margin-bottom:8px;">Credit not approved</h3>
+        <p class="text-muted review-reject-reason" id="review-reject-reason"></p>
+        <div class="card review-reject-card">
+          <div class="plan-row"><span class="text-muted">Reviewed on</span><span style="font-weight:500;" id="review-rej-date">—</span></div>
+          <div class="plan-row"><span class="text-muted">Reapply from</span><span style="font-weight:500;" id="review-rej-reapply">—</span></div>
+        </div>
+        <button type="button" class="btn btn-primary" id="btn-reapply-review" style="display:none;margin-top:16px;">Apply again</button>
+        <button type="button" class="btn btn-secondary" id="btn-home-rejected" style="margin-top:12px;">Back to Home</button>
+      </div>
+
+      <!-- 审核中可并行绑卡 -->
+      <div class="card payout-promo-card" style="margin-top:24px;" id="bind-card-section">
+        <p class="eyebrow"><span class="dot">•</span> While you wait</p>
+        <div id="bind-first" onclick="AppState.goPayoutManage('review')">
+          <h3 style="font-size:18px;margin:8px 0;">Link payout account</h3>
+          <p class="text-muted" style="margin-bottom:12px;font-size:14px;">Add an e-wallet or bank account — no face verification for your first account.</p>
+          <span class="cta-hint">Link account →</span>
+        </div>
+        <div id="bind-done" style="display:none;" onclick="AppState.goPayoutManage('review')">
+          <h3 style="font-size:18px;margin:8px 0;">Account linked</h3>
+          <p style="font-weight:500;margin-bottom:8px;" id="review-payout-linked">—</p>
+          <span class="cta-hint">Change account →</span>
+        </div>
+      </div>
+
+      <!-- 原型：快速预览 Standard / Premier 结果 -->
+      <div class="flow-demo-nav" id="review-demo-nav">
+        <p class="flow-demo-label">Prototype — preview result</p>
+        <div class="flow-demo-btns">
+          <button type="button" class="flow-demo-btn" id="demo-standard">Standard result</button>
+          <button type="button" class="flow-demo-btn" id="demo-premier">Premier result</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="js/app.js"></script>
+  <script>
+    if (!AppState.requireAuth()) throw '';
+
+    const kyc = AppState.get(AppState.KEYS.kycStep);
+    if (kyc === 'approved') {
+      AppState.startBorrow();
+      throw '';
+    }
+    if (kyc === 'rejected') {
+      AppState.go('credit-rejected.html');
+      throw '';
+    }
+    if (kyc !== 'reviewing') {
+      AppState.routeAfterAuth();
+      throw '';
+    }
+
+    let resultTimer = null;
+    let redirectTimer = null;
+    let redirectSec = AppState.APPROVED_REDIRECT_SEC;
+    let demoLocked = false;
+
+    const panels = {
+      pending: document.getElementById('review-pending'),
+      waiting: document.getElementById('review-waiting'),
+      standard: document.getElementById('review-approved-standard'),
+      premier: document.getElementById('review-approved-premier'),
+      rejected: document.getElementById('review-rejected')
+    };
+    const bindSection = document.getElementById('bind-card-section');
+
+    function hideAllPanels() {
+      Object.values(panels).forEach(el => { if (el) el.style.display = 'none'; });
+    }
+
+    function renderBindSection() {
+      const bound = AppState.isPayoutBound();
+      document.getElementById('bind-first').style.display = bound ? 'none' : 'block';
+      document.getElementById('bind-done').style.display = bound ? 'block' : 'none';
+      if (bound) {
+        document.getElementById('review-payout-linked').textContent = AppState.getPayoutDisplay();
+      }
+    }
+
+    function clearTimers() {
+      if (resultTimer) clearTimeout(resultTimer);
+      if (redirectTimer) clearInterval(redirectTimer);
+      resultTimer = null;
+      redirectTimer = null;
+    }
+
+    function showWaiting() {
+      panels.pending.style.display = 'none';
+      panels.waiting.style.display = 'block';
+    }
+
+    function showRejected() {
+      clearTimers();
+      demoLocked = true;
+      hideAllPanels();
+      bindSection.style.display = 'none';
+      document.getElementById('review-demo-nav').style.display = 'none';
+      AppState.rejectCreditReview();
+      const meta = AppState.getCreditRejectMeta();
+      panels.rejected.style.display = 'block';
+      document.getElementById('review-reject-reason').textContent = meta.reason;
+      document.getElementById('review-rej-date').textContent = AppState.formatCreditDate(meta.reviewedAt);
+      document.getElementById('review-rej-reapply').textContent = AppState.formatCreditDate(meta.reapplyAt);
+      const reapplyBtn = document.getElementById('btn-reapply-review');
+      reapplyBtn.style.display = meta.canReapply ? 'block' : 'none';
+    }
+
+    function startApprovedRedirect(isPremier) {
+      redirectSec = AppState.APPROVED_REDIRECT_SEC;
+      const hintEl = document.getElementById(isPremier ? 'redirect-hint-premier' : 'redirect-hint-standard');
+      const target = isPremier ? 'order-premium.html' : 'order.html';
+      const tick = () => {
+        hintEl.innerHTML = redirectSec > 0
+          ? `Redirecting to borrow in <strong>${redirectSec}s</strong>…`
+          : 'Redirecting…';
+        if (redirectSec <= 0) {
+          clearInterval(redirectTimer);
+          AppState.go(target);
+        }
+        redirectSec -= 1;
+      };
+      tick();
+      redirectTimer = setInterval(tick, 1000);
+    }
+
+    function showApproved(tier) {
+      clearTimers();
+      demoLocked = true;
+      hideAllPanels();
+      bindSection.style.display = 'none';
+      document.getElementById('review-demo-nav').style.display = 'none';
+      AppState.completeCreditReview(tier);
+      const isPremier = tier === 'premier';
+      const panel = isPremier ? panels.premier : panels.standard;
+      panel.style.display = 'block';
+      document.getElementById(isPremier ? 'approved-limit-premier' : 'approved-limit-standard').textContent =
+        AppState.formatPHP(AppState.getCreditLimit());
+      startApprovedRedirect(isPremier);
+    }
+
+    function scheduleAutoResult() {
+      if (demoLocked) return;
+      resultTimer = AppState.scheduleCreditReviewResult('standard', AppState.REVIEW_RESULT_DELAY_MS);
+    }
+
+    document.getElementById('btn-back').addEventListener('click', () => AppState.go('home.html'));
+    document.getElementById('btn-home-rejected').addEventListener('click', () => AppState.go('home.html'));
+    document.getElementById('btn-reapply-review').addEventListener('click', () => AppState.reapplyCredit());
+    document.getElementById('demo-standard').addEventListener('click', () => showApproved('standard'));
+    document.getElementById('demo-premier').addEventListener('click', () => showApproved('premier'));
+
+    renderBindSection();
+    window.addEventListener('pageshow', renderBindSection);
+
+    AppState.bindCreditReviewCountdown({
+      el: document.getElementById('review-countdown'),
+      onCountdownEnd: () => {
+        document.getElementById('review-spinner').style.display = 'none';
+        showWaiting();
+        scheduleAutoResult();
+      }
+    });
+
+    if (AppState.isCreditReviewCountdownDone()) {
+      document.getElementById('review-spinner').style.display = 'none';
+      document.getElementById('review-countdown').textContent = '';
+      showWaiting();
+      scheduleAutoResult();
+    }
+
+    window.addEventListener('storage', () => {
+      if (AppState.isKycApproved()) {
+        showApproved(AppState.isPremier() ? 'premier' : 'standard');
+      }
+    });
+  </script>
+</body>
+</html>

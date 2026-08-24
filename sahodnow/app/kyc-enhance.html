@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>SahodNow — Credit Enhancement</title>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <div class="app-shell no-nav">
+    <div class="page-header">
+      <button class="back-btn" id="btn-back" aria-label="Back">
+        <svg width="20" height="20" viewBox="0 0 20 20"><path d="M12 4l-6 6 6 6" stroke="#141413" stroke-width="1.5" fill="none"/></svg>
+      </button>
+      <div>
+        <h2>Credit enhancement</h2>
+      </div>
+    </div>
+
+    <div class="page-content">
+      <div class="enhance-guide">
+        <p class="enhance-guide-lead">The more documents you upload, the better offer we can give you.</p>
+        <div class="enhance-guide-benefits">
+          <div class="enhance-guide-benefit">
+            <strong>+100%</strong>
+            <span>Higher limit</span>
+          </div>
+          <div class="enhance-guide-benefit">
+            <strong>Up to 50% off</strong>
+            <span>Lower rate</span>
+          </div>
+        </div>
+      </div>
+
+      <section class="enhance-section" aria-labelledby="enhance-required-title">
+        <div class="enhance-section-head">
+          <h3 class="enhance-section-title" id="enhance-required-title">Choose at least one</h3>
+        </div>
+
+        <div class="enhance-list" id="required-list">
+          <div class="enhance-row enhance-row--required enhance-row--nav" data-key="card" data-href="kyc-enhance-card.html">
+            <button type="button" class="enhance-row-trigger">
+              <span class="enhance-row-icon">💳</span>
+              <span class="enhance-row-meta">
+                <span class="enhance-row-title">Credit card</span>
+                <span class="enhance-row-sub">Visa / Mastercard</span>
+              </span>
+              <span class="enhance-row-check" data-done-icon aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+                  <circle cx="11" cy="11" r="11" fill="#2E7D32"/>
+                  <path d="M6.5 11.2l2.8 2.8 6.2-6.4" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </span>
+              <span class="enhance-row-chevron">›</span>
+            </button>
+          </div>
+
+          <div class="enhance-row enhance-row--required enhance-row--nav" data-key="bank" data-href="kyc-enhance-bank.html">
+            <button type="button" class="enhance-row-trigger">
+              <span class="enhance-row-icon">🏦</span>
+              <span class="enhance-row-meta">
+                <span class="enhance-row-title">Bank statement</span>
+                <span class="enhance-row-sub">PDF · last 6 months</span>
+              </span>
+              <span class="enhance-row-check" data-done-icon aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+                  <circle cx="11" cy="11" r="11" fill="#2E7D32"/>
+                  <path d="M6.5 11.2l2.8 2.8 6.2-6.4" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </span>
+              <span class="enhance-row-chevron">›</span>
+            </button>
+          </div>
+
+          <div class="enhance-row enhance-row--required enhance-row--nav" data-key="gcash" data-href="kyc-enhance-ewallet.html">
+            <button type="button" class="enhance-row-trigger">
+              <span class="enhance-row-icon">📱</span>
+              <span class="enhance-row-meta">
+                <span class="enhance-row-title">E-Wallet bill</span>
+                <span class="enhance-row-sub">PDF · last 3 months</span>
+              </span>
+              <span class="enhance-row-check" data-done-icon aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+                  <circle cx="11" cy="11" r="11" fill="#2E7D32"/>
+                  <path d="M6.5 11.2l2.8 2.8 6.2-6.4" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </span>
+              <span class="enhance-row-chevron">›</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="enhance-section" aria-labelledby="enhance-optional-title">
+        <div class="enhance-section-head">
+          <h3 class="enhance-section-title" id="enhance-optional-title">Optional</h3>
+        </div>
+
+        <div class="enhance-list" id="optional-list">
+          <div class="enhance-row enhance-row--nav" data-key="prc" data-href="kyc-enhance-prc.html">
+            <button type="button" class="enhance-row-trigger">
+              <span class="enhance-row-icon">🪪</span>
+              <span class="enhance-row-meta">
+                <span class="enhance-row-title">PRC ID</span>
+              </span>
+              <span class="enhance-row-check" data-done-icon aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+                  <circle cx="11" cy="11" r="11" fill="#2E7D32"/>
+                  <path d="M6.5 11.2l2.8 2.8 6.2-6.4" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </span>
+              <span class="enhance-row-chevron">›</span>
+            </button>
+          </div>
+
+          <div class="enhance-row enhance-row--nav" data-key="payslip" data-href="kyc-enhance-payslip.html">
+            <button type="button" class="enhance-row-trigger">
+              <span class="enhance-row-icon">💰</span>
+              <span class="enhance-row-meta">
+                <span class="enhance-row-title">Payslip</span>
+                <span class="enhance-row-sub">PDF only</span>
+              </span>
+              <span class="enhance-row-check" data-done-icon aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+                  <circle cx="11" cy="11" r="11" fill="#2E7D32"/>
+                  <path d="M6.5 11.2l2.8 2.8 6.2-6.4" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </span>
+              <span class="enhance-row-chevron">›</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <button type="button" class="btn btn-primary" id="btn-submit" disabled>Submit for review</button>
+      <div id="kyc-privacy-note"></div>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+  <script>
+    if (!AppState.requireAuth()) throw '';
+
+    Auth.initKycHints();
+    Auth.bindKycExitRetain({
+      step: 'enhance',
+      mode: 'survey',
+      exitTo: 'home.html',
+      backBtn: '#btn-back'
+    });
+
+    const REQUIRED_KEYS = ['card', 'bank', 'gcash'];
+    const OPTIONAL_KEYS = ['prc', 'payslip'];
+
+    function setRowDone(key, done) {
+      const row = document.querySelector(`.enhance-row[data-key="${key}"]`);
+      if (!row) return;
+      row.classList.toggle('done', !!done);
+      const icon = row.querySelector('[data-done-icon]');
+      if (icon) icon.setAttribute('aria-hidden', done ? 'false' : 'true');
+    }
+
+    function refreshDoneState() {
+      [...REQUIRED_KEYS, ...OPTIONAL_KEYS].forEach(key => {
+        setRowDone(key, AppState.isEnhanceItemDone(key));
+      });
+      const requiredOk = REQUIRED_KEYS.some(k => AppState.isEnhanceItemDone(k));
+      document.getElementById('btn-submit').disabled = !requiredOk;
+    }
+
+    document.querySelectorAll('.enhance-row--nav').forEach(row => {
+      row.querySelector('.enhance-row-trigger')?.addEventListener('click', () => {
+        const href = row.getAttribute('data-href');
+        if (href) AppState.go(href);
+      });
+    });
+
+    document.getElementById('btn-submit').addEventListener('click', () => {
+      if (!REQUIRED_KEYS.some(k => AppState.isEnhanceItemDone(k))) return;
+      const optionalDone = OPTIONAL_KEYS.some(k => AppState.isEnhanceItemDone(k));
+      const requiredCount = REQUIRED_KEYS.filter(k => AppState.isEnhanceItemDone(k)).length;
+      const totalDone = [...REQUIRED_KEYS, ...OPTIONAL_KEYS].filter(k => AppState.isEnhanceItemDone(k)).length;
+      AppState.set(AppState.KEYS.enhanceRequired, optionalDone || requiredCount > 1 || totalDone > 1);
+      AppState.clearPayoutAccount();
+      AppState.startCreditReview();
+      AppState.set(AppState.KEYS.kycStep, 'reviewing');
+      AppState.go('review.html');
+    });
+
+    refreshDoneState();
+  </script>
+</body>
+</html>

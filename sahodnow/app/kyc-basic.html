@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>SahodNow — Basic Information</title>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <div class="app-shell no-nav">
+    <div class="page-header">
+      <button class="back-btn" id="btn-back" aria-label="Back">
+        <svg width="20" height="20" viewBox="0 0 20 20"><path d="M12 4l-6 6 6 6" stroke="#141413" stroke-width="1.5" fill="none"/></svg>
+      </button>
+      <div>
+        <div id="step-label"></div>
+        <h2>Basic information</h2>
+      </div>
+    </div>
+
+    <div class="page-content">
+      <div id="progress-bar"></div>
+
+      <div class="form-section-block">
+        <p class="form-section-title">Basic information</p>
+
+        <div class="form-group">
+          <label class="form-label">Education level</label>
+          <input type="hidden" id="education" value="">
+          <button type="button" class="form-picker-trigger" data-kyc-select="education" aria-haspopup="dialog">
+            <span class="form-picker-trigger__text text-muted">Select</span>
+            <span class="chevron" aria-hidden="true">›</span>
+          </button>
+          <p class="form-error" data-field-error="education"></p>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Purpose of loan</label>
+          <input type="hidden" id="loanPurpose" value="">
+          <button type="button" class="form-picker-trigger" data-kyc-select="loanPurpose" aria-haspopup="dialog">
+            <span class="form-picker-trigger__text text-muted">Select</span>
+            <span class="chevron" aria-hidden="true">›</span>
+          </button>
+          <p class="form-error" data-field-error="loanPurpose"></p>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input class="form-input" type="email" id="personal-email" placeholder="account@email.com" autocomplete="email" required>
+          <div class="email-suffix-row" id="personal-email-suffixes" aria-label="Email domain shortcuts"></div>
+          <p class="form-error" data-field-error="personal-email"></p>
+        </div>
+      </div>
+
+      <div class="form-section-block">
+        <p class="form-section-title">Work information</p>
+
+        <div class="form-group">
+          <label class="form-label">Profession</label>
+          <input type="hidden" id="profession" value="">
+          <button type="button" class="form-picker-trigger" data-kyc-select="profession" aria-haspopup="dialog">
+            <span class="form-picker-trigger__text text-muted">Select</span>
+            <span class="chevron" aria-hidden="true">›</span>
+          </button>
+          <p class="form-error" data-field-error="profession"></p>
+        </div>
+
+        <div class="form-group">
+        <label class="form-label">Monthly income (PHP)</label>
+        <input class="form-input" type="number" id="income" placeholder="e.g. 25000" min="0">
+        <p class="form-error" data-field-error="income"></p>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Payroll period</label>
+        <input type="hidden" id="payrollPeriod" value="">
+        <button type="button" class="form-picker-trigger" data-kyc-select="payrollPeriod" aria-haspopup="dialog">
+          <span class="form-picker-trigger__text text-muted">Select</span>
+          <span class="chevron" aria-hidden="true">›</span>
+        </button>
+        <p class="form-error" data-field-error="payrollPeriod"></p>
+      </div>
+
+      <div class="form-group" id="payroll-date-group" style="display:none;">
+        <label class="form-label">Payroll date</label>
+        <button type="button" class="form-picker-trigger" id="payroll-date-trigger" aria-haspopup="dialog">
+          <span class="form-picker-trigger__text text-muted" id="payroll-date-display">Select</span>
+          <span class="chevron" aria-hidden="true">›</span>
+        </button>
+        <input type="hidden" id="payrollDates" value="">
+        <p class="form-error" data-field-error="payrollDates"></p>
+      </div>
+
+      <div id="work-email-block">
+      <div class="form-group">
+        <label class="form-label">Company name</label>
+        <input class="form-input" type="text" id="companyName" placeholder="e.g. ABC Corporation" autocomplete="organization">
+        <p class="form-error" data-field-error="companyName"></p>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Corporate email</label>
+        <div class="enhance-email-row">
+          <input class="form-input" type="email" id="corp-email" placeholder="you@company.com" autocomplete="work email">
+          <button type="button" class="btn btn-secondary" id="btn-send-code">Send code</button>
+        </div>
+        <p class="form-error" data-field-error="corp-email"></p>
+      </div>
+
+      <div class="form-group" id="email-otp-panel" style="display:none;">
+        <label class="form-label">Verification code</label>
+        <div class="enhance-otp-row" id="email-otp-inputs">
+          <input class="form-input otp-input" type="tel" inputmode="numeric" maxlength="1" aria-label="Digit 1">
+          <input class="form-input otp-input" type="tel" inputmode="numeric" maxlength="1" aria-label="Digit 2">
+          <input class="form-input otp-input" type="tel" inputmode="numeric" maxlength="1" aria-label="Digit 3">
+          <input class="form-input otp-input" type="tel" inputmode="numeric" maxlength="1" aria-label="Digit 4">
+          <input class="form-input otp-input" type="tel" inputmode="numeric" maxlength="1" aria-label="Digit 5">
+          <input class="form-input otp-input" type="tel" inputmode="numeric" maxlength="1" aria-label="Digit 6">
+        </div>
+        <p class="text-muted" style="font-size:13px;margin-top:8px;">Verification code will be sent to your work inbox.</p>
+        <p class="form-error" data-field-error="corp-otp"></p>
+      </div>
+      </div>
+      </div>
+
+      <button class="btn btn-primary" id="btn-next">Continue</button>
+      <div id="kyc-privacy-note"></div>
+    </div>
+  </div>
+
+  <div class="overlay" id="prepare-overlay" role="dialog" aria-modal="true" aria-labelledby="prepare-title">
+    <div class="sheet sheet-prepare">
+      <div class="sheet-handle"></div>
+      <h3 class="prepare-sheet-title" id="prepare-title">Check your limit</h3>
+      <p class="prepare-sheet-lead">
+        Upload a few documents to see how much you may qualify for.
+      </p>
+      <p class="prepare-sheet-hint">Have these ready. Salary proof unlocks a better offer.</p>
+
+      <ul class="prepare-checklist">
+        <li class="prepare-item">
+          <div class="prepare-item-visual" aria-hidden="true">
+            <svg viewBox="0 0 26 26" fill="none">
+              <rect x="4" y="5" width="18" height="16" rx="3" stroke="#141413" stroke-width="1.5"/>
+              <circle cx="10.5" cy="12" r="2.4" stroke="#141413" stroke-width="1.5"/>
+              <path d="M7.5 17.5c.6-1.6 1.8-2.5 3-2.5s2.4.9 3 2.5" stroke="#141413" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M15.5 11h4M15.5 14.5h3" stroke="#F37338" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="prepare-item-body">
+            <strong>Government ID</strong>
+            <span>Clear photo of a valid PH ID</span>
+          </div>
+        </li>
+        <li class="prepare-item">
+          <div class="prepare-item-visual" aria-hidden="true">
+            <svg viewBox="0 0 26 26" fill="none">
+              <path d="M7 4.5h8.5L20.5 9.5V21a1.5 1.5 0 01-1.5 1.5H7A1.5 1.5 0 015.5 21V6A1.5 1.5 0 017 4.5z" stroke="#141413" stroke-width="1.5" stroke-linejoin="round"/>
+              <path d="M15.5 4.5V9h4.5" stroke="#141413" stroke-width="1.5" stroke-linejoin="round"/>
+              <path d="M9 13h8M9 16.5h5.5" stroke="#141413" stroke-width="1.5" stroke-linecap="round"/>
+              <circle cx="18.5" cy="18.5" r="3.5" fill="#F37338"/>
+              <path d="M17.2 18.5l1 1 1.8-2" stroke="#fff" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="prepare-item-body">
+            <strong>Salary proof</strong>
+            <span>Payslip or bank / e-wallet statement</span>
+          </div>
+        </li>
+      </ul>
+
+      <button type="button" class="btn btn-primary prepare-sheet-cta" id="btn-prepare-ready">
+        Got it <span class="prepare-countdown" id="prepare-countdown" aria-live="polite">5s</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="overlay" id="kyc-select-overlay">
+    <div class="sheet sheet-half">
+      <div class="sheet-handle"></div>
+      <h3 class="id-more-sheet-title" data-select-title>Select</h3>
+      <div class="kyc-select-list" data-select-list role="listbox"></div>
+    </div>
+  </div>
+
+  <div class="overlay" id="payroll-date-overlay">
+    <div class="sheet sheet-half">
+      <div class="sheet-handle"></div>
+      <h3 class="id-more-sheet-title" id="payroll-picker-title">Select payroll date</h3>
+      <p class="id-more-sheet-desc" id="payroll-picker-desc">Choose each pay date in order.</p>
+      <div class="payroll-picker-trail" id="payroll-picker-trail"></div>
+      <div class="payroll-wheel-wrap">
+        <div class="payroll-wheel-highlight" aria-hidden="true"></div>
+        <div class="payroll-wheel" id="payroll-picker-wheel" role="listbox" tabindex="0"></div>
+      </div>
+      <button type="button" class="btn btn-primary" id="payroll-picker-confirm">Confirm</button>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+  <script>
+    if (!AppState.requireAuth()) throw '';
+    document.getElementById('step-label').innerHTML = Auth.stepLabel(1);
+    document.getElementById('progress-bar').innerHTML = Auth.progressBar('basic');
+    Auth.initKycHints();
+    Auth.bindPersonalEmailInput(
+      document.getElementById('personal-email'),
+      document.getElementById('personal-email-suffixes')
+    );
+
+    (function bindPrepareSheet() {
+      const overlay = document.getElementById('prepare-overlay');
+      const btn = document.getElementById('btn-prepare-ready');
+      const countdownEl = document.getElementById('prepare-countdown');
+      const AUTO_CLOSE_SEC = 5;
+      let left = AUTO_CLOSE_SEC;
+      let timerId = null;
+      let closed = false;
+
+      const stopTimer = () => {
+        if (timerId) {
+          clearInterval(timerId);
+          timerId = null;
+        }
+      };
+
+      const close = () => {
+        if (closed) return;
+        closed = true;
+        stopTimer();
+        if (countdownEl) countdownEl.textContent = '';
+        AppState.hideOverlay('prepare-overlay');
+      };
+
+      const tick = () => {
+        left -= 1;
+        if (countdownEl) countdownEl.textContent = left > 0 ? `${left}s` : '';
+        if (left <= 0) close();
+      };
+
+      btn.addEventListener('click', close);
+      overlay.addEventListener('click', e => {
+        if (e.target === overlay) close();
+      });
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          AppState.showOverlay('prepare-overlay');
+          left = AUTO_CLOSE_SEC;
+          if (countdownEl) countdownEl.textContent = `${left}s`;
+          timerId = setInterval(tick, 1000);
+        });
+      });
+    })();
+
+    Auth.bindKycSelectSheets({
+      fields: {
+        education: {
+          title: 'Education level',
+          options: [
+            'Primary/Grade School',
+            'Secondary/High School',
+            'Certification/Vocational Courses',
+            "Bachelor's Degree",
+            'Master Degree',
+            'Doctorate'
+          ]
+        },
+        loanPurpose: {
+          title: 'Purpose of loan',
+          options: [
+            'Business Development',
+            'Emergency',
+            'Housing',
+            'Medical',
+            'Education',
+            'Travel',
+            'Special Occasion',
+            'Credit Card',
+            'Loans',
+            'General Expenses',
+            'Other'
+          ]
+        },
+        profession: {
+          title: 'Profession',
+          options: [
+            'Self-employed/Business Owner/Freelancer',
+            'BPO Worker',
+            'Government Employee',
+            'Corporate Employee',
+            'Contract Employee',
+            'Factory Worker',
+            'Construction Worker',
+            'Education/Teaching',
+            'Healthcare/Medical',
+            'Homemaker/Housewife',
+            'Student',
+            'Unemployed',
+            'OFW',
+            'Farmers/Agriculture',
+            'Service Practitioner (beautician/driver etc.)',
+            'Director/Manager'
+          ]
+        },
+        payrollPeriod: {
+          title: 'Payroll period',
+          options: [
+            { value: 'daily', label: 'Daily' },
+            { value: 'weekly', label: 'Weekly' },
+            { value: 'twice', label: 'Twice per Month' },
+            { value: 'once', label: 'Once a Month' }
+          ]
+        }
+      }
+    });
+
+    const workEmailBlock = document.getElementById('work-email-block');
+    if (AppState.getCorpEmailAuthMode() !== 'required') {
+      workEmailBlock.style.display = 'none';
+    }
+
+    Auth.bindKycExitRetain({
+      step: 'basic',
+      mode: 'benefit',
+      exitTo: 'home.html',
+      backBtn: '#btn-back'
+    });
+
+    let emailCodeSent = false;
+    let corpEmailVerified = false;
+    let resendCooldown = 0;
+    let resendTimerId = null;
+
+    const btnSendCode = document.getElementById('btn-send-code');
+
+    function updateResendButton() {
+      if (resendCooldown > 0) {
+        btnSendCode.disabled = true;
+        btnSendCode.textContent = emailCodeSent ? `Resend (${resendCooldown}s)` : `Send code (${resendCooldown}s)`;
+      } else {
+        btnSendCode.disabled = false;
+        btnSendCode.textContent = emailCodeSent ? 'Resend' : 'Send code';
+      }
+    }
+
+    function stopResendCooldown() {
+      clearInterval(resendTimerId);
+      resendTimerId = null;
+      resendCooldown = 0;
+      updateResendButton();
+    }
+
+    function startResendCooldown(sec = 60) {
+      resendCooldown = sec;
+      updateResendButton();
+      clearInterval(resendTimerId);
+      resendTimerId = setInterval(() => {
+        resendCooldown -= 1;
+        if (resendCooldown <= 0) stopResendCooldown();
+        else updateResendButton();
+      }, 1000);
+    }
+
+    btnSendCode.addEventListener('click', () => {
+      if (resendCooldown > 0) return;
+      const email = document.getElementById('corp-email').value.trim();
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        document.getElementById('corp-email').focus();
+        return;
+      }
+      emailCodeSent = true;
+      corpEmailVerified = false;
+      document.getElementById('email-otp-panel').style.display = 'block';
+      startResendCooldown(60);
+      document.querySelector('#email-otp-inputs .otp-input')?.focus();
+    });
+
+    document.getElementById('corp-email').addEventListener('input', () => {
+      corpEmailVerified = false;
+      emailCodeSent = false;
+      stopResendCooldown();
+      document.getElementById('email-otp-panel').style.display = 'none';
+      document.querySelectorAll('#email-otp-inputs .otp-input').forEach(el => { el.value = ''; });
+    });
+
+    Auth.bindOtpInputs(document.getElementById('email-otp-inputs'), code => {
+      corpEmailVerified = code.length === 6 && emailCodeSent;
+    });
+
+    const PAYROLL_DATE_COUNT = {
+      daily: 0,
+      weekly: 4,
+      twice: 2,
+      once: 1
+    };
+
+    const ORDINALS = ['1st', '2nd', '3rd', '4th'];
+    const WEEKDAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+    const payrollPeriodEl = document.getElementById('payrollPeriod');
+    const payrollDateGroup = document.getElementById('payroll-date-group');
+    const payrollDateTrigger = document.getElementById('payroll-date-trigger');
+    const payrollDateDisplay = document.getElementById('payroll-date-display');
+    const payrollDatesInput = document.getElementById('payrollDates');
+
+    let selectedPayrollDates = [];
+    let pickerStep = 0;
+
+    function ordinalLabel(n) {
+      return ORDINALS[n] || `${n + 1}th`;
+    }
+
+    function formatPayrollValue(period, value) {
+      if (period === 'weekly') return value;
+      return `${value}${value === 1 ? 'st' : value === 2 ? 'nd' : value === 3 ? 'rd' : 'th'}`;
+    }
+
+    function getRequiredDateCount() {
+      return PAYROLL_DATE_COUNT[payrollPeriodEl.value] || 0;
+    }
+
+    function getPickerOptions(period) {
+      if (period === 'weekly') return WEEKDAYS.slice();
+      return Array.from({ length: 28 }, (_, i) => i + 1);
+    }
+
+    function formatDisplayValue(period, value) {
+      if (period === 'weekly') return value;
+      return formatPayrollValue(period, value);
+    }
+
+    function formatSelectionSummary(period, dates) {
+      return dates.map(v => formatDisplayValue(period, v)).join(' · ');
+    }
+
+    function isMonthlyPeriod(period) {
+      return period === 'twice' || period === 'once';
+    }
+
+    function isOptionDisabled(period, opt, step) {
+      if (!isMonthlyPeriod(period)) return false;
+      return selectedPayrollDates.some((v, i) => i !== step && v === opt);
+    }
+
+    function isPayrollDatesComplete() {
+      const need = getRequiredDateCount();
+      return need === 0 || selectedPayrollDates.length === need;
+    }
+
+    function updatePayrollDateField() {
+      const period = payrollPeriodEl.value;
+      const need = getRequiredDateCount();
+
+      if (!need) {
+        payrollDateGroup.style.display = 'none';
+        selectedPayrollDates = [];
+        payrollDatesInput.value = '';
+        return;
+      }
+
+      payrollDateGroup.style.display = 'block';
+
+      if (selectedPayrollDates.length === need) {
+        payrollDateDisplay.textContent = formatSelectionSummary(period, selectedPayrollDates);
+        payrollDateDisplay.classList.remove('text-muted');
+        payrollDateTrigger.classList.add('selected');
+        payrollDateTrigger.classList.remove('has-error');
+        payrollDatesInput.value = JSON.stringify({ period, dates: selectedPayrollDates });
+      } else {
+        payrollDateDisplay.textContent = selectedPayrollDates.length
+          ? formatSelectionSummary(period, selectedPayrollDates)
+          : 'Select';
+        payrollDateDisplay.classList.toggle('text-muted', !selectedPayrollDates.length);
+        payrollDateTrigger.classList.toggle('selected', selectedPayrollDates.length > 0);
+        payrollDatesInput.value = '';
+      }
+    }
+
+    function resetPayrollDates() {
+      selectedPayrollDates = [];
+      pickerStep = 0;
+      updatePayrollDateField();
+    }
+
+    function renderPickerTrail(period, need, activeStep) {
+      const trail = document.getElementById('payroll-picker-trail');
+      trail.innerHTML = Array.from({ length: need }, (_, i) => {
+        const done = i < selectedPayrollDates.length;
+        const active = i === activeStep;
+        const cls = ['payroll-picker-trail-item'];
+        if (done) cls.push('done');
+        if (active) cls.push('active');
+        const value = done
+          ? `<span class="trail-value">${formatDisplayValue(period, selectedPayrollDates[i])}</span>`
+          : '';
+        return `<button type="button" class="${cls.join(' ')}" data-step="${i}">
+          <span>${ordinalLabel(i)}</span>${value}
+        </button>`;
+      }).join('');
+
+      trail.querySelectorAll('.payroll-picker-trail-item').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const step = Number(btn.dataset.step);
+          if (step <= selectedPayrollDates.length) {
+            pickerStep = step;
+            selectedPayrollDates = selectedPayrollDates.slice(0, step);
+            renderPayrollPicker();
+          }
+        });
+      });
+    }
+
+    function getAvailablePickerOptions(period, step) {
+      const options = getPickerOptions(period);
+      if (!isMonthlyPeriod(period)) return options;
+      return options.filter(opt => !isOptionDisabled(period, opt, step));
+    }
+
+    const payrollWheelEl = document.getElementById('payroll-picker-wheel');
+    const WHEEL_ITEM_H = 44;
+    let wheelScrollTimer = null;
+
+    function syncWheelActiveItem() {
+      const items = payrollWheelEl.querySelectorAll('.payroll-wheel-item');
+      if (!items.length) return;
+      const rect = payrollWheelEl.getBoundingClientRect();
+      const center = rect.top + rect.height / 2;
+      let activeIdx = 0;
+      let bestDist = Infinity;
+      items.forEach((el, i) => {
+        const r = el.getBoundingClientRect();
+        const dist = Math.abs(r.top + r.height / 2 - center);
+        if (dist < bestDist) {
+          bestDist = dist;
+          activeIdx = i;
+        }
+      });
+      items.forEach((el, i) => el.classList.toggle('is-active', i === activeIdx));
+      return activeIdx;
+    }
+
+    function scrollWheelToIndex(index, smooth = false) {
+      const items = payrollWheelEl.querySelectorAll('.payroll-wheel-item');
+      if (!items.length) return;
+      const idx = Math.max(0, Math.min(index, items.length - 1));
+      payrollWheelEl.scrollTo({
+        top: idx * WHEEL_ITEM_H,
+        behavior: smooth ? 'smooth' : 'auto'
+      });
+      requestAnimationFrame(syncWheelActiveItem);
+    }
+
+    function getWheelSelection() {
+      syncWheelActiveItem();
+      const active = payrollWheelEl.querySelector('.payroll-wheel-item.is-active');
+      if (!active) return null;
+      const period = payrollPeriodEl.value;
+      return period === 'weekly' ? active.dataset.value : Number(active.dataset.value);
+    }
+
+    function bindWheelScroll() {
+      payrollWheelEl.onscroll = () => {
+        syncWheelActiveItem();
+        clearTimeout(wheelScrollTimer);
+        wheelScrollTimer = setTimeout(() => {
+          const idx = syncWheelActiveItem();
+          scrollWheelToIndex(idx, true);
+        }, 100);
+      };
+    }
+
+    payrollWheelEl.addEventListener('click', e => {
+      const item = e.target.closest('.payroll-wheel-item');
+      if (!item) return;
+      const items = [...payrollWheelEl.querySelectorAll('.payroll-wheel-item')];
+      const idx = items.indexOf(item);
+      if (idx >= 0) scrollWheelToIndex(idx, true);
+    });
+
+    function renderPayrollWheel(period, step) {
+      const options = getAvailablePickerOptions(period, step);
+      const current = selectedPayrollDates[step];
+      let startIdx = 0;
+      if (current != null) {
+        const idx = options.findIndex(opt => opt === current);
+        if (idx >= 0) startIdx = idx;
+      }
+
+      payrollWheelEl.innerHTML = options.map(opt => {
+        const label = formatDisplayValue(period, opt);
+        return `<div class="payroll-wheel-item" role="option" data-value="${opt}">${label}</div>`;
+      }).join('');
+
+      bindWheelScroll();
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => scrollWheelToIndex(startIdx));
+      });
+    }
+
+    function confirmPayrollPickerStep() {
+      const period = payrollPeriodEl.value;
+      const need = getRequiredDateCount();
+      const value = getWheelSelection();
+      if (value == null) return;
+
+      selectedPayrollDates[pickerStep] = value;
+      pickerStep += 1;
+
+      if (pickerStep >= need) {
+        AppState.hideOverlay('payroll-date-overlay');
+        updatePayrollDateField();
+        return;
+      }
+      renderPayrollPicker();
+    }
+
+    document.getElementById('payroll-picker-confirm').addEventListener('click', confirmPayrollPickerStep);
+
+    function renderPayrollPicker() {
+      const period = payrollPeriodEl.value;
+      const need = getRequiredDateCount();
+      if (!need) return;
+
+      if (pickerStep >= need) pickerStep = selectedPayrollDates.length;
+
+      document.getElementById('payroll-picker-title').textContent =
+        `Select ${ordinalLabel(pickerStep)} payroll date`;
+      document.getElementById('payroll-picker-desc').textContent =
+        period === 'weekly'
+          ? 'Scroll to pick the weekday you receive pay.'
+          : 'Scroll to pick the day of the month you receive pay.';
+
+      renderPickerTrail(period, need, pickerStep);
+      renderPayrollWheel(period, pickerStep);
+    }
+
+    function openPayrollPicker() {
+      const need = getRequiredDateCount();
+      if (!need) return;
+      pickerStep = selectedPayrollDates.length;
+      if (pickerStep >= need) pickerStep = need - 1;
+      renderPayrollPicker();
+      AppState.showOverlay('payroll-date-overlay');
+    }
+
+    payrollPeriodEl.addEventListener('change', resetPayrollDates);
+
+    payrollDateTrigger.addEventListener('click', () => {
+      document.querySelector('[data-field-error="payrollDates"]')?.classList.remove('show');
+      payrollDateTrigger.classList.remove('has-error');
+      openPayrollPicker();
+    });
+
+    document.getElementById('payroll-date-overlay').addEventListener('click', e => {
+      if (e.target.id === 'payroll-date-overlay') {
+        updatePayrollDateField();
+        AppState.hideOverlay('payroll-date-overlay');
+      }
+    });
+
+    document.getElementById('btn-next').addEventListener('click', () => {
+      const EMPTY_MSG = 'Please complete the required information';
+      const workEmailBlock = document.getElementById('work-email-block');
+      const corpEmailRequired = workEmailBlock && workEmailBlock.style.display !== 'none';
+
+      const clearAllErrors = () => {
+        document.querySelectorAll('[data-field-error]').forEach(err => {
+          err.textContent = '';
+          err.classList.remove('show');
+        });
+        document.querySelectorAll('.form-input.has-error, .form-picker-trigger.has-error').forEach(el => {
+          el.classList.remove('has-error');
+        });
+      };
+
+      const focusTarget = (key) => {
+        const picker = document.querySelector(`[data-kyc-select="${key}"]`);
+        if (picker) {
+          picker.focus({ preventScroll: true });
+          picker.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          return picker;
+        }
+        if (key === 'payrollDates') {
+          payrollDateTrigger.focus({ preventScroll: true });
+          payrollDateTrigger.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          return payrollDateTrigger;
+        }
+        if (key === 'corp-otp') {
+          const otp = document.querySelector('#email-otp-inputs .otp-input');
+          otp?.focus({ preventScroll: true });
+          otp?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          return otp;
+        }
+        const el = document.getElementById(key);
+        el?.focus({ preventScroll: true });
+        el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return el;
+      };
+
+      const showFieldError = (key, message) => {
+        const err = document.querySelector(`[data-field-error="${key}"]`);
+        if (err) {
+          err.textContent = message;
+          err.classList.add('show');
+        }
+        const picker = document.querySelector(`[data-kyc-select="${key}"]`);
+        if (picker) picker.classList.add('has-error');
+        else if (key === 'payrollDates') payrollDateTrigger.classList.add('has-error');
+        else if (key === 'corp-otp') {
+          document.querySelectorAll('#email-otp-inputs .otp-input').forEach(i => i.classList.add('has-error'));
+        } else {
+          document.getElementById(key)?.classList.add('has-error');
+        }
+        focusTarget(key);
+      };
+
+      clearAllErrors();
+
+      const required = [
+        'education',
+        'loanPurpose',
+        'personal-email',
+        'profession',
+        'income',
+        'payrollPeriod'
+      ];
+      if (corpEmailRequired) required.push('companyName', 'corp-email');
+
+      for (const id of required) {
+        const el = document.getElementById(id);
+        if (!el || !String(el.value || '').trim()) {
+          showFieldError(id, EMPTY_MSG);
+          return;
+        }
+      }
+
+      const personalEmail = document.getElementById('personal-email').value.trim();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(personalEmail)) {
+        showFieldError('personal-email', 'Please enter a valid email address.');
+        return;
+      }
+
+      const incomeRaw = document.getElementById('income').value.trim();
+      if (!/^\d+$/.test(incomeRaw)) {
+        showFieldError('income', 'Please enter a whole number (no decimals).');
+        return;
+      }
+      const incomeNum = Number(incomeRaw);
+      if (incomeNum > 1000000) {
+        showFieldError('income', 'Monthly income cannot exceed ₱1,000,000.');
+        return;
+      }
+
+      if (!isPayrollDatesComplete()) {
+        showFieldError('payrollDates', EMPTY_MSG);
+        return;
+      }
+
+      if (!corpEmailRequired) {
+        AppState.set(AppState.KEYS.kycStep, 'id');
+        AppState.go('kyc-id.html');
+        return;
+      }
+
+      const corpEmail = document.getElementById('corp-email').value.trim();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(corpEmail)) {
+        showFieldError('corp-email', 'Please enter a valid email address.');
+        return;
+      }
+
+      if (!corpEmailVerified) {
+        if (!emailCodeSent) {
+          showFieldError('corp-email', 'Please verify your corporate email.');
+          document.getElementById('btn-send-code').click();
+        } else {
+          showFieldError('corp-otp', EMPTY_MSG);
+        }
+        return;
+      }
+
+      AppState.set(AppState.KEYS.kycStep, 'id');
+      AppState.go('kyc-id.html');
+    });
+
+    // Clear field error when user edits
+    ['education', 'loanPurpose', 'profession', 'payrollPeriod'].forEach(id => {
+      document.getElementById(id)?.addEventListener('change', () => {
+        const err = document.querySelector(`[data-field-error="${id}"]`);
+        err?.classList.remove('show');
+        document.querySelector(`[data-kyc-select="${id}"]`)?.classList.remove('has-error');
+      });
+    });
+    ['personal-email', 'income', 'companyName', 'corp-email'].forEach(id => {
+      document.getElementById(id)?.addEventListener('input', () => {
+        const err = document.querySelector(`[data-field-error="${id}"]`);
+        err?.classList.remove('show');
+        document.getElementById(id)?.classList.remove('has-error');
+      });
+    });
+  </script>
+</body>
+</html>

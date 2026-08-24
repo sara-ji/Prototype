@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>SahodNow — Unable to Borrow</title>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <div class="app-shell no-nav">
+    <div class="page-header">
+      <button class="back-btn" onclick="AppState.go('home.html')" aria-label="Back to Home">
+        <svg width="20" height="20" viewBox="0 0 20 20"><path d="M12 4l-6 6 6 6" stroke="#141413" stroke-width="1.5" fill="none"/></svg>
+      </button>
+      <div>
+        <h2>Unable to borrow</h2>
+      </div>
+    </div>
+
+    <div class="page-content" style="padding-top:16px;">
+      <div class="listing-reject-module listing-reject-module--primary">
+        <div class="fail-icon fail-icon--compact">✕</div>
+        <h3 class="listing-reject-module__title">We can't offer you a loan right now</h3>
+        <p class="listing-reject-module__text">
+          Based on our review, we're unable to provide a loan at this time. This is not a final decision on your account — you may be eligible to try again later.
+        </p>
+      </div>
+
+      <div class="listing-reject-module">
+        <p class="listing-reject-module__label">Try again</p>
+        <p class="listing-reject-countdown" id="listing-reject-countdown">7</p>
+        <p class="listing-reject-module__text" id="listing-reject-reapply">You can try again in 7 days</p>
+      </div>
+
+      <div class="listing-reject-module">
+        <p class="listing-reject-module__label">Why this may happen</p>
+        <div id="listing-reject-reasons"></div>
+      </div>
+
+      <button type="button" class="btn btn-primary" id="btn-retry" style="display:none;margin-top:8px;">Try again</button>
+      <button type="button" class="btn btn-secondary" style="margin-top:12px;" onclick="AppState.go('home.html')">Back to Home</button>
+    </div>
+  </div>
+  <script src="js/app.js"></script>
+  <script>
+    if (!AppState.requireApproved()) throw '';
+    AppState.markListingRejected();
+
+    const meta = AppState.getListingRejectMeta();
+    document.getElementById('listing-reject-countdown').textContent = meta.canRetry ? '0' : String(meta.daysRemaining);
+    document.getElementById('listing-reject-reapply').textContent = AppState.formatListingReapplyLabel(meta);
+    document.getElementById('listing-reject-reasons').innerHTML = AppState.renderListingRejectReasonsList();
+
+    const retryBtn = document.getElementById('btn-retry');
+    if (meta.canRetry) {
+      retryBtn.style.display = 'block';
+      retryBtn.addEventListener('click', () => {
+        AppState.clearListingRejected();
+        AppState.startBorrow();
+      });
+    }
+  </script>
+</body>
+</html>
