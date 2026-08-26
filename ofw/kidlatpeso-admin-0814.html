@@ -673,11 +673,11 @@
         mgmt_only_help_title: '仅代填管理可修改的字段',
         mgmt_only_help_note: '普通销售任意时点都不可改以上字段；销管在用户提交终审前均可修改，退回后可继续修改，Pending 仅可修改被标红字段。Co-maker 手机号始终锁定，Backend 不开放新增担保人。',
         detail_suffix: '详情',
-        search_ph: '搜索手机号或 User ID…',
-        list_tip_sales: '默认：终审填资 / 退回 / Pending / 待担保确认。状态筛可选「全部用户状态」或任一状态。搜 1111 可认领未分配。',
-        list_tip_mgmt: '默认仅人审退回 / Pending；状态筛可选「全部用户状态」或指定态，也可用销售 / 搜索扩展。',
-        status_filter_default_sales: '默认：终审填资/退回/Pending/待担保',
-        status_filter_default_mgmt: '默认：退回/Pending',
+        search_ph: '搜索手机号或用户ID…',
+        list_tip_sales: '默认：终审填资 / 退回 / 暂挂 / 待担保确认。状态筛可选「全部用户状态」或任一状态。搜 1111 可认领未分配。',
+        list_tip_mgmt: '默认仅人审退回 / 暂挂；状态筛可选「全部用户状态」或指定态，也可用销售 / 搜索扩展。',
+        status_filter_default_sales: '默认：终审填资/退回/暂挂/待担保',
+        status_filter_default_mgmt: '默认：退回/暂挂',
         status_filter_all: '全部用户状态',
         alert_auto_assign: '已自动分配跟进销售为自己（原型演示）。',
         sales_unassigned: '未分配',
@@ -689,21 +689,21 @@
         all_sales_rep: '全部跟进销售',
         filter_sales_rep: '跟进填资的销售名字',
         profile_status_tip: '填资状态说明销售介入时机；标 ★ 表示当前可协助填资',
-        review_search_ph: '请输入 User ID',
+        review_search_ph: '请输入用户ID',
         review_claim_ph: '输入单量（最多10单）',
         review_claim: '领单',
         review_claim_ok: '已领取 {n} 单（原型演示）',
         review_claim_none: '暂无可领取的未分配案件',
-        review_assign: 'Owner分配',
+        review_assign: '分配审核员',
         review_assign_ph: '请选择审核账号',
         review_assign_ok: '已分配 {n} 单（原型演示）',
         review_assign_need: '请勾选案件并选择审核人员',
         review_col_applied: '申请时间',
         review_col_audit_status: '审核状态',
         review_col_last_call: '上次拨打时间',
-        review_col_owner: 'Owner',
+        review_col_owner: '审核员',
         review_stat_rank: '排名',
-        review_stat_owner: '审核Owner',
+        review_stat_owner: '审核员',
         review_stat_cases: '案件数',
         review_stat_done_today: '今日已完成案件量',
         review_stat_untouched: '未触碰案件数量',
@@ -716,7 +716,7 @@
         review_detail: 'OFW审核详情',
         rv_detail_title: 'OFW审核详情',
         rv_borrower_info: '借款人信息',
-        rv_listing_id: 'ListingID',
+        rv_listing_id: 'Listing ID',
         rv_loan_term: '期限',
         rv_mother_maiden: '母家姓',
         rv_dob: '出生日期',
@@ -784,19 +784,19 @@
         rv_borrower_material: '借款人材料',
         rv_id_photo: 'ID照片',
         rv_liveness: '活体照片',
-        rv_oec: 'Valid OEC',
+        rv_oec: '有效 OEC',
         rv_visa: '签证',
         rv_flight: '机票行程单',
         rv_work_contract: '工作合同',
         rv_contract: '工作合同',
         rv_pass: '通过',
         rv_reject: '退回',
-        rv_mark_pending: 'Pending',
+        rv_mark_pending: '暂挂',
         rv_mark_reject: '拒绝',
-        rv_match_id: 'match the id',
-        rv_no_match_id: 'no match the id',
-        rv_match: 'match the id',
-        rv_no_match: 'no match the id',
+        rv_match_id: '与证件匹配',
+        rv_no_match_id: '与证件不匹配',
+        rv_match: '与证件匹配',
+        rv_no_match: '与证件不匹配',
         rv_contacts: '联系人信息',
         rv_comaker_info: '担保人信息',
         rv_phone: '电话',
@@ -819,19 +819,21 @@
         rv_audit_log: 'OFW审核记录',
         rv_add_tags: '添加审核标签',
         rv_audit_status_now: '当前审核状态',
+        rv_must_mark_materials: '必须标记的材料',
+        rv_current_marks: '当前审核标记',
         rv_audit_status: '字段标记',
         rv_audit_pending: '已审',
         rv_suggest_pass: '通过',
         rv_suggest_reject: '拒绝',
         rv_suggest_return: '退回',
-        rv_suggest_pending: 'Pending',
+        rv_suggest_pending: '暂挂',
         rv_open_decision: '确认提交',
         rv_pending_hold: '销售修改资料中，暂无法审核',
         rv_pending_countdown: '倒计时',
         rv_stat_pass: '通过',
         rv_stat_return: '退回',
         rv_stat_reject: '拒绝',
-        rv_stat_pending: 'Pending',
+        rv_stat_pending: '暂挂',
         rv_stat_idle: '未标',
         rv_gate_has_issue: '存在退回 / Pending / 拒绝标记，不可通过。',
         rv_gate_has_return: '存在退回或拒绝标记，不可 Pending。',
@@ -845,7 +847,7 @@
         dec_outcome_hint: '先选结论，再核对已标记资料。',
         dec_return_title: '退回',
         dec_return_desc: '用户或销售补件。',
-        dec_pending_title: 'Pending',
+        dec_pending_title: '暂挂',
         dec_pending_desc: '先由销售修改。',
         dec_reject_title: '拒绝',
         dec_reject_desc: '本轮不再补件。',
@@ -885,28 +887,28 @@
         alert_rejected: '已提交拒绝。用户将看到拒绝结果。',
         alert_returned: '已提交退回。用户可在退回页补件，销售代填会标红对应字段。',
         alert_pending: '已提交 Pending。审核单已挂起，已通知销售改资料；用户仍显示审核中。',
-        reason_key_mismatch: 'Key info mismatched',
-        reason_not_target: 'Not target material',
-        reason_forged: 'forged document',
-        reason_key_unqualified: 'Key info unqualified',
-        reason_expired: 'Material has expired',
-        reason_other: 'Other',
-        biz_not_first: 'Not first-time OFW',
-        biz_seaman: 'Seaman',
-        biz_fraud: 'Potential fraud',
-        biz_id: 'ID issue',
-        biz_comaker: 'Unqualified co-maker',
-        biz_calling: 'Calling Issue',
-        biz_other: 'Other',
+        reason_key_mismatch: '关键信息不符',
+        reason_not_target: '非目标材料',
+        reason_forged: '伪造材料',
+        reason_key_unqualified: '关键信息不达标',
+        reason_expired: '材料已过期',
+        reason_other: '其他',
+        biz_not_first: '非首次 OFW',
+        biz_seaman: '海员',
+        biz_fraud: '疑似欺诈',
+        biz_id: '证件问题',
+        biz_comaker: '担保人不符合要求',
+        biz_calling: '外呼问题',
+        biz_other: '其他',
         alert_saved_return_final: '已保存并重新提交终审戳额（原型演示）。',
         alert_saved_pending: '已更新 Pending 资料，已通知原审核员继续审核（不重新终审）。',
         flag_return: '人审退回',
-        flag_pending: 'Pending',
+        flag_pending: '暂挂',
         notif_title: '通知',
         notif_mark_all: '全部已读',
         notif_empty: '暂无通知',
         notif_view: '查看',
-        notif_userid: 'UserID: {id}',
+        notif_userid: '用户ID：{id}',
         notif_time: '时间：{time}',
         notif_return_title: '人审退回待处理(OFW)',
         notif_return_body: '{name}（{id}）材料被退回，请尽快协助补件。',
@@ -916,14 +918,14 @@
         notif_user_fixed_body: '{name}（{id}）已改完资料，请继续审核。',
         notif_return_resubmit_title: '退回补件已重提(OFW)',
         notif_return_resubmit_body: '{name}（{id}）已补件并重新提交终审（演示）。',
-        rv_rel_user: 'User',
+        rv_rel_user: '用户',
         rv_audit_pending_fmt: '还有 {n} 项图片待审核',
         rv_no_selected_cm: '用户下单时未选择担保人',
         rv_no_comaker: '用户下单时未选择担保人',
         col_no: '序号',
         col_mobile: '手机号',
         col_name: '姓名',
-        col_user_id: 'User ID',
+        col_user_id: '用户ID',
         col_version: '用户版本',
         col_registered: '注册时间',
         col_channel: '邀请人',
@@ -951,10 +953,10 @@
         col_profile_status: '用户状态',
         all_profile_status: '全部用户状态',
         profile_status_tip: '状态说明销售介入时机；标 ★ 表示当前可主动触达',
-        sec_identity: 'ID Information',
-        sec_basics: 'Basic info',
-        sec_work: 'Work info',
-        sec_contacts: 'Contacts',
+        sec_identity: '证件信息',
+        sec_basics: '基本信息',
+        sec_work: '工作信息',
+        sec_contacts: '联系人',
         phase_pre: '戳额前',
         phase_final: '终审前',
         phase_loan: '发标',
@@ -1202,6 +1204,8 @@
         rv_audit_log: 'OFW Audit Log',
         rv_add_tags: 'Add Audit Tags',
         rv_audit_status: 'Field marks',
+        rv_must_mark_materials: 'Materials that must be marked',
+        rv_current_marks: 'Current review marks',
         rv_audit_pending: 'Reviewed',
         rv_suggest_pass: 'Pass',
         rv_suggest_reject: 'Reject',
@@ -1426,6 +1430,190 @@
     };
     function t(key) {
       return (I18N[lang] && I18N[lang][key]) || (I18N.en && I18N.en[key]) || key;
+    }
+
+    /** EN field/option labels → ZH when lang=zh. Listing ID stays English. */
+    const LABEL_ZH = {
+      'Philippine Passport Photo': '菲律宾护照照片',
+      'Passport Number': '护照号码',
+      'First Name': '名',
+      'Middle Name': '中间名',
+      'Last Name': '姓',
+      "Mother's Maiden Name": '母亲娘家姓',
+      'Date of Birth': '出生日期',
+      'Gender': '性别',
+      'Marital Status': '婚姻状况',
+      'Residential Address': '住址',
+      'Residential Address in PH': '菲律宾住址',
+      'Complete Address with House/Unit Number': '详细地址（含门牌）',
+      'Complete Address': '详细地址',
+      'Education Level': '学历',
+      'Email': '邮箱',
+      'Social Media': '社交媒体',
+      'Social Media Account': '社交账号',
+      'Credit Card Ownership': '是否持有信用卡',
+      'Country of Employment': '就业国家',
+      'Occupation': '职业',
+      'Monthly income': '月收入',
+      'OFW Agency': 'OFW 中介',
+      'Invitation Code': '邀请码',
+      'Activity Code': '活动码',
+      'Valid Visa': '有效签证',
+      'Valid Visa / Document': '有效签证 / 证件',
+      'Visa Expiration Date': '签证到期日',
+      'Valid OEC': '有效 OEC',
+      'Contract Duration on OEC': 'OEC 合同期限',
+      'Flight Itinerary': '机票行程单',
+      'Departure Date': '出发日期',
+      'Employer Name': '雇主名称',
+      'Employer Address': '雇主地址',
+      'Employer Phone Number': '雇主电话',
+      'Contract with Employer': '雇主合同',
+      'Payroll Period': '发薪周期',
+      'Expected Payday': '预计发薪日',
+      'Estimated Start Date of Work': '预计开工日期',
+      'Nationality': '国籍',
+      'Employer Type': '雇主类型',
+      'Current Job Start Date': '当前工作开始日期',
+      'Current Job End Date': '当前工作结束日期',
+      'Overseas Residence Document Type': '海外居留证件类型',
+      'Issue Date': '签发日期',
+      'Expiration Date': '到期日期',
+      'Visa Issue Date': '签证签发日期',
+      'Oversea Government-Issued ID': '海外政府证件',
+      'Overseas Phone Number': '海外手机号',
+      'First Overseas Job Start Date': '首次海外工作开始日期',
+      'Proof of income': '收入证明',
+      'Proof of employment': '在职证明',
+      'Agency Information': '中介信息',
+      'ID Information': '证件信息',
+      'Basic info': '基本信息',
+      'Work info': '工作信息',
+      'Contacts': '联系人',
+      "Contact's Name": '联系人姓名',
+      "Contact's Phone Number": '联系人电话',
+      "Contact's Relationship": '联系人关系',
+      "Contact's Residential Address": '联系人住址',
+      'Name': '姓名',
+      'Phone Number': '手机号',
+      'Relationship': '关系',
+      'Contact · Name': '联系人 · 姓名',
+      'Contact · Phone Number': '联系人 · 手机号',
+      'Contact · Relationship': '联系人 · 关系',
+      'Contact 1 · Name': '联系人1 · 姓名',
+      'Contact 1 · Phone Number': '联系人1 · 手机号',
+      'Contact 1 · Relationship': '联系人1 · 关系',
+      'Contact 1 · Residential Address': '联系人1 · 住址',
+      'Contact 1 · Complete Address': '联系人1 · 详细地址',
+      "Contact 1 · Contact's Name": '联系人1 · 姓名',
+      "Contact 1 · Contact's Phone Number": '联系人1 · 手机号',
+      "Contact 1 · Contact's Relationship": '联系人1 · 关系',
+      "Contact 1 · Contact's Residential Address": '联系人1 · 住址',
+      'Contact 2 · Name': '联系人2 · 姓名',
+      'Contact 2 · Phone Number': '联系人2 · 手机号',
+      'Contact 2 · Relationship': '联系人2 · 关系',
+      'Contact 2 · Residential Address': '联系人2 · 住址',
+      'Contact 2 · Complete Address': '联系人2 · 详细地址',
+      "Contact 2 · Contact's Name": '联系人2 · 姓名',
+      "Contact 2 · Contact's Phone Number": '联系人2 · 手机号',
+      "Contact 2 · Contact's Relationship": '联系人2 · 关系',
+      "Contact 2 · Contact's Residential Address": '联系人2 · 住址',
+      "Co-maker's Phone Number": '担保人手机号',
+      "Co-maker's First Name": '担保人名',
+      "Co-maker's Middle Name": '担保人中间名',
+      "Co-maker's Last Name": '担保人姓',
+      'Relationship with Co-maker': '与担保人关系',
+      "Co-maker's Date Of Birth": '担保人出生日期',
+      "Co-maker's Gender": '担保人性别',
+      "Co-maker's ID Type": '担保人证件类型',
+      "Co-maker's ID Number": '担保人证件号码',
+      "Co-maker's ID photo": '担保人证件照',
+      "Co-maker's Residential Address": '担保人住址',
+      "Co-maker's Complete Address": '担保人详细地址',
+      "Co-maker's Email": '担保人邮箱',
+      "Co-maker's Occupation": '担保人职业',
+      "Co-maker's Monthly Income": '担保人月收入',
+      'Relationship Certificate Type': '关系证明类型',
+      'Relationship Certificate': '关系证明',
+      "Co-maker's Proof of Address Type": '担保人地址证明类型',
+      "Co-maker's Proof of Address": '担保人地址证明',
+      'Male': '男',
+      'Female': '女',
+      'Single': '单身',
+      'Married': '已婚',
+      'Separated': '分居',
+      'Widowed': '丧偶',
+      'Yes': '是',
+      'No': '否',
+      'Other': '其他',
+      'Spouse': '配偶',
+      'Parent': '父母',
+      'Child': '子女',
+      'Sibling': '兄弟姐妹',
+      'Relative': '亲属',
+      'Colleague': '同事',
+      'Friend': '朋友',
+      'Daily': '日结',
+      'Weekly': '周结',
+      'Twice per month': '每月两次',
+      'Once a month': '每月一次',
+      'Primary / Grade School': '小学',
+      'Secondary / High School': '中学',
+      "Bachelor's Degree": '学士',
+      'Master Degree': '硕士',
+      'Domestic Helper': '家政',
+      'Healthcare / Medical': '医疗健康',
+      'Catering': '餐饮',
+      'Construction Worker': '建筑工人',
+      'BPO worker': 'BPO',
+      'Public institutions': '公共机构',
+      'Enterprises': '企业',
+      'Private individuals': '私人雇主',
+      'Employment / Work Visa': '工作签证',
+      'Residence Visa': '居留签证',
+      'Skilled Professional Visa': '技术专业签证',
+      'Permanent Resident': '永久居民',
+      'Dependent Visa with Work Permit': '家属签证（可工作）',
+      'Special / Golden Visa': '特殊 / 黄金签证',
+      'J1/H1B Visa': 'J1/H1B 签证',
+      'Marriage Certificate': '结婚证',
+      'Birth Certificate': '出生证明',
+      'Affidavit of Relationship': '关系宣誓书',
+      'Bank Account Summary (past 3 months)': '近3个月银行流水',
+      'Utility Bills': '水电账单',
+      'Barangay Clearance': '巴郎盖证明',
+      'Self-employed / Business Owner / Freelancer': '自雇 / 企业主 / 自由职业',
+      'Government Employee': '政府雇员',
+      'Corporate Employee': '企业雇员',
+      'UMID': 'UMID',
+      'Driver License': '驾照',
+      'Passport': '护照',
+      'SSS ID': 'SSS ID',
+      'PhilHealth ID': 'PhilHealth ID',
+      'Saudi Arabia': '沙特阿拉伯',
+      'UAE': '阿联酋',
+      'Hong Kong': '香港',
+      'Singapore': '新加坡',
+      'Qatar': '卡塔尔',
+      'Philippines': '菲律宾',
+      'Agency A': '中介 A',
+      'Agency B': '中介 B',
+      'Agency C': '中介 C',
+    };
+    function locLabel(s) {
+      if (s == null || s === '') return s;
+      if (lang !== 'zh') return s;
+      const str = String(s);
+      if (/^Listing\s*ID$/i.test(str.trim())) return 'Listing ID';
+      if (LABEL_ZH[str]) return LABEL_ZH[str];
+      // Contact N · Xxx composed labels
+      const m = str.match(/^(Contact [12]) · (.+)$/);
+      if (m) {
+        const left = m[1] === 'Contact 1' ? '联系人1' : '联系人2';
+        const right = LABEL_ZH[m[2]] || m[2];
+        return left + ' · ' + right;
+      }
+      return str;
     }
     function setLang(next) {
       lang = next;
@@ -1792,7 +1980,7 @@
         <button type="button" class="help-q" aria-label="${esc(t('mgmt_only_help_title'))}">?</button>
         <span class="help-pop" role="tooltip">
           <strong>${esc(t('mgmt_only_help_title'))}</strong>
-          <ul>${MGMT_ONLY_FIELD_LABELS.map(l => `<li>${esc(l)}</li>`).join('')}</ul>
+          <ul>${MGMT_ONLY_FIELD_LABELS.map(l => `<li>${esc(locLabel(l))}</li>`).join('')}</ul>
           <p class="help-note">${esc(t('mgmt_only_help_note'))}</p>
         </span>
       </span>`;
@@ -1803,77 +1991,77 @@
     const USER_STATUS_META = {
       FILLING_PRE: {
         labelZh: '注册未填资', labelEn: 'Not started', color: 'info',
-        actionZh: '可开始协助填资', actionEn: 'Can start assisting fill',
+        actionZh: '辅助用户填资', actionEn: 'Assist user fill',
         salesHelp: true, lockBorrower: false, lockActiveCm: false,
       },
       PRE_REVIEWING: {
         labelZh: '初审中', labelEn: 'Pre reviewing', color: 'info',
-        actionZh: '观望，勿改关键资质', actionEn: 'Wait — do not edit key fields',
+        actionZh: '', actionEn: '',
         salesHelp: false, lockBorrower: true, lockActiveCm: false,
       },
       PRE_REJECTED: {
         labelZh: '初审拒绝', labelEn: 'Pre rejected', color: 'danger',
-        actionZh: '一般不介入', actionEn: 'Usually no follow-up',
+        actionZh: '', actionEn: '',
         salesHelp: false, lockBorrower: true, lockActiveCm: false,
       },
       PRE_APPROVED: {
         labelZh: '终审填资', labelEn: 'Final filling', color: 'success', star: true,
-        actionZh: '已有初审额，催补详资冲终审', actionEn: 'Starter limit ready — push final fill',
+        actionZh: '辅助用户填资', actionEn: 'Assist user fill',
         salesHelp: true, lockBorrower: false, lockActiveCm: false,
       },
       FINAL_REVIEWING: {
         labelZh: '终审中', labelEn: 'Final reviewing', color: 'info',
-        actionZh: '观望', actionEn: 'Wait',
+        actionZh: '', actionEn: '',
         salesHelp: false, lockBorrower: true, lockActiveCm: false,
       },
       FINAL_REJECTED: {
         labelZh: '终审拒绝', labelEn: 'Final rejected', color: 'danger',
-        actionZh: '一般不介入', actionEn: 'Usually no follow-up',
+        actionZh: '', actionEn: '',
         salesHelp: false, lockBorrower: true, lockActiveCm: false,
       },
       LIMIT_READY: {
         labelZh: '有额未借', labelEn: 'Ready to loan', color: 'success', star: true,
-        actionZh: '终审额已出，推确认借款 / 补担保与账户', actionEn: 'Push loan confirm / co-maker / payout account',
+        actionZh: '推动用户借款', actionEn: 'Push user to borrow',
         salesHelp: 'cm_only', lockBorrower: true, lockActiveCm: false,
       },
       LOAN_COMAKER_CONFIRM: {
-        labelZh: '待担保确认', labelEn: 'Awaiting co-maker', color: 'warning', star: true,
-        actionZh: '催 Co-maker 确认；必要时取消借款换人', actionEn: 'Chase co-maker; may cancel loan to switch',
+        labelZh: '待担保人确认', labelEn: 'Awaiting co-maker', color: 'warning', star: true,
+        actionZh: '推动co-maker确认', actionEn: 'Push co-maker to confirm',
         salesHelp: 'cm_other', lockBorrower: true, lockActiveCm: true,
       },
       LOAN_REVIEWING: {
         labelZh: '发标审核中', labelEn: 'Listing under review', color: 'info',
-        actionZh: '已发标，只读等结果', actionEn: 'Listed — read-only follow-up',
+        actionZh: '', actionEn: '',
         salesHelp: false, lockBorrower: true, lockActiveCm: true,
       },
       LOAN_REJECTED: {
         labelZh: '发标拒绝', labelEn: 'Listing rejected', color: 'danger',
-        actionZh: '标的已失败（含机审拒 / 人审拒）', actionEn: 'Listing failed (machine or manual reject)',
+        actionZh: '', actionEn: '',
         salesHelp: false, lockBorrower: true, lockActiveCm: true,
       },
       MANUAL_RETURNED: {
         labelZh: '人审退回', labelEn: 'Manual returned', color: 'warning', star: true,
-        actionZh: '改标红退回项后重提终审（编辑能力同终审填资）', actionEn: 'Fix returned fields then re-submit final (edit rules like final filling)',
+        actionZh: '有资料需要修改', actionEn: 'Materials need update',
         salesHelp: true, lockBorrower: false, lockActiveCm: false,
       },
       MANUAL_PENDING: {
-        labelZh: '人审 Pending', labelEn: 'Manual pending', color: 'warning', star: true,
-        actionZh: '仅改标红 Pending 项并提交，无需重跑终审', actionEn: 'Edit pending fields only — no re-final',
+        labelZh: '人审Pending', labelEn: 'Manual pending', color: 'warning', star: true,
+        actionZh: '有资料需要修改', actionEn: 'Materials need update',
         salesHelp: 'pending_only', lockBorrower: false, lockActiveCm: true,
       },
       DISBURSING: {
         labelZh: '放款中', labelEn: 'Disbursing', color: 'info',
-        actionZh: '告知等待', actionEn: 'Tell user to wait',
+        actionZh: '', actionEn: '',
         salesHelp: false, lockBorrower: true, lockActiveCm: true,
       },
       DISBURSED: {
         labelZh: '放款成功', labelEn: 'Disbursed', color: 'success',
-        actionZh: '结案', actionEn: 'Closed',
+        actionZh: '', actionEn: '',
         salesHelp: false, lockBorrower: true, lockActiveCm: true,
       },
       DISBURSED_FAILED: {
         labelZh: '放款失败', labelEn: 'Disbursement failed', color: 'danger', star: true,
-        actionZh: '放款异常，走救回流程', actionEn: 'Disbursement failed — recover',
+        actionZh: '', actionEn: '',
         salesHelp: false, lockBorrower: true, lockActiveCm: true,
       },
     };
@@ -2076,34 +2264,47 @@
     function teamBEditHint(user) {
       const code = userStatus(user);
       const m = usMeta(code);
+      const zh = lang === 'zh';
       if (isSalesMgmtMenu() && isBeforeFinalSubmit(user)) {
-        return lang === 'zh'
-          ? `${m.label} · 用户提交终审前，销管可编辑资料并维护已有 Co-maker；不开放新增 Co-maker，Co-maker 手机号始终不可改。`
-          : `${m.label} · Before final submission, Sales Assist Admin can edit data and maintain existing co-makers. Backend cannot add co-makers, and co-maker phone is always locked.`;
+        return zh
+          ? `${m.label}：现在可以改资料、维护已有担保人。注意不能新增担保人，用户/担保人手机号也不能改。`
+          : `${m.label}: You can edit profile and maintain existing co-makers. Cannot add co-makers; borrower/co-maker phones are locked.`;
       }
-      if (code === 'FILLING_PRE') {
-        return `${m.label} · ${m.action} · ${lang === 'zh' ? '本人资料与担保人均可代填/修改。' : 'Borrower profile and co-makers are editable.'}`;
-      }
-      if (code === 'PRE_APPROVED') {
-        return `${m.label} · ${m.action} · ${lang === 'zh' ? '本人资料与担保人均可代填/修改。' : 'Borrower profile and co-makers are editable.'}`;
-      }
-      if (code === 'MANUAL_RETURNED') {
-        return lang === 'zh'
-          ? `${m.label} · 标红为退回字段须优先修改；其他本人资料亦可编辑（销售无权字段除外，规则同终审填资）。保存后重新提交终审戳额。`
-          : `${m.label} · Highlighted = returned fields; other borrower fields editable like final filling (except sales-restricted). Save then re-submit final stamp.`;
-      }
-      if (code === 'MANUAL_PENDING') {
-        return lang === 'zh'
-          ? `${m.label} · 仅标红 Pending 字段可编辑；其他只读。保存后更新资料并通知原审核员，不重新终审。用户 APP 仍显示审核中。`
-          : `${m.label} · Only highlighted Pending fields editable. Save updates data and notifies reviewer — no re-final. APP stays under review.`;
-      }
-      if (code === 'LIMIT_READY') {
-        return `${m.label} · ${lang === 'zh' ? '终审后本人资料已锁定；可维护担保人并推发标。' : 'Borrower locked after final limit; co-makers editable — push listing.'}`;
-      }
-      if (code === 'LOAN_COMAKER_CONFIRM') {
-        return `${m.label} · ${lang === 'zh' ? '本人已锁；担保中 Co-maker 不可改；未担保中可改。' : 'Borrower locked; guaranteeing CM locked; non-guaranteeing editable.'}`;
-      }
-      return `${m.label} · ${m.action}`;
+      const hintsZh = {
+        FILLING_PRE: `${m.label}：可以帮用户填预审资料。填好后提醒他在 APP 提交初审——后台不能代提交。`,
+        PRE_REVIEWING: `${m.label}：结果还没出来，先别改资料，等初审结果就好。`,
+        PRE_REJECTED: `${m.label}：初审没过，一般不用再跟进填资。`,
+        PRE_APPROVED: `${m.label}：可以继续帮用户补终审资料。保存后提醒他在 APP 提交终审——后台不能代提交。`,
+        FINAL_REVIEWING: `${m.label}：结果还没出来，先别改资料，等终审结果就好。`,
+        FINAL_REJECTED: `${m.label}：终审没过，一般不用再跟进。`,
+        LIMIT_READY: `${m.label}：催用户去 APP 确认借款。本人资料已锁，需要时可以维护担保人信息。`,
+        LOAN_COMAKER_CONFIRM: `${m.label}：催担保人尽快确认。本人资料已锁；担保中的 Co-maker 不能改，其他未担保的还可以维护。`,
+        LOAN_REVIEWING: `${m.label}：审核进行中，资料只读。告知用户耐心等待即可。`,
+        LOAN_REJECTED: `${m.label}：发标已拒绝，结案告知即可。`,
+        MANUAL_RETURNED: `${m.label}：优先改标红字段，其他本人资料也能改。改完点保存；终审要用户自己在 APP 提交，后台代不了。`,
+        MANUAL_PENDING: `${m.label}：只改标红的 Pending 字段，改完保存会通知审核员继续审。用户 APP 仍显示审核中，一般不用特意告知。`,
+        DISBURSING: `${m.label}：放款处理中，告知用户等待即可。`,
+        DISBURSED: `${m.label}：已放款成功，可以结案。`,
+        DISBURSED_FAILED: `${m.label}：放款异常，按救回流程跟进。`,
+      };
+      const hintsEn = {
+        FILLING_PRE: `${m.label}: Help fill pre-review info, then remind the user to submit in APP — BK cannot submit for them.`,
+        PRE_REVIEWING: `${m.label}: Result pending — don't edit; wait for pre-review.`,
+        PRE_REJECTED: `${m.label}: Pre-review failed — usually no further fill follow-up.`,
+        PRE_APPROVED: `${m.label}: Help complete final-fill info, then remind the user to submit final in APP — BK cannot submit.`,
+        FINAL_REVIEWING: `${m.label}: Result pending — don't edit; wait for final review.`,
+        FINAL_REJECTED: `${m.label}: Final rejected — usually no further follow-up.`,
+        LIMIT_READY: `${m.label}: Push the user to confirm the loan in APP. Borrower profile is locked; you can still maintain co-makers if needed.`,
+        LOAN_COMAKER_CONFIRM: `${m.label}: Push the co-maker to confirm. Borrower locked; active guaranteeing co-maker locked; others still editable.`,
+        LOAN_REVIEWING: `${m.label}: Under listing review — read-only. Tell the user to wait.`,
+        LOAN_REJECTED: `${m.label}: Listing rejected — close the case with the user.`,
+        MANUAL_RETURNED: `${m.label}: Fix highlighted fields first; other borrower fields are editable too. Save only — user must re-submit final in APP.`,
+        MANUAL_PENDING: `${m.label}: Edit highlighted Pending fields only, then save to notify the reviewer. APP still shows under review — usually no need to tell the user.`,
+        DISBURSING: `${m.label}: Disbursing — tell the user to wait.`,
+        DISBURSED: `${m.label}: Disbursed successfully — you can close the case.`,
+        DISBURSED_FAILED: `${m.label}: Disbursement failed — follow recovery flow.`,
+      };
+      return (zh ? hintsZh : hintsEn)[code] || `${m.label}${m.action ? '：' + m.action : ''}`;
     }
 
     const MOCK_IMG = {
@@ -2779,11 +2980,11 @@
     }
 
     function rf(label, value, fieldKey, tip, extra) {
-      return { label, value, fieldKey, tip, ...(extra || {}) };
+      return { label: locLabel(label), value: locLabel(value), fieldKey, tip, ...(extra || {}) };
     }
 
     function rfMeta(label, value, tip, extra) {
-      return { label, value, tip, ...(extra || {}) };
+      return { label: locLabel(label), value, tip, ...(extra || {}) };
     }
 
     function setPendingHold(user) {
@@ -3136,7 +3337,7 @@
       return {
         key: item.key,
         fieldKey: item.fieldKey,
-        label: item.label,
+        label: locLabel(item.label),
         person: item.person || 'borrower',
         personLabel: item.personLabel,
         url: item.url || '',
@@ -3163,7 +3364,7 @@
             const marks = userId && f.fieldKey
               ? renderMarkButtons(userId, f.fieldKey, pendingKeys.has(f.fieldKey), { requirePass: false })
               : '';
-            html += `<th class="rv-label">${esc(f.label)}${fieldTipMark(f.tip)}</th><td class="rv-value"><span class="rv-val-text">${val}</span>${marks}</td>`;
+            html += `<th class="rv-label">${esc(locLabel(f.label))}${fieldTipMark(f.tip)}</th><td class="rv-value"><span class="rv-val-text">${val}</span>${marks}</td>`;
           } else {
             html += '<th class="rv-label rv-pad"></th><td class="rv-value rv-pad"></td>';
           }
@@ -3231,7 +3432,7 @@
         ? `<button type="button" class="img-thumb-btn" onclick="openLightbox('${esc(item.url)}')"><img class="audit-thumb" src="${esc(item.url)}" alt="" /></button>`
         : `<div class="audit-thumb placeholder">${esc(item.placeholder || '—')}</div>`;
       return `<div class="audit-card${cardClass}">
-        <div class="audit-card-title">${esc(item.label)}${fieldTipMark(item.tip)}</div>
+        <div class="audit-card-title">${esc(locLabel(item.label))}${fieldTipMark(item.tip)}</div>
         <div class="audit-card-img">${img}</div>
         <div class="audit-card-actions">${btns}</div>
       </div>`;
@@ -3483,8 +3684,8 @@
               const rejectTitle = canReject ? '' : esc(rejectBlockReason(user));
               const pendingTitle = canPending ? '' : esc(pendingBlockReason(user));
               return `
-              <p class="rv-audit-status primary">必须标记的材料：${img.marked}/${img.total}</p>
-              <p class="rv-audit-status secondary">当前审核标记：${t('rv_stat_pass')} ${marks.passed} · ${t('rv_stat_return')} ${marks.returned} · ${t('rv_stat_pending')} ${marks.pending} · ${t('rv_stat_reject')} ${marks.rejected}</p>
+              <p class="rv-audit-status primary">${t('rv_must_mark_materials')}：${img.marked}/${img.total}</p>
+              <p class="rv-audit-status secondary">${t('rv_current_marks')}：${t('rv_stat_pass')} ${marks.passed} · ${t('rv_stat_return')} ${marks.returned} · ${t('rv_stat_pending')} ${marks.pending} · ${t('rv_stat_reject')} ${marks.rejected}</p>
               ${hold ? `<p class="rv-pending-hold">${t('rv_pending_countdown')} <span class="cd" id="pending-countdown">${esc(formatPendingCountdown(user.pendingUntil))}</span> · ${t('rv_pending_hold')}</p>` : ''}
               <div class="rv-action-row">
                 <button type="button" class="btn-suggest${canPass ? '' : ' disabled'}" title="${passTitle}" onclick="reviewDecision('${user.id}', 'pass')">${t('rv_suggest_pass')}</button>
@@ -4144,7 +4345,7 @@
       }
       const thumb = url
         ? `<button type="button" class="img-thumb-btn" onclick="openLightbox('${esc(url)}')">
-             <img class="field-thumb" src="${esc(url)}" alt="${esc(field.label)}" />
+             <img class="field-thumb" src="${esc(url)}" alt="${esc(locLabel(field.label))}" />
            </button>`
         : `<span class="file-ok">${esc(v)}</span>`;
       return editable
@@ -4162,7 +4363,7 @@
       if (field.type === 'select') {
         return `<select onchange="${changeFn}">
           <option value="">${t('please_select')}</option>
-          ${field.options.map(o => `<option value="${esc(o)}"${v===o?' selected':''}>${esc(o)}</option>`).join('')}
+          ${field.options.map(o => `<option value="${esc(o)}"${v===o?' selected':''}>${esc(locLabel(o))}</option>`).join('')}
         </select>`;
       }
       return `<input type="${field.type}" value="${esc(v)}" placeholder="${esc(t('to_fill'))}" onchange="${changeFn}" />`;
@@ -4240,10 +4441,10 @@
       editCtx = { userId, cmId: cmId || null, field };
       const dataObj = dataObjForGate;
       const v = fieldDisplayValue(dataObj, field.key);
-      document.getElementById('edit-modal-title').textContent = `${t('edit')} · ${field.label}`;
+      document.getElementById('edit-modal-title').textContent = `${t('edit')} · ${locLabel(field.label)}`;
       document.getElementById('edit-modal-cancel').textContent = t('cancel');
       document.getElementById('edit-modal-ok').textContent = t('confirm');
-      let body = `<label>${esc(field.label)}</label>`;
+      let body = `<label>${esc(locLabel(field.label))}</label>`;
       if (field.type === 'file') {
         body += `<div class="file-field" style="margin-top:4px">
           <span class="file-empty" id="edit-modal-file-status">${v ? t('file_ok') : t('not_uploaded')}</span>
@@ -4253,7 +4454,7 @@
       } else if (field.type === 'select') {
         body += `<select id="edit-modal-input" class="kv-input">
           <option value="">${t('please_select')}</option>
-          ${(field.options || []).map(o => `<option value="${esc(o)}"${v===o?' selected':''}>${esc(o)}</option>`).join('')}
+          ${(field.options || []).map(o => `<option value="${esc(o)}"${v===o?' selected':''}>${esc(locLabel(o))}</option>`).join('')}
         </select>`;
       } else {
         body += `<input id="edit-modal-input" class="kv-input" type="${field.type || 'text'}" value="${esc(v)}" placeholder="${esc(t('to_fill'))}" />`;
@@ -4318,14 +4519,14 @@
         }
         const url = isImageUrl(v) ? v : mockFileUrl(field.key);
         const thumb = `<button type="button" class="img-thumb-btn" onclick="openLightbox('${esc(url)}')">
-             <img class="field-thumb" src="${esc(url)}" alt="${esc(field.label)}" />
+             <img class="field-thumb" src="${esc(url)}" alt="${esc(locLabel(field.label))}" />
            </button>`;
         return `<div class="kv-value-row file-field-img">${thumb}${editIcon}</div>`;
       }
 
-      const text = empty ? '<span class="kv-empty">—</span>' : esc(v);
+      const text = empty ? '<span class="kv-empty">—</span>' : esc(locLabel(v));
       if (canEdit) return `<div class="kv-value-row"><span>${text}</span>${editIcon}</div>`;
-      return empty ? '<span class="kv-empty">—</span>' : esc(v);
+      return empty ? '<span class="kv-empty">—</span>' : esc(locLabel(v));
     }
 
     function renderKvRows(fields, dataObj, editable, changeFnFor, uploadFnFor, editMeta) {
@@ -4342,7 +4543,7 @@
           : '';
         const labelCls = `kv-label${flagged ? ' kv-flagged-label' : ''}`;
         const valueCls = `kv-value${flagged ? ' kv-flagged' : ''}`;
-        return `<th class="${labelCls}">${esc(f.label)}${flagTag}</th><td class="${valueCls}">${renderKvValue(dataObj, f, fieldEdit, changeFnFor(f), uploadFnFor(f), fieldEdit ? editMeta : null)}</td>`;
+        return `<th class="${labelCls}">${esc(locLabel(f.label))}${flagTag}</th><td class="${valueCls}">${renderKvValue(dataObj, f, fieldEdit, changeFnFor(f), uploadFnFor(f), fieldEdit ? editMeta : null)}</td>`;
       };
       for (let i = 0; i < textFields.length; i += 3) {
         const chunk = textFields.slice(i, i + 3);
@@ -4360,7 +4561,7 @@
         const flagTag = flagged
           ? `<span class="tag tag-warning" style="margin-left:6px;font-size:10px">${esc(userStatus(user) === 'MANUAL_PENDING' ? t('flag_pending') : t('flag_return'))}</span>`
           : '';
-        html += `<tr><th class="kv-label kv-photo-label${flagged ? ' kv-flagged-label' : ''}">${esc(f.label)}${flagTag}</th><td class="kv-value kv-photo-value${flagged ? ' kv-flagged' : ''}" colspan="5">${renderKvValue(dataObj, f, fieldEdit, changeFnFor(f), uploadFnFor(f), fieldEdit ? editMeta : null)}</td></tr>`;
+        html += `<tr><th class="kv-label kv-photo-label${flagged ? ' kv-flagged-label' : ''}">${esc(locLabel(f.label))}${flagTag}</th><td class="kv-value kv-photo-value${flagged ? ' kv-flagged' : ''}" colspan="5">${renderKvValue(dataObj, f, fieldEdit, changeFnFor(f), uploadFnFor(f), fieldEdit ? editMeta : null)}</td></tr>`;
       });
       return html;
     }
@@ -4496,9 +4697,7 @@
         const help = renderMgmtOnlyHelp();
         const saveLabel = userStatus(user) === 'MANUAL_PENDING'
           ? (lang === 'zh' ? '保存并通知审核员' : 'Save & notify reviewer')
-          : (userStatus(user) === 'MANUAL_RETURNED'
-            ? (lang === 'zh' ? '保存并重新终审' : 'Save & re-submit final')
-            : t('save'));
+          : t('save');
         return header + `
           <div class="alert ${showSave ? 'alert-ok' : 'alert-lock'}">${teamBEditHint(user)}${help}</div>
           <div class="tab-body">${renderProfileSections(user, profileEditable)}</div>
@@ -4538,17 +4737,6 @@
         if (ac) { ac.auditStatus = 'pending'; ac.auditOwner = reviewer; }
         notifyReviewerForUser({ ...u, pendingReviewer: reviewer }, 'user_fixed');
         alert(t('alert_saved_pending') + '\n' + (lang === 'zh' ? `审核员：${reviewer}` : `Reviewer: ${reviewer}`));
-      } else if (code === 'MANUAL_RETURNED') {
-        u.statusCode = 'FINAL_REVIEWING';
-        u.returnFields = [];
-        u.listingStatus = 'failed';
-        notifyReviewerForUser(u, 'return_resubmit');
-        alert(t('alert_saved_return_final'));
-        setTimeout(() => {
-          u.statusCode = 'LIMIT_READY';
-          alert(lang === 'zh' ? '终审已通过（演示），可重新确认借款发标。' : 'Final approved (demo) — ready to re-list.');
-          render();
-        }, 600);
       } else {
         alert(t('alert_saved'));
       }
@@ -4753,7 +4941,7 @@
             const hasValue = !!(issue.value && String(issue.value).trim());
             const isImage = issue.kind === 'image' && issue.url;
             const valueCell = isImage
-              ? `<span class="dec-issue-value is-image" title="${esc(issue.label)}">
+              ? `<span class="dec-issue-value is-image" title="${esc(locLabel(issue.label))}">
                    <img class="dec-issue-preview" src="${esc(issue.url)}" alt="" onclick="openLightbox('${esc(issue.url)}')" />
                    <span class="dec-issue-value-caption">${esc(lang === 'zh' ? '证件图' : 'Doc')}</span>
                  </span>`
@@ -4762,7 +4950,7 @@
               <div class="dec-issue">
                 <div class="dec-issue-row1">
                   <span class="dec-issue-person ${person}">${esc(personText)}</span>
-                  <span class="dec-issue-title" title="${esc(issue.label)}">${esc(issue.label)}</span>
+                  <span class="dec-issue-title" title="${esc(locLabel(issue.label))}">${esc(locLabel(issue.label))}</span>
                   ${valueCell}
                   <button type="button" class="dec-issue-remove" onclick="removeDecisionIssue('${issue.key}')">${t('dec_remove')}</button>
                 </div>
@@ -4816,7 +5004,7 @@
         showToast(t('dec_need_materials'));
         return;
       }
-      const materialNotes = issues.map(i => `${i.label}: ${t(i.reason)}${i.remark ? ` (${i.remark})` : ''}`).join('; ');
+      const materialNotes = issues.map(i => `${locLabel(i.label)}: ${t(i.reason)}${i.remark ? ` (${i.remark})` : ''}`).join('; ');
       const composedNote = [
         bizTags.length ? `Biz: ${bizTags.map(k => t(k)).join(', ')}` : '',
         materialNotes,
