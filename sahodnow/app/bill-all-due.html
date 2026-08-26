@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>SahodNow — All due bills</title>
+  <title>SahodNow — Overdue bills</title>
   <link rel="stylesheet" href="css/app.css">
 </head>
 <body>
@@ -13,8 +13,7 @@
         <svg width="20" height="20" viewBox="0 0 20 20"><path d="M12 4l-6 6 6 6" stroke="#141413" stroke-width="1.5" fill="none"/></svg>
       </button>
       <div>
-        <h2>All due bills</h2>
-        <p class="text-muted" style="margin:4px 0 0;font-size:13px;">Outstanding billing periods</p>
+        <h2>Overdue bills</h2>
       </div>
     </div>
 
@@ -69,7 +68,19 @@
       throw '';
     }
 
-    listEl.innerHTML = cycles.map((cycle, idx) => {
+    const hasOverdue = cycles.some(cycle => {
+      const due = new Date(cycle.dueDate);
+      due.setHours(0, 0, 0, 0);
+      return today > due;
+    });
+
+    const warnBanner = hasOverdue || isOverdueView ? `
+      <div class="bill-overdue-banner" role="status">
+        <span class="bill-overdue-banner__icon" aria-hidden="true">!</span>
+        <p class="bill-overdue-banner__copy">Longer overdue period leads to higher penalty interest and will affect your future loan.</p>
+      </div>` : '';
+
+    listEl.innerHTML = warnBanner + cycles.map(cycle => {
       const due = new Date(cycle.dueDate);
       due.setHours(0, 0, 0, 0);
       const overdueDays = today > due ? Math.floor((today - due) / 86400000) : 0;
@@ -79,29 +90,28 @@
         ? AppState.computeBillPenalty(cycle.total, overdueDays, principalBase)
         : null;
       const total = isOverdue ? penalty.totalDue : cycle.total;
-      const statusText = isOverdue
-        ? `${overdueDays} day${overdueDays === 1 ? '' : 's'} overdue`
-        : idx === 0 ? 'Current' : 'Upcoming';
-      const statusClass = isOverdue ? 'overdue' : '';
+      const billAmt = cycle.total;
+      const penAmt = isOverdue ? penalty.penaltyAccrued : 0;
+      const badge = isOverdue
+        ? `<span class="bill-due-badge">Overdue ${overdueDays} day${overdueDays === 1 ? '' : 's'}</span>`
+        : '';
 
       return `
-        <div class="bill-due-card${isOverdue ? ' bill-due-card--overdue' : ''}">
-          <div class="bill-due-card__head">
-            <div>
-              <p class="bill-due-card__date">Due ${cycle.dueLabel}</p>
-              <p class="bill-due-card__meta">${cycle.items.length} installment${cycle.items.length === 1 ? '' : 's'}</p>
+        <div class="bill-due-card">
+          <div class="bill-due-card__body">
+            <div class="bill-due-card__top">
+              <span class="bill-due-card__date">Due ${cycle.dueLabel}</span>
+              ${badge}
             </div>
-            <div class="bill-due-card__amount">
-              <strong>${AppState.formatPHP(total)}</strong>
-              <span class="status${statusClass ? ' ' + statusClass : ''}">${statusText}</span>
-            </div>
+            <p class="bill-due-card__amount">${AppState.formatPHP(total)}</p>
+            <p class="bill-due-card__break">Bill ${AppState.formatPHP(billAmt)}${penAmt ? `&nbsp;&nbsp;Penalty ${AppState.formatPHP(penAmt)}` : ''}</p>
           </div>
           <button
             type="button"
-            class="btn ${isOverdue ? 'btn-consent' : 'btn-primary'} bill-due-card__repay"
+            class="btn btn-consent bill-due-card__repay-side"
             data-repay="${total}"
             data-due-key="${cycle.dueKey}"
-          >${isOverdue ? 'Repay now' : 'Repay'}</button>
+          >Repay</button>
         </div>`;
     }).join('');
 

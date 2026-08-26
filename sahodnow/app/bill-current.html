@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>SahodNow — Statement details</title>
+  <title>SahodNow — Current statements</title>
   <link rel="stylesheet" href="css/app.css">
 </head>
 <body>
@@ -13,8 +13,7 @@
         <svg width="20" height="20" viewBox="0 0 20 20"><path d="M12 4l-6 6 6 6" stroke="#141413" stroke-width="1.5" fill="none"/></svg>
       </button>
       <div>
-        <h2>Statement details</h2>
-        <p class="text-muted" style="margin:4px 0 0;font-size:13px;" id="page-subtitle"></p>
+        <h2>Current statements</h2>
       </div>
     </div>
 
@@ -67,8 +66,6 @@
       throw '';
     }
 
-    document.getElementById('page-subtitle').textContent = `Due ${cycle.dueLabel}`;
-
     const overdue = (() => {
       const today = new Date(refDate);
       today.setHours(0, 0, 0, 0);
@@ -76,45 +73,59 @@
       due.setHours(0, 0, 0, 0);
       return today > due;
     })();
+    const showOverdue = overdue || isOverdueView;
     let displayTotal = cycle.total;
-    let penaltyHtml = '';
+    let overdueDays = 0;
+    let penaltyLine = '';
 
-    if (overdue || isOverdueView) {
+    if (showOverdue) {
       const today = new Date(refDate);
       today.setHours(0, 0, 0, 0);
       const due = new Date(cycle.dueDate);
       due.setHours(0, 0, 0, 0);
-      const overdueDays = Math.max(1, Math.floor((today - due) / 86400000));
+      overdueDays = Math.max(1, Math.floor((today - due) / 86400000));
       const principalBase = cycle.items.reduce((s, it) => s + (Number(it.principal) || 0), 0);
       const penalty = AppState.computeBillPenalty(cycle.total, overdueDays, principalBase);
       displayTotal = penalty.totalDue;
-      penaltyHtml = `
-        <div class="bill-statement-penalty">
-          <div class="plan-row"><span class="text-muted">Bill amount</span><span>${AppState.formatPHP(cycle.total)}</span></div>
-          <div class="plan-row"><span class="text-muted">Penalty (${overdueDays} days)</span><span>${AppState.formatPHP(penalty.penaltyAccrued)}</span></div>
-        </div>`;
+      penaltyLine = `<p class="bill-hero-penalty-line">Bill ${AppState.formatPHP(cycle.total)}&nbsp;&nbsp;Penalty ${AppState.formatPHP(penalty.penaltyAccrued)}</p>`;
     }
+
+    const warnBanner = showOverdue ? `
+      <div class="bill-overdue-banner" role="status">
+        <span class="bill-overdue-banner__icon" aria-hidden="true">!</span>
+        <p class="bill-overdue-banner__copy">Longer overdue period leads to higher penalty interest and will affect your future loan.</p>
+      </div>` : '';
 
     const itemsHtml = cycle.items.map(it =>
       AppState.renderBillLoanRow(it, {
         amount: it.amount,
-        amountLabel: `Inst. ${it.period}/${it.termMonths}`,
         from: 'bill-current',
         clickable: false,
-        statusText: overdue || isOverdueView ? 'Overdue' : '',
-        statusClass: overdue || isOverdueView ? 'overdue' : ''
+        statusText: showOverdue ? 'Overdue' : '',
+        statusClass: showOverdue ? 'overdue' : ''
       })
     ).join('');
 
+    const overdueInline = showOverdue
+      ? `<span class="bill-hero-overdue">Overdue ${overdueDays} day${overdueDays === 1 ? '' : 's'}</span>`
+      : '';
+
     mainEl.innerHTML = `
-      <div class="bill-hero${overdue || isOverdueView ? ' bill-hero--overdue' : ''}" style="margin-bottom:20px;">
-        <p class="bill-hero-label">${overdue || isOverdueView ? 'Total overdue' : 'Statement total'}</p>
+      ${warnBanner}
+      <div class="bill-hero${showOverdue ? ' bill-hero--overdue' : ''}" style="margin-bottom:20px;">
+        <div class="bill-hero-top">
+          <div class="bill-hero-meta-row">
+            <span class="bill-hero-due">${showOverdue ? 'Total outstanding' : 'Total outstanding'}</span>
+            ${overdueInline}
+          </div>
+        </div>
         <p class="bill-hero-amount">${AppState.formatPHP(displayTotal)}</p>
-        <p class="bill-hero-meta">${cycle.items.length} installment${cycle.items.length === 1 ? '' : 's'} in this statement</p>
-        ${penaltyHtml}
-        <button class="btn btn-consent" type="button" id="btn-repay-statement">Repay</button>
+        ${penaltyLine}
+        <div class="bill-hero-actions">
+          <button class="btn btn-consent" type="button" id="btn-repay-statement">Repay</button>
+        </div>
       </div>
-      <p class="eyebrow" style="margin-bottom:12px;"><span class="dot">•</span> Breakdown by loan</p>
+      <p class="eyebrow bill-section-label"><span class="dot">•</span> All orders</p>
       <div class="bill-order-list">${itemsHtml}</div>`;
 
     document.getElementById('btn-repay-statement').addEventListener('click', () => {
@@ -126,7 +137,7 @@
       AppState.hideOverlay('repay-overlay');
       AppState.payCurrentStatement(refDate, cycle.dueKey);
       alert('Payment successful.');
-      AppState.go('bill.html');
+      AppState.go(billHomeHref);
     });
   </script>
 </body>

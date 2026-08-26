@@ -934,7 +934,10 @@ h3 { font-size: 24px; font-weight: 500; line-height: 1.2; letter-spacing: -0.02e
 }
 .bill-item .amount { font-size: 20px; font-weight: 500; }
 .bill-item .status,
-.bill-order-card .status {
+.bill-order-card .status,
+.bill-history-row .status,
+.bill-loan-list-card .status,
+.repay-timeline-status {
   font-size: 12px;
   font-weight: 500;
   padding: 4px 12px;
@@ -942,9 +945,16 @@ h3 { font-size: 24px; font-weight: 500; line-height: 1.2; letter-spacing: -0.02e
   background: var(--canvas);
 }
 .bill-item .status.overdue,
-.bill-order-card .status.overdue { background: #FEE; color: var(--consent); }
+.bill-order-card .status.overdue,
+.bill-history-row .status.overdue,
+.bill-loan-list-card .status.overdue,
+.repay-timeline-status.overdue { background: #FEE; color: var(--consent); }
 .bill-item .status.paid,
-.bill-order-card .status.paid { background: #E8F5E9; color: #2E7D32; }
+.bill-order-card .status.paid,
+.bill-history-row .status.paid,
+.bill-loan-list-card .status.paid,
+.repay-timeline-status.paid { background: #E8F5E9; color: #2E7D32; }
+.repay-timeline-status.pending { background: rgba(20,20,19,0.06); color: var(--ink); }
 
 .bill-order-card {
   background: var(--white);
@@ -959,6 +969,35 @@ h3 { font-size: 24px; font-weight: 500; line-height: 1.2; letter-spacing: -0.02e
   cursor: default;
 }
 .bill-order-card--static:active { opacity: 1; }
+.bill-order-card--compact {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 18px;
+}
+.bill-order-main {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.bill-order-main strong {
+  font-size: 15px;
+  font-weight: 500;
+}
+.bill-order-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.bill-order-amt {
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
 .bill-order-head {
   display: flex;
   justify-content: space-between;
@@ -1004,24 +1043,88 @@ h3 { font-size: 24px; font-weight: 500; line-height: 1.2; letter-spacing: -0.02e
 .bill-order-meta-item span:last-child { font-weight: 500; }
 .bill-order-card > .status { margin-top: 12px; display: inline-block; }
 
+.bill-loan-list-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: var(--white);
+  border-radius: var(--radius-btn);
+  padding: 18px 20px;
+  margin-bottom: 12px;
+  border: 1px solid rgba(20,20,19,0.06);
+  cursor: pointer;
+}
+.bill-loan-list-card:active { opacity: 0.92; }
+.bill-loan-list-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.bill-loan-list-left strong {
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+.bill-loan-list-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  text-align: right;
+  font-size: 13px;
+}
+.bill-overdue-inline {
+  color: var(--consent);
+  font-weight: 500;
+  font-size: 13px;
+}
+
 /* Bill hub */
 .bill-hero {
   background: var(--ink);
   color: var(--canvas);
   border-radius: var(--radius-card);
-  padding: 24px 20px;
+  padding: 22px 20px 20px;
   margin-bottom: 16px;
 }
+.bill-hero-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.bill-hero-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  min-width: 0;
+}
+.bill-hero-due,
 .bill-hero-label {
-  font-size: 14px;
+  font-size: 13px;
   opacity: 0.7;
-  margin: 0 0 4px;
+  margin: 0;
+}
+.bill-hero-overdue {
+  font-size: 13px;
+  font-weight: 600;
+  color: #FF7A5C;
+  opacity: 1;
 }
 .bill-hero-amount {
   font-size: 36px;
   font-weight: 500;
   letter-spacing: -0.02em;
-  margin: 0 0 4px;
+  margin: 0 0 8px;
+  line-height: 1.1;
+}
+.bill-hero-penalty-line {
+  margin: 0 0 16px;
+  font-size: 13px;
+  opacity: 0.85;
 }
 .bill-hero-meta {
   font-size: 13px;
@@ -1032,6 +1135,56 @@ h3 { font-size: 24px; font-weight: 500; line-height: 1.2; letter-spacing: -0.02e
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
+  margin-top: 4px;
+}
+.bill-hero-actions .btn {
+  margin-top: 0;
+}
+.bill-section-label {
+  margin: 4px 0 12px;
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 500;
+  font-size: 13px;
+}
+.bill-outstanding-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--white);
+  border: 1px solid rgba(20, 20, 19, 0.06);
+  border-radius: var(--radius-btn);
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  text-decoration: none;
+  color: inherit;
+}
+.bill-outstanding-card:active { opacity: 0.92; }
+.bill-outstanding-ico {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--canvas);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--ink);
+}
+.bill-outstanding-txt {
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  font-weight: 500;
+}
+.bill-outstanding-link {
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--consent);
+  max-width: 42%;
+  text-align: right;
+  line-height: 1.3;
 }
 .bill-link-card {
   display: flex;
@@ -1098,9 +1251,8 @@ h3 { font-size: 24px; font-weight: 500; line-height: 1.2; letter-spacing: -0.02e
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  margin-bottom: 6px;
-  padding: 8px 12px;
+  gap: 4px;
+  padding: 6px 12px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.12);
   color: rgba(243, 240, 238, 0.92);
@@ -1127,6 +1279,10 @@ h3 { font-size: 24px; font-weight: 500; line-height: 1.2; letter-spacing: -0.02e
   flex-direction: column;
   gap: 10px;
 }
+.bill-order-list .bill-order-card,
+.bill-order-list .bill-loan-list-card {
+  margin-bottom: 0;
+}
 
 .bill-statement-penalty {
   margin: 12px 0 4px;
@@ -1135,14 +1291,63 @@ h3 { font-size: 24px; font-weight: 500; line-height: 1.2; letter-spacing: -0.02e
 }
 
 .bill-due-card {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 14px;
   padding: 16px 18px;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
   border-radius: var(--radius-btn);
   background: var(--white);
   border: 1.5px solid rgba(20, 20, 19, 0.08);
-  text-decoration: none;
   color: inherit;
+}
+.bill-due-card__body {
+  flex: 1;
+  min-width: 0;
+}
+.bill-due-card__top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.bill-due-card__date {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+.bill-due-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  background: #FEE;
+  color: var(--consent);
+  font-size: 12px;
+  font-weight: 500;
+}
+.bill-due-card__amount {
+  margin: 0 0 4px;
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+.bill-due-card__break {
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+.bill-due-card__repay-side {
+  width: auto;
+  min-width: 88px;
+  flex-shrink: 0;
+  padding: 12px 20px;
+  background: var(--orbital);
+  border-color: var(--orbital);
+  color: var(--white);
+  border-radius: var(--radius-btn);
 }
 
 .bill-due-card--overdue { border-color: rgba(207, 69, 0, 0.22); background: rgba(207, 69, 0, 0.03); }
@@ -1154,25 +1359,74 @@ h3 { font-size: 24px; font-weight: 500; line-height: 1.2; letter-spacing: -0.02e
   gap: 12px;
 }
 
-.bill-due-card__date {
-  margin: 0 0 4px;
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--ink);
-}
-
 .bill-due-card__meta {
   margin: 0;
   font-size: 13px;
   color: var(--muted);
 }
 
-.bill-due-card__amount { text-align: right; flex-shrink: 0; }
-.bill-due-card__amount strong { display: block; font-size: 17px; margin-bottom: 6px; }
-
 .bill-due-card__repay {
   width: 100%;
   margin-top: 14px;
+}
+
+.bill-history-group {
+  margin-bottom: 20px;
+}
+.bill-history-group__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+  padding: 0 2px;
+}
+.bill-history-group__month {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink);
+}
+.bill-history-group__total {
+  font-size: 13px;
+  color: var(--muted);
+}
+.bill-history-group__body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.bill-history-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: var(--white);
+  border-radius: var(--radius-btn);
+  padding: 16px 18px;
+  border: 1px solid rgba(20, 20, 19, 0.06);
+  cursor: pointer;
+}
+.bill-history-row:active { opacity: 0.92; }
+.bill-history-row-main {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.bill-history-row-main strong {
+  font-size: 15px;
+  font-weight: 500;
+}
+.bill-history-row-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.bill-history-amt {
+  font-size: 16px;
+  font-weight: 500;
 }
 
 .bill-history-month {
@@ -1465,25 +1719,32 @@ h3 { font-size: 24px; font-weight: 500; line-height: 1.2; letter-spacing: -0.02e
   display: flex;
   align-items: flex-start;
   gap: 12px;
-  padding: 14px 16px;
+  padding: 12px 14px;
   margin-bottom: 12px;
   border-radius: var(--radius-btn);
-  background: linear-gradient(135deg, rgba(207, 69, 0, 0.12) 0%, rgba(243, 115, 56, 0.08) 100%);
-  border: 1px solid rgba(207, 69, 0, 0.22);
+  background: #FCE4DE;
+  border: 1px solid rgba(217, 68, 54, 0.28);
 }
 .bill-overdue-banner__icon {
   flex-shrink: 0;
-  width: 36px;
-  height: 36px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(207, 69, 0, 0.14);
-  color: var(--consent);
-  font-size: 18px;
+  background: rgba(217, 68, 54, 0.14);
+  color: #D94436;
+  font-size: 14px;
   font-weight: 700;
   line-height: 1;
+}
+.bill-overdue-banner__copy {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #D94436;
+  font-weight: 500;
 }
 .bill-overdue-banner__title {
   margin: 0 0 4px;
@@ -1503,12 +1764,12 @@ h3 { font-size: 24px; font-weight: 500; line-height: 1.2; letter-spacing: -0.02e
   font-weight: 600;
 }
 .bill-hero--overdue {
-  box-shadow: inset 0 0 0 1px rgba(243, 115, 56, 0.35);
+  box-shadow: none;
 }
 .bill-hero--overdue .bill-hero-label {
-  color: rgba(243, 115, 56, 0.95);
+  color: rgba(243, 240, 238, 0.7);
   opacity: 1;
-  font-weight: 600;
+  font-weight: 450;
 }
 .bill-hero-penalty-row {
   display: flex;
@@ -1961,6 +2222,10 @@ h3 { font-size: 24px; font-weight: 500; line-height: 1.2; letter-spacing: -0.02e
 }
 .repay-timeline-amount-line {
   margin: 0 0 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
   line-height: 1.3;
 }
 .repay-timeline-tag {
@@ -1974,6 +2239,39 @@ h3 { font-size: 24px; font-weight: 500; line-height: 1.2; letter-spacing: -0.02e
   font-weight: 500;
   color: var(--ink);
   letter-spacing: -0.01em;
+}
+.repay-timeline-status {
+  flex-shrink: 0;
+}
+.repay-timeline-item--overdue .repay-timeline-inst,
+.repay-timeline-item--overdue .repay-timeline-amount {
+  color: var(--consent);
+}
+.repay-timeline-item--overdue .repay-timeline-dot {
+  border-color: var(--consent);
+  background: var(--consent);
+  box-shadow: 0 0 0 3px rgba(207, 69, 0, 0.14);
+}
+.loan-schedule-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.loan-schedule-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+}
+.loan-schedule-due {
+  margin: 0;
+  font-size: 13px;
+  white-space: nowrap;
+}
+.loan-detail-card {
+  background: var(--white);
+  border-radius: var(--radius-btn);
 }
 .repay-timeline-breakdown {
   margin: 0;

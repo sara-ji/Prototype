@@ -1527,39 +1527,46 @@ const AppState = {
   renderRepayTimeline(items, opts = {}) {
     const currentPeriod = opts.currentPeriod ?? null;
     const allPaid = !!opts.allPaid;
+    const overduePeriod = opts.overduePeriod ?? null;
     if (!items?.length) return '';
 
     return `<div class="repay-timeline" role="list">${items.map((it, idx) => {
       let state = it.state || 'upcoming';
       if (allPaid || it.paid) state = 'paid';
+      else if (overduePeriod != null && it.period === overduePeriod) state = 'overdue';
       else if (state === 'upcoming' && currentPeriod != null && it.period === currentPeriod) state = 'current';
       else if (state === 'upcoming' && currentPeriod == null && idx === 0) state = 'current';
 
       const amount = it.payment ?? it.amount ?? 0;
       const principal = it.principal ?? 0;
       const interestFees = it.interestFees ?? ((it.interest || 0) + (it.fee || 0));
+      const penalty = Number(it.penalty) || 0;
       const dueShort = it.dueShort || it.dueLabel || '—';
-      const dueMeta = it.daysInPeriod != null
-        ? `${dueShort} <span class="repay-timeline-days">(${it.daysInPeriod} days)</span>`
-        : dueShort;
-      const tag = state === 'paid' ? 'Paid' : 'Amount due';
+      const tag = state === 'paid' ? 'Paid'
+        : state === 'overdue' ? 'Overdue'
+        : state === 'current' ? 'Pending'
+        : '';
+      const tagHtml = tag
+        ? `<span class="status repay-timeline-status${state === 'paid' ? ' paid' : ''}${state === 'overdue' ? ' overdue' : ''}${state === 'current' ? ' pending' : ''}">${tag}</span>`
+        : '';
       const amt = this.formatPHP(amount);
-      const breakdown = `Principal ${this.formatPHP(principal)} + Int. & fees ${this.formatPHP(interestFees)}`;
+      let breakdown = `Principal ${this.formatPHP(principal)} + Int. & fees ${this.formatPHP(interestFees)}`;
+      if (penalty > 0) breakdown += `, Penalty ${this.formatPHP(penalty)}`;
 
       return `
         <div class="repay-timeline-item repay-timeline-item--${state}" role="listitem">
           <div class="repay-timeline-left">
             <span class="repay-timeline-inst">Inst. ${it.period}</span>
-            <span class="repay-timeline-date">${dueMeta}</span>
+            <span class="repay-timeline-date">${dueShort}</span>
           </div>
           <div class="repay-timeline-rail" aria-hidden="true">
             <span class="repay-timeline-dot"></span>
           </div>
           <div class="repay-timeline-right">
-            <p class="repay-timeline-amount-line">
-              <span class="repay-timeline-tag">${tag}</span>
+            <div class="repay-timeline-amount-line">
               <span class="repay-timeline-amount">${amt}</span>
-            </p>
+              ${tagHtml}
+            </div>
             <p class="repay-timeline-breakdown">${breakdown}</p>
           </div>
         </div>`;
@@ -1811,7 +1818,7 @@ const AppState = {
     const lines = cycle.items.map(it => ({
       loanId: it.loanId,
       name: 'Installment loan',
-      instText: `${it.period}/${it.termMonths}`,
+      instText: `Term ${it.period} of ${it.termMonths}`,
       amount: it.amount,
       status: 'Paid'
     }));
@@ -1849,8 +1856,8 @@ const AppState = {
         title: this.formatDueDate(d),
         total: i === 1 ? 1800 : 900,
         lines: [
-          { loanId: 'KM20260101001', name: 'Installment loan', instText: `${5 - i + 1}/5`, amount: i === 1 ? 1000 : 900, status: 'Paid' },
-          ...(i <= 2 ? [{ loanId: 'KM20260101002', name: 'Installment loan', instText: `${5 - i + 1}/5`, amount: 800, status: 'Paid' }] : [])
+          { loanId: 'KM20260101001', name: 'Installment loan', instText: `Term ${5 - i + 1} of 5`, amount: i === 1 ? 1000 : 900, status: 'Paid' },
+          ...(i <= 2 ? [{ loanId: 'KM20260101002', name: 'Installment loan', instText: `Term ${5 - i + 1} of 5`, amount: 800, status: 'Paid' }] : [])
         ],
         paidAt: now - i * 30 * 86400000
       });
@@ -1882,82 +1889,78 @@ const AppState = {
     return { total, items };
   },
 
-  /** Bill sub-pages: loan row with due/outstanding amount, principal, remaining periods, borrow date */
+  /**
+   * Bill sub-pages loan row.
+   * variant: 'order' (current statements) | 'list' (installment loans)
+   */
   renderBillLoanRow(item, opts = {}) {
     const {
       amount = item.amount,
-      amountLabel = 'Due',
       from = 'bill-current',
       statusText = '',
       statusClass = '',
-      clickable = true
+      clickable = true,
+      variant = 'order',
+      overdueDays = 0
     } = opts;
     const remaining = item.remainingPeriods ?? item.remaining ?? 0;
     const term = item.termMonths || 0;
-    const periodNote = remaining
-      ? `${remaining} of ${term} installment${term === 1 ? '' : 's'} left`
-      : `${term} installment${term === 1 ? '' : 's'}`;
+    const period = item.period || Math.max(1, term - remaining + 1);
+    const termLabel = `Term ${period} of ${term}`;
+    const stateQ = (typeof location !== 'undefined' && new URLSearchParams(location.search).get('state') === 'overdue')
+      ? '&state=overdue'
+      : '';
+    const goHref = `loan-detail.html?id=${encodeURIComponent(item.loanId || item.id)}&from=${from}${stateQ}`;
+    const interactiveAttrs = clickable
+      ? `role="button" tabindex="0"
+        onclick="AppState.go('${goHref}')"
+        onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();AppState.go('${goHref}')}"`
+      : '';
+
+    if (variant === 'list') {
+      const completed = statusClass === 'paid' || statusText === 'Completed';
+      const right = completed
+        ? `<span class="status paid">Completed</span>`
+        : `<div class="bill-loan-list-right">
+            <span class="text-muted">${remaining} installment${remaining === 1 ? '' : 's'} left</span>
+            ${overdueDays > 0 ? `<span class="bill-overdue-inline">Overdue ${overdueDays} day${overdueDays === 1 ? '' : 's'}</span>` : ''}
+          </div>`;
+      return `
+      <div class="bill-loan-list-card${clickable ? '' : ' bill-order-card--static'}" ${interactiveAttrs}>
+        <div class="bill-loan-list-left">
+          <strong>${this.formatPHP(item.principal ?? amount)}</strong>
+          <span class="text-muted">${this.formatDate(item.disbursedAt || item.appliedAt)}</span>
+        </div>
+        ${right}
+      </div>`;
+    }
+
     const statusHtml = statusText
       ? `<span class="status${statusClass ? ' ' + statusClass : ''}">${statusText}</span>`
       : '';
-    const interactiveAttrs = clickable
-      ? `role="button" tabindex="0"
-        onclick="AppState.go('loan-detail.html?id=${encodeURIComponent(item.loanId)}&from=${from}')"
-        onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();AppState.go('loan-detail.html?id=${encodeURIComponent(item.loanId)}&from=${from}')}"`
-      : '';
     return `
-      <div class="bill-order-card${clickable ? '' : ' bill-order-card--static'}" ${interactiveAttrs}>
-        <div class="bill-order-head">
-          <div>
-            <p class="bill-order-id">${item.loanId}</p>
-            <p class="bill-order-borrowed">${this.formatDate(item.appliedAt)}</p>
-          </div>
-          <div class="bill-order-amount-block">
-            <p class="amount">${this.formatPHP(amount)}</p>
-            <p class="bill-order-amount-label">${amountLabel}</p>
-          </div>
+      <div class="bill-order-card bill-order-card--compact${clickable ? '' : ' bill-order-card--static'}" ${interactiveAttrs}>
+        <div class="bill-order-main">
+          <strong>Installment loan</strong>
+          <span class="text-muted">${termLabel}</span>
         </div>
-        <div class="bill-order-meta">
-          <div class="bill-order-meta-item">
-            <span class="text-muted">Principal</span>
-            <span>${this.formatPHP(item.principal)}</span>
-          </div>
-          <div class="bill-order-meta-item">
-            <span class="text-muted">Installments left</span>
-            <span>${periodNote}</span>
-          </div>
+        <div class="bill-order-side">
+          <span class="bill-order-amt">${this.formatPHP(amount)}</span>
+          ${statusHtml}
         </div>
-        ${statusHtml}
       </div>`;
   },
 
   renderBillHistoryRow(loan) {
-    const settledAt = loan.settledAt || loan.appliedAt;
     return `
-      <div class="bill-order-card" role="button" tabindex="0"
+      <div class="bill-loan-list-card" role="button" tabindex="0"
         onclick="AppState.go('loan-detail.html?id=${encodeURIComponent(loan.id)}&from=bill-history')"
         onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();AppState.go('loan-detail.html?id=${encodeURIComponent(loan.id)}&from=bill-history')}">
-        <div class="bill-order-head">
-          <div>
-            <p class="bill-order-id">${loan.id}</p>
-            <p class="bill-order-borrowed">Closed ${this.formatDate(settledAt)}</p>
-          </div>
-          <div class="bill-order-amount-block">
-            <p class="amount">${this.formatPHP(loan.principal)}</p>
-            <p class="bill-order-amount-label">Principal</p>
-          </div>
+        <div class="bill-loan-list-left">
+          <strong>${this.formatPHP(loan.principal)}</strong>
+          <span class="text-muted">${this.formatDate(loan.disbursedAt || loan.appliedAt)}</span>
         </div>
-        <div class="bill-order-meta">
-          <div class="bill-order-meta-item">
-            <span class="text-muted">Installment term</span>
-            <span>${loan.termMonths} installment${loan.termMonths === 1 ? '' : 's'}</span>
-          </div>
-          <div class="bill-order-meta-item">
-            <span class="text-muted">Disbursement date</span>
-            <span>${this.formatDate(loan.disbursedAt || loan.appliedAt)}</span>
-          </div>
-        </div>
-        <span class="status paid">Closed</span>
+        <span class="status paid">Completed</span>
       </div>`;
   },
 
@@ -2008,63 +2011,70 @@ const AppState = {
       ? this.computeBillPenalty(priority.total, priority.overdueDays, priority.principalBase)
       : null;
     const displayTotal = overdue ? penalty.totalDue : priority.total;
-    const itemCount = priority.items.length;
     const daysLabel = priority.overdueDays === 1 ? '1 day' : `${priority.overdueDays} days`;
-    const detailsHref = `bill-current.html?due=${encodeURIComponent(priority.dueKey)}${overdue ? '&state=overdue' : ''}`;
+    const stateQ = overdue ? '&state=overdue' : '';
+    const stateOnly = overdue ? '?state=overdue' : '';
+    const detailsHref = `bill-current.html?due=${encodeURIComponent(priority.dueKey)}${stateQ}`;
 
     const overdueBanner = overdue ? `
       <div class="bill-overdue-banner" role="status">
         <span class="bill-overdue-banner__icon" aria-hidden="true">!</span>
-        <div>
-          <p class="bill-overdue-banner__title">You're ${daysLabel} overdue</p>
-          <p class="bill-overdue-banner__sub">Due date was <strong>${priority.dueLabel}</strong>. Repay soon to stop penalty charges.</p>
-        </div>
+        <p class="bill-overdue-banner__copy">Longer overdue period leads to higher penalty interest and will affect your future loan.</p>
       </div>` : '';
 
-    const heroClass = overdue ? 'bill-hero bill-hero--overdue' : 'bill-hero';
-    const heroLabel = overdue ? 'Overdue amount' : `Due ${priority.dueLabel}`;
-    const penaltyRows = overdue ? `
-      <div class="bill-hero-penalty-row">
-        <span>Bill <strong>${this.formatPHP(priority.total)}</strong></span>
-        <span>Penalty <strong>${this.formatPHP(penalty.penaltyAccrued)}</strong></span>
-      </div>
-      <p class="bill-hero-penalty-row">
-        <span>Penalty rate <strong>${this.formatPHP(penalty.dailyPenalty)}/day</strong></span>
-      </p>
-      <p class="bill-hero-reminder">Late fees accrue daily until paid.</p>` : '';
+    const penaltyLine = overdue ? `
+      <p class="bill-hero-penalty-line">Bill ${this.formatPHP(priority.total)}&nbsp;&nbsp;Penalty ${this.formatPHP(penalty.penaltyAccrued)}</p>` : '';
 
-    const allDueLink = priority.allDueCount > 1 ? `
-      <a class="bill-link-card bill-link-card--alert" href="bill-all-due.html${overdue ? '?state=overdue' : ''}" aria-label="All current due bills">
-        <div class="bill-link-leading">
-          <span class="bill-link-icon bill-link-icon--alert" aria-hidden="true">!</span>
-          <div class="bill-link-text">
-            <h3>All current due bills</h3>
-            <p>${priority.allDueCount} billing period${priority.allDueCount === 1 ? '' : 's'} outstanding</p>
-          </div>
-        </div>
-        <span class="bill-link-arrow">→</span>
+    const overdueInline = overdue
+      ? `<span class="bill-hero-overdue">Overdue ${daysLabel}</span>`
+      : '';
+
+    // Sum all payable cycles (with penalty) for the outstanding strip
+    let allDueTotal = displayTotal;
+    if (priority.allDueCount > 1) {
+      const cycles = this.getPayableBillCycles(now);
+      const today = new Date(now);
+      today.setHours(0, 0, 0, 0);
+      allDueTotal = cycles.reduce((sum, c) => {
+        const due = new Date(c.dueDate);
+        due.setHours(0, 0, 0, 0);
+        const days = today > due ? Math.floor((today - due) / 86400000) : 0;
+        const base = c.items.reduce((s, it) => s + (Number(it.principal) || 0), 0);
+        const p = days > 0 ? this.computeBillPenalty(c.total, days, base) : null;
+        return sum + (p ? p.totalDue : c.total);
+      }, 0);
+    }
+
+    const outstandingCard = priority.allDueCount > 1 ? `
+      <a class="bill-outstanding-card" href="bill-all-due.html${stateOnly}" aria-label="Overdue bills">
+        <span class="bill-outstanding-ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" width="18" height="18">
+            <path d="M4 6h16v12H4z" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M4 8l8 5 8-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        <span class="bill-outstanding-txt">Total outstanding ${this.formatPHP(allDueTotal)}</span>
+        <span class="bill-outstanding-link">You have ${priority.allDueCount} overdue bills ›</span>
       </a>` : '';
 
     const html = `
       ${overdueBanner}
-      <div class="${heroClass}">
-        <p class="bill-hero-label">${heroLabel}</p>
-        <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px;">
-          <p class="bill-hero-amount" style="margin:0;">${this.formatPHP(displayTotal)}</p>
-          <a href="${detailsHref}" class="bill-hero-details-link">
-            Details <span aria-hidden="true">→</span>
-          </a>
+      <div class="bill-hero${overdue ? ' bill-hero--overdue' : ''}">
+        <div class="bill-hero-top">
+          <div class="bill-hero-meta-row">
+            <span class="bill-hero-due">Due ${priority.dueLabel}</span>
+            ${overdueInline}
+          </div>
+          <a href="${detailsHref}" class="bill-hero-details-link">Details ›</a>
         </div>
-        <p class="bill-hero-meta">${itemCount} installment${itemCount === 1 ? '' : 's'} from ${itemCount} loan${itemCount === 1 ? '' : 's'}</p>
-        ${penaltyRows}
+        <p class="bill-hero-amount">${this.formatPHP(displayTotal)}</p>
+        ${penaltyLine}
         <div class="bill-hero-actions">
-          <button class="btn btn-consent" type="button" data-repay="${displayTotal}" data-due-key="${priority.dueKey}">
-            ${overdue ? 'Repay now' : 'Repay'}
-          </button>
+          <button class="btn btn-consent" type="button" data-repay="${displayTotal}" data-due-key="${priority.dueKey}">Repay</button>
         </div>
       </div>
-      ${allDueLink}
-      <a class="bill-link-card" href="bill-all.html" aria-label="Installment loans yep">
+      ${outstandingCard}
+      <a class="bill-link-card" href="bill-all.html${stateOnly}" aria-label="Installment loans">
         <div class="bill-link-leading">
           <span class="bill-link-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none">
@@ -2073,11 +2083,11 @@ const AppState = {
             </svg>
           </span>
           <div class="bill-link-text">
-            <h3>Installment loans yep</h3>
-            <p>View all loans by order</p>
+            <h3>Installment loans</h3>
+            <p>Total loan orders</p>
           </div>
         </div>
-        <span class="bill-link-arrow">→</span>
+        <span class="bill-link-arrow">›</span>
       </a>
       <a class="bill-link-card" href="bill-history.html" aria-label="Statement history">
         <div class="bill-link-leading">
@@ -2090,26 +2100,11 @@ const AppState = {
           </span>
           <div class="bill-link-text">
             <h3>Statement history</h3>
-            <p>Past monthly statements</p>
+            <p>Monthly statements</p>
           </div>
         </div>
-        <span class="bill-link-arrow">→</span>
-      </a>
-      <div class="bill-safety-card" style="margin-top:4px;">
-        <div class="bill-safety-row">
-          <div class="bill-safety-illu" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none">
-              <path d="M12 2l8 4v6c0 5-3.4 9.4-8 10-4.6-.6-8-5-8-10V6l8-4Z" stroke="#141413" stroke-width="1.3" opacity=".6"/>
-              <path d="M9.5 12.2l1.7 1.8L14.8 10" stroke="#141413" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
-          <div>
-            <p class="eyebrow" style="margin-bottom:8px;"><span class="dot">•</span> Security</p>
-            <h3>Fraud alert</h3>
-            <p>Never share your OTP or PIN. Repay only through SahodNow official channels.</p>
-          </div>
-        </div>
-      </div>`;
+        <span class="bill-link-arrow">›</span>
+      </a>`;
 
     if (mainEl) {
       mainEl.innerHTML = html;

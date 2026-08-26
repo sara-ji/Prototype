@@ -18,9 +18,9 @@
     </div>
 
     <div class="page-content" style="padding-top:8px;">
-      <div class="card" style="margin-bottom:16px;">
+      <div class="card loan-detail-card" style="margin-bottom:16px;">
         <div class="plan-row">
-          <span class="text-muted">Agreement no.</span>
+          <span class="text-muted">Order no.</span>
           <span style="font-weight:500;" id="loan-id">—</span>
         </div>
         <div class="plan-row">
@@ -28,23 +28,23 @@
           <span style="font-weight:500;" id="loan-disbursed">—</span>
         </div>
         <div class="plan-row">
-          <span class="text-muted">Principal amount</span>
+          <span class="text-muted">Principal</span>
           <span style="font-weight:500;" id="loan-principal">—</span>
         </div>
         <div class="plan-row">
-          <span class="text-muted">Installment term</span>
+          <span class="text-muted">Installments</span>
           <span style="font-weight:500;" id="loan-installments">—</span>
         </div>
         <div class="plan-row">
           <span class="text-muted">Disbursement account</span>
           <span style="font-weight:500;" id="loan-payout">—</span>
         </div>
-        <div class="plan-row">
-          <span class="text-muted">Outstanding balance</span>
+        <div class="plan-row" id="row-outstanding">
+          <span class="text-muted" id="loan-balance-label">Total outstanding</span>
           <span style="font-weight:500;" id="loan-outstanding">—</span>
         </div>
         <div class="plan-row">
-          <span class="text-muted">Loan status</span>
+          <span class="text-muted">Status</span>
           <span style="font-weight:500;" id="loan-status">—</span>
         </div>
         <div class="plan-row" id="row-settled" style="display:none;">
@@ -53,18 +53,15 @@
         </div>
       </div>
 
-      <div class="card" style="margin-bottom:16px;">
-        <p class="form-label" style="margin-bottom:4px;">Installment schedule</p>
-        <p class="text-muted" style="margin:0 0 12px;font-size:13px;line-height:1.45;" id="schedule-caption">
-          Each installment has its own due date. The first period may be shorter or longer than later periods.
-        </p>
+      <div class="card loan-detail-card" style="margin-bottom:16px;">
+        <div class="loan-schedule-head">
+          <p class="loan-schedule-title">Repayment schedule</p>
+          <p class="text-muted loan-schedule-due" id="schedule-caption">· due 20th</p>
+        </div>
         <div id="schedule-list"></div>
       </div>
 
       <button type="button" class="btn btn-primary" id="btn-settle" style="display:none;">Early payoff</button>
-      <p class="text-muted" id="settle-hint" style="margin-top:12px;font-size:12px;line-height:1.4;display:none;">
-        Pay remaining balance in full.
-      </p>
     </div>
   </div>
 
@@ -75,12 +72,13 @@
     const params = new URLSearchParams(location.search);
     const id = params.get('id') || '';
     const from = params.get('from') || 'bill';
+    const isOverdueView = params.get('state') === 'overdue';
     const backMap = {
-      'bill-current': 'bill-current.html',
-      'bill-all': 'bill-all.html',
-      'bill-all-due': 'bill-all-due.html',
+      'bill-current': `bill-current.html${isOverdueView ? '?state=overdue' : ''}`,
+      'bill-all': `bill-all.html${isOverdueView ? '?state=overdue' : ''}`,
+      'bill-all-due': `bill-all-due.html${isOverdueView ? '?state=overdue' : ''}`,
       'bill-history': 'bill-history.html',
-      bill: 'bill.html'
+      bill: `bill.html${isOverdueView ? '?state=overdue' : ''}`
     };
     document.getElementById('btn-back').addEventListener('click', () => {
       AppState.go(backMap[from] || 'bill.html');
@@ -94,46 +92,62 @@
     }
 
     const schedule = AppState.getLoanSchedule(loan);
-    const installmentLabel = AppState.formatInstallmentTerm(loan);
     const isClosed = loan.status === 'settled';
+    const refDate = isOverdueView ? AppState.getBillReferenceDate() : new Date();
 
     document.getElementById('loan-id').textContent = loan.id;
     document.getElementById('loan-disbursed').textContent = AppState.formatDate(loan.disbursedAt);
     document.getElementById('loan-principal').textContent = AppState.formatPHP(loan.principal);
-    document.getElementById('loan-installments').textContent = installmentLabel;
+    document.getElementById('loan-installments').textContent = String(loan.termMonths || schedule.length || '—');
     document.getElementById('loan-payout').textContent = loan.payoutDisplay;
-    document.getElementById('loan-outstanding').textContent = isClosed
-      ? AppState.formatPHP(0)
-      : AppState.formatPHP(AppState.getLoanRemainingAmount(loan));
-    document.getElementById('loan-status').textContent = isClosed ? 'Closed' : 'Active';
 
     if (isClosed) {
+      const repaid = schedule.reduce((s, r) => s + (Number(r.amount) || Number(r.payment) || 0), 0);
+      document.getElementById('loan-balance-label').textContent = 'Repayment amount';
+      document.getElementById('loan-outstanding').textContent = AppState.formatPHP(repaid || loan.principal);
+      document.getElementById('loan-status').textContent = 'Settled';
       document.getElementById('row-settled').style.display = 'flex';
       document.getElementById('loan-settled').textContent = AppState.formatDate(loan.settledAt || loan.disbursedAt);
+    } else {
+      document.getElementById('loan-outstanding').textContent = AppState.formatPHP(AppState.getLoanRemainingAmount(loan));
+      document.getElementById('loan-status').textContent = 'Active';
     }
 
-    const firstDue = schedule[0];
-    const caption = firstDue?.daysInPeriod != null
-      ? `${installmentLabel} · first due ${firstDue.dueLabel} (${firstDue.daysInPeriod}-day period)`
-      : installmentLabel;
-    document.getElementById('schedule-caption').textContent = caption;
+    document.getElementById('schedule-caption').textContent = '· due 20th';
 
     const currentPeriod = isClosed ? null : AppState.getLoanCurrentPeriod(loan);
+    let overduePeriod = null;
+    if (!isClosed) {
+      const next = schedule.find(r => !r.paid);
+      if (next) {
+        const today = new Date(refDate);
+        today.setHours(0, 0, 0, 0);
+        const due = new Date(next.dueDate);
+        due.setHours(0, 0, 0, 0);
+        if (today > due) {
+          overduePeriod = next.period;
+          const days = Math.max(1, Math.floor((today - due) / 86400000));
+          const pen = AppState.computeBillPenalty(next.amount || next.payment || 0, days, loan.principal);
+          next.penalty = pen.penaltyAccrued;
+        }
+      }
+    }
+
     document.getElementById('schedule-list').innerHTML = AppState.renderRepayTimeline(schedule, {
-      currentPeriod,
+      currentPeriod: overduePeriod != null ? null : currentPeriod,
+      overduePeriod,
       allPaid: isClosed
     });
 
     if (loan.status === 'active' && AppState.getLoanRemainingPeriods(loan) > 0) {
       document.getElementById('btn-settle').style.display = 'block';
-      document.getElementById('settle-hint').style.display = 'block';
     }
 
     document.getElementById('btn-settle').addEventListener('click', () => {
       if (!confirm('Pay off this loan early?')) return;
       AppState.settleLoan(loan.id);
-      alert('Loan closed.');
-      AppState.go(backMap[from] || 'bill.html');
+      alert('Loan settled.');
+      location.reload();
     });
   </script>
 </body>

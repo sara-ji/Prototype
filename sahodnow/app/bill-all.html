@@ -9,12 +9,11 @@
 <body>
   <div class="app-shell no-nav">
     <div class="page-header">
-      <button class="back-btn" onclick="AppState.go('bill.html')" aria-label="Back">
+      <button class="back-btn" id="btn-back" aria-label="Back">
         <svg width="20" height="20" viewBox="0 0 20 20"><path d="M12 4l-6 6 6 6" stroke="#141413" stroke-width="1.5" fill="none"/></svg>
       </button>
       <div>
         <h2>Installment loans</h2>
-        <p class="text-muted" style="margin:4px 0 0;font-size:13px;">All loans by order</p>
       </div>
     </div>
 
@@ -27,10 +26,26 @@
     if (!AppState.requireApproved()) throw '';
     AppState.bootstrapDemoSession();
 
+    const isOverdueView = new URLSearchParams(location.search).get('state') === 'overdue';
+    const billHomeHref = `bill.html${isOverdueView ? '?state=overdue' : ''}`;
+    const refDate = isOverdueView ? AppState.getBillReferenceDate() : new Date();
+    document.getElementById('btn-back').addEventListener('click', () => AppState.go(billHomeHref));
+
     const mainEl = document.getElementById('bill-all-main');
     const loans = AppState.getLoans();
     const active = loans.filter(l => l.status === 'active');
     const settled = loans.filter(l => l.status === 'settled');
+
+    function loanOverdueDays(loan) {
+      const schedule = AppState.getLoanSchedule(loan);
+      const next = schedule.find(r => !r.paid);
+      if (!next) return 0;
+      const today = new Date(refDate);
+      today.setHours(0, 0, 0, 0);
+      const due = new Date(next.dueDate);
+      due.setHours(0, 0, 0, 0);
+      return today > due ? Math.floor((today - due) / 86400000) : 0;
+    }
 
     if (!loans.length) {
       mainEl.innerHTML = `
@@ -56,8 +71,7 @@
 
       function rowActive(l) {
         const remain = AppState.getLoanRemainingPeriods(l);
-        const schedule = AppState.getLoanSchedule(l);
-        const next = schedule.find(r => !r.paid);
+        const days = loanOverdueDays(l);
         return AppState.renderBillLoanRow({
           loanId: l.id,
           principal: l.principal,
@@ -65,11 +79,11 @@
           disbursedAt: l.disbursedAt,
           termMonths: l.termMonths,
           remainingPeriods: remain,
-          amount: next?.amount || l.monthlyPayment
+          amount: l.principal
         }, {
-          amount: l.principal,
-          amountLabel: 'Principal',
-          from: 'bill-all'
+          variant: 'list',
+          from: 'bill-all',
+          overdueDays: days
         });
       }
 
@@ -88,7 +102,22 @@
         emptyEl.style.display = 'none';
         listEl.innerHTML = arr
           .sort((a, b) => (b.appliedAt || 0) - (a.appliedAt || 0))
-          .map(l => (which === 'settled' ? AppState.renderBillHistoryRow(l) : rowActive(l)))
+          .map(l => (which === 'settled'
+            ? AppState.renderBillLoanRow({
+                loanId: l.id,
+                principal: l.principal,
+                appliedAt: l.appliedAt,
+                disbursedAt: l.disbursedAt,
+                termMonths: l.termMonths,
+                remainingPeriods: 0,
+                amount: l.principal
+              }, {
+                variant: 'list',
+                from: 'bill-all',
+                statusText: 'Completed',
+                statusClass: 'paid'
+              })
+            : rowActive(l)))
           .join('');
       }
 

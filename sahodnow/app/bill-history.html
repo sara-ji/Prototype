@@ -14,7 +14,6 @@
       </button>
       <div>
         <h2>Statement history</h2>
-        <p class="text-muted" style="margin:4px 0 0;font-size:13px;">Past monthly statements</p>
       </div>
     </div>
 
@@ -36,18 +35,29 @@
     const emptyEl = document.getElementById('history-empty');
     const statements = AppState.getStatementHistory();
 
+    function formatMonthLabel(st) {
+      if (st.monthKey && /^\d{4}-\d{2}$/.test(st.monthKey)) {
+        const [y, m] = st.monthKey.split('-');
+        return `${m}/${y}`;
+      }
+      return st.dueLabel || st.title || '—';
+    }
+
     function renderLine(line) {
+      const inst = String(line.instText || '').startsWith('Term')
+        ? line.instText
+        : (line.instText ? `Term ${String(line.instText).replace('/', ' of ')}` : '');
       return `
-        <div class="bill-history-line" role="button" tabindex="0"
+        <div class="bill-history-row" role="button" tabindex="0"
           onclick="AppState.go('loan-detail.html?id=${encodeURIComponent(line.loanId)}&from=bill-history')"
           onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();AppState.go('loan-detail.html?id=${encodeURIComponent(line.loanId)}&from=bill-history')}">
-          <div>
-            <p class="bill-history-line__name">${line.name}</p>
-            <p class="bill-history-line__inst">${line.instText}</p>
+          <div class="bill-history-row-main">
+            <strong>${line.name || 'Installment loan'}</strong>
+            <span class="text-muted">${inst}</span>
           </div>
-          <div class="bill-history-line__right">
-            <p class="amount">${AppState.formatPHP(line.amount)}</p>
-            <span class="status paid">${line.status}</span>
+          <div class="bill-history-row-side">
+            <span class="bill-history-amt">${AppState.formatPHP(line.amount)}</span>
+            <span class="status paid">${line.status || 'Paid'}</span>
           </div>
         </div>`;
     }
@@ -56,32 +66,17 @@
       emptyEl.style.display = 'block';
     } else {
       emptyEl.style.display = 'none';
-      listEl.innerHTML = statements.map((st, idx) => `
-        <div class="bill-history-month">
-          <button type="button" class="bill-history-month__head" aria-expanded="${idx === 0 ? 'true' : 'false'}" data-toggle-month>
-            <div>
-              <p class="bill-history-month__due">Due ${st.dueLabel || st.title}</p>
-              <p class="bill-history-month__paid">Paid · ${st.lines.length} installment${st.lines.length === 1 ? '' : 's'}</p>
-            </div>
-            <div class="bill-history-month__total">
-              <strong>${AppState.formatPHP(st.total)}</strong>
-              <span class="bill-history-month__chevron" aria-hidden="true">›</span>
-            </div>
-          </button>
-          <div class="bill-history-month__body"${idx === 0 ? '' : ' hidden'}>
+      listEl.innerHTML = statements.map(st => `
+        <section class="bill-history-group">
+          <div class="bill-history-group__head">
+            <span class="bill-history-group__month"><span class="dot">•</span> ${formatMonthLabel(st)}</span>
+            <span class="bill-history-group__total">Total ${AppState.formatPHP(st.total)}</span>
+          </div>
+          <div class="bill-history-group__body">
             ${(st.lines || []).map(renderLine).join('')}
           </div>
-        </div>
+        </section>
       `).join('');
-
-      listEl.querySelectorAll('[data-toggle-month]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const body = btn.nextElementSibling;
-          const open = btn.getAttribute('aria-expanded') === 'true';
-          btn.setAttribute('aria-expanded', open ? 'false' : 'true');
-          body.hidden = open;
-        });
-      });
     }
   </script>
 </body>
