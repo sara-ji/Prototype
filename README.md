@@ -16,6 +16,7 @@ https://sara-ji.github.io/Prototype/
 | SahodNow 业务邮箱说明 | https://sara-ji.github.io/Prototype/wiki/sahodnow-business-email.html |
 | OFW KidlatPeso V3 | https://sara-ji.github.io/Prototype/ofw/kidlatpeso-v3-0818.html |
 | OFW Admin | https://sara-ji.github.io/Prototype/ofw/kidlatpeso-admin-0814.html |
+| OFW OCR 字段抽取对照报告 | https://sara-ji.github.io/Prototype/ofw/ocr-field-accuracy-report.html |
 
 ## 注意
 

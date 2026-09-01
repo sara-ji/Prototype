@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OFW 样例 OCR 字段抽取对照报告</title>
+  <style>
+    :root {
+      --bg: #f7f4ef;
+      --ink: #1a1a1a;
+      --muted: #6b6560;
+      --card: #ffffff;
+      --line: #e8e2d9;
+      --accent: #e8612d;
+      --ok: #2f6b3a;
+      --ok-bg: #eef6ef;
+      --warn: #9a4d12;
+      --warn-bg: #fff4ef;
+      --no: #8a1f1f;
+      --no-bg: #fdeeee;
+      --info: #1f4f7a;
+      --info-bg: #eef4f8;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.6;
+    }
+    main { max-width: 1080px; margin: 0 auto; padding: 40px 24px 96px; }
+    h1 { margin: 0 0 8px; font-size: 28px; font-weight: 650; }
+    h2 { margin: 36px 0 12px; font-size: 20px; font-weight: 650; }
+    h3 { margin: 24px 0 8px; font-size: 16px; font-weight: 650; }
+    p { margin: 0 0 12px; }
+    .meta { color: var(--muted); margin: 0 0 24px; font-size: 14px; }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin: 8px 0 20px;
+    }
+    .stat {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 16px 18px;
+    }
+    .stat b { display: block; font-size: 28px; line-height: 1.1; margin-bottom: 6px; }
+    .stat span { color: var(--muted); font-size: 13px; }
+    .stat.ok b { color: var(--ok); }
+    .stat.warn b { color: var(--warn); }
+    .stat.no b { color: var(--no); }
+    .callout {
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin: 0 0 20px;
+      border: 1px solid var(--line);
+    }
+    .callout.warn { background: var(--warn-bg); border-color: #f0c4b0; }
+    .callout.ok { background: var(--ok-bg); border-color: #c9e3ce; }
+    .callout.no { background: var(--no-bg); border-color: #f0c4c4; }
+    .callout strong { display: block; margin-bottom: 4px; }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 16px 18px;
+    }
+    .bar-row { display: grid; grid-template-columns: 120px 1fr 52px; gap: 10px; align-items: center; margin: 8px 0; font-size: 13px; }
+    .bar-track { height: 10px; background: #eee8df; border-radius: 999px; overflow: hidden; display: flex; }
+    .bar-fill { height: 100%; }
+    .bar-fill.ok { background: var(--ok); }
+    .bar-fill.no { background: var(--no); }
+    .bar-fill.info { background: var(--info); }
+    .bar-fill.accent { background: var(--accent); }
+    .legend { display: flex; gap: 16px; flex-wrap: wrap; color: var(--muted); font-size: 13px; margin: 8px 0 4px; }
+    .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; }
+    .filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 16px; }
+    .filters button {
+      border: 1px solid var(--line);
+      background: var(--card);
+      border-radius: 999px;
+      padding: 6px 12px;
+      cursor: pointer;
+      font: inherit;
+      font-size: 13px;
+    }
+    .filters button.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      overflow: hidden;
+      margin: 8px 0 16px;
+    }
+    th, td {
+      text-align: left;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+      font-size: 13px;
+    }
+    th { background: #fbf8f3; font-weight: 650; color: var(--muted); }
+    tr:last-child td { border-bottom: none; }
+    tr.danger td:first-child { box-shadow: inset 3px 0 0 var(--no); }
+    tr.warn td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
+    tr.ok td:first-child { box-shadow: inset 3px 0 0 var(--ok); }
+    .tag {
+      display: inline-block;
+      font-size: 12px;
+      border-radius: 999px;
+      padding: 1px 8px;
+      border: 1px solid var(--line);
+    }
+    .tag.ok { color: var(--ok); background: var(--ok-bg); border-color: #c9e3ce; }
+    .tag.warn { color: var(--warn); background: var(--warn-bg); border-color: #f0c4b0; }
+    .tag.no { color: var(--no); background: var(--no-bg); border-color: #f0c4c4; }
+    .mono { font-family: ui-monospace, Consolas, monospace; font-size: 12px; }
+    ul { margin: 0; padding-left: 18px; }
+    li { margin: 6px 0; }
+    .hidden { display: none; }
+    .caption { color: var(--muted); font-size: 12px; margin-top: -4px; }
+    @media (max-width: 860px) {
+      .stats, .grid-2 { grid-template-columns: 1fr 1fr; }
+      main { padding: 24px 16px 72px; }
+    }
+    @media (max-width: 560px) {
+      .stats, .grid-2 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>OFW 样例 OCR 字段抽取对照报告</h1>
+    <p class="meta">对照 OCR 部门返回的《OFW-样例字段抽取输出.pdf》与本地 <span class="mono">99_素材附件/OCR示例图</span> 原图。日期格式转换视为正确。评测日期 2026-09-01。</p>
+
+    <div class="stats">
+      <div class="stat no"><b>40.5%</b><span>样张覆盖率（30/74）</span></div>
+      <div class="stat ok"><b>93.9%</b><span>已抽字段精确率（216/230）</span></div>
+      <div class="stat ok"><b>96.1%</b><span>已抽字段可用率（含轻微错字）</span></div>
+      <div class="stat warn"><b>5</b><span>National ID 漏抽 Given Names</span></div>
+    </div>
+
+    <div class="callout warn">
+      <strong>先看覆盖，再看准确率</strong>
+      PDF 只返回了 P0 资料（机票 / National ID / OEC / 护照 / PRC / 收入证明 / UMID / 签证）共 30 张，与文件夹一一对应。P1 39 张、P2 5 张完全没有结果，不能把 93.9% 当成全量样张的识别率。
+    </div>
+
+    <h2>样张覆盖</h2>
+    <p class="caption">分母是 OCR示例图文件夹内全部 74 张原图。PDF 路径前缀已映射到 P0 资料对应子目录。</p>
+    <div class="legend"><span><i style="background:#2f6b3a"></i>PDF 已返回</span><span><i style="background:#8a1f1f"></i>有图未返回</span></div>
+    <div class="bar-row"><span>P0 资料 30 张</span><div class="bar-track"><div class="bar-fill ok" style="width:100%"></div></div><span>100%</span></div>
+    <div class="bar-row"><span>P1 资料 39 张</span><div class="bar-track"><div class="bar-fill no" style="width:100%"></div></div><span>0%</span></div>
+    <div class="bar-row"><span>P2 资料 5 张</span><div class="bar-track"><div class="bar-fill no" style="width:100%"></div></div><span>0%</span></div>
+
+    <h2>已返回字段准确率（按证件类型）</h2>
+    <p class="caption">精确率 = 完全正确 / 已抽出的非空字段。可用率把 1–2 个字母的错字算进去。未抽出的 Given Names 不在这个分母里。</p>
+    <div class="legend"><span><i style="background:#2f6b3a"></i>可用率</span><span><i style="background:#1f4f7a"></i>精确率</span></div>
+    <div id="type-bars"></div>
+
+    <div class="grid-2">
+      <div class="card">
+        <h3 style="margin-top:0">结论要点</h3>
+        <ul>
+          <li>OEC、护照、UMID、PRC 在已定义字段上可用率都在 96% 以上，印刷清晰的表格类证件最好。</li>
+          <li>National ID 是短板：5 张正面全部没有 Given Names，姓名链不完整，业务上不能当通过。</li>
+          <li>护照两处出生地错误（FILOLO、FILIPINO）属于高风险——号码和姓名都对，出生地却串到国籍或残片。</li>
+          <li>P0「Proof of Income/下载.png」实际是阿联酋劳动合同首页，与 P2 Contract 同类。</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0">错误形态（件数）</h3>
+        <div class="bar-row"><span>字段错位 / 错值</span><div class="bar-track"><div class="bar-fill no" style="width:100%"></div></div><span>9</span></div>
+        <div class="bar-row"><span>漏抽 Given Names</span><div class="bar-track"><div class="bar-fill accent" style="width:56%"></div></div><span>5</span></div>
+        <div class="bar-row"><span>轻微错字</span><div class="bar-track"><div class="bar-fill info" style="width:56%"></div></div><span>5</span></div>
+        <div class="bar-row"><span>无文字推断性别</span><div class="bar-track"><div class="bar-fill" style="width:22%;background:#9a8f84"></div></div><span>2</span></div>
+        <p class="caption">件数不是字段数的再加权。精确率分母仍是 230 个已抽非空字段。</p>
+      </div>
+    </div>
+
+    <h2>按类型筛选明细</h2>
+    <div class="filters" id="filters"></div>
+    <div class="stats" id="filter-stats"></div>
+
+    <h3>问题字段</h3>
+    <table>
+      <thead>
+        <tr><th>证件</th><th>文件</th><th>字段</th><th>OCR 结果</th><th>原图应是</th><th>类型</th></tr>
+      </thead>
+      <tbody id="finding-body"></tbody>
+    </table>
+
+    <h3>逐张对照</h3>
+    <table>
+      <thead>
+        <tr><th>PDF 文件名</th><th>本地原图</th><th>结论</th><th>说明</th></tr>
+      </thead>
+      <tbody id="file-body"></tbody>
+    </table>
+
+    <h2>建议给 OCR 部门的反馈</h2>
+    <div class="grid-2">
+      <div class="card">
+        <h3 style="margin-top:0">必须修</h3>
+        <p><strong>National ID 抽出 Given Names</strong><br>正面 5/5 缺失。PhilID 标签是 Apelyido / Mga Pangalan / Gitnang Apelyido，当前只稳定命中了姓和中间名。</p>
+        <p><strong>禁止把邻近字段写入空槽</strong><br>证件号→DOB、国籍→出生地、出生地→地址、Direct Employer→Principal、名→中间名。</p>
+        <p><strong>补 P1 / P2</strong><br>驾驶证、SSS、TIN、Voter、Barangay、合同、PhilHealth 等 44 张尚未返回。</p>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0">建议修</h3>
+        <p><strong>MRZ 按行切分</strong><br>沙特签证 MRZ 两行粘连，姓名和签证号本身是对的。</p>
+        <p><strong>长地名不要截断</strong><br>BUENAVISTA ILOILO → FILOLO；UMID 边缘 CRN 截断。反光、裁切样本要单独回归。</p>
+        <p><strong>机票统一 schema</strong><br>三张里两张有中文字段名，一张只有裸值。正面未印的 Sex 应保持空，不要按头像填 M/F。</p>
+      </div>
+    </div>
+
+    <p class="caption">评分口径：空值且原图也没有该印刷项，记为正确空，不计入 230。Given Names 漏抽单独计 5 条。P1/P2 无 PDF 结果，不参与准确率分母。</p>
+  </main>
+
+  <script>
+    const TYPE_STATS = [
+      { id: "flight", label: "机票", files: 3, extracted: 15, correct: 15, minor: 0, wrong: 0, usable: 100, exact: 100 },
+      { id: "national_id", label: "National ID", files: 7, extracted: 26, correct: 22, minor: 1, wrong: 3, usable: 88.5, exact: 84.6 },
+      { id: "oec", label: "OEC", files: 6, extracted: 60, correct: 58, minor: 1, wrong: 1, usable: 98.3, exact: 96.7 },
+      { id: "passport", label: "护照", files: 7, extracted: 63, correct: 61, minor: 0, wrong: 2, usable: 96.8, exact: 96.8 },
+      { id: "prc", label: "PRC", files: 1, extracted: 6, correct: 6, minor: 0, wrong: 0, usable: 100, exact: 100 },
+      { id: "proof_income", label: "收入/合同", files: 1, extracted: 20, correct: 18, minor: 1, wrong: 1, usable: 95.0, exact: 90.0 },
+      { id: "umid", label: "UMID", files: 4, extracted: 29, correct: 26, minor: 2, wrong: 1, usable: 96.6, exact: 89.7 },
+      { id: "visa", label: "签证", files: 1, extracted: 11, correct: 10, minor: 0, wrong: 1, usable: 90.9, exact: 90.9 }
+    ];
+    const FINDINGS = [
+      ["national_id","National ID","20260528143626552561.jpg","date of birth","07-5068-5295-5472","证件上无 DOB；PCN 约为 1987-5088-5293-5472","错值 / 错位","no"],
+      ["national_id","National ID","National ID.jpeg","middle name / given names","middle name = JAIRA","Given Names = JAIRA；Middle Name 为空","错值 / 错位","no"],
+      ["national_id","National ID","National ID-back.jpeg","address","QUEZON CITY, METRO MANILA","背面无地址；该值是 Place of Birth","错值 / 错位","no"],
+      ["national_id","National ID","5 张正面","given names","空 / 未出字段","JENALYN / TRISHA MAE / CARLOS / JAIRA / ABIGAIL","漏抽","no"],
+      ["national_id","National ID","20260528144309917732.jpg","address","DONSOOL","DONSOL","轻微错字","warn"],
+      ["national_id","National ID","National ID.jpeg / Villanueva","sex","F / M","PhilID 正面不印性别","无文字推断","warn"],
+      ["oec","OEC","OEC-1.jpeg","principal","SALEH SALEEM Y ALHURAYESS","Principal = ALITGAN RECRUITMENT OFFICE；该值是 Direct Employer","错值 / 错位","no"],
+      ["passport","Passport","1a75338f….jpeg","place of birth","FILOLO","BUENAVISTA ILOILO","错值 / 错位","no"],
+      ["passport","Passport","Passport.jpeg","place of birth","FILIPINO","RODRIGUEZ RIZAL","错值 / 错位","no"],
+      ["proof_income","Contract","下载.png","Friday","Corresponding to","It is on Friday Corresponding to 15/05/2026 In UAE","错值 / 错位","no"],
+      ["umid","UMID","UMID.jpg","id number","CRN-0033-59128","CRN-0033-5912859（末位在画面边缘被裁切）","错值 / 错位","no"],
+      ["umid","UMID","仅正面.jpg","id number","0111-4754248-8","CRN-0111-4754248-8","轻微错字","warn"],
+      ["visa","Visa","VISA-1.jpeg","MRZ","两行拼成一行，第二行丢失护照号前缀","应按两行切分","错值 / 错位","no"],
+      ["flight","Flight","Flight Itinerary.jpg","整单结构","10 FEB 2026 / MNL / DOH / DOH / AMM","两段值对，但没有字段名","结构不规范","warn"]
+    ];
+    const FILES = [
+      ["flight","flight/Flight Itinerary-1.jpeg","P0 资料/Flight Itinerary/Flight Itinerary-1.jpeg","通过","ok","两段行程日期/出发/到达全部正确。"],
+      ["flight","flight/Flight Itinerary.jpg","P0 资料/Flight Itinerary/Flight Itinerary.jpg","结构差","warn","MNL-DOH、DOH-AMM 值对，无字段标签。"],
+      ["flight","flight/Flight Itinerary.png","P0 资料/Flight Itinerary/Flight Itinerary.png","通过","ok","SUNDAY 17 MAY / MNL / HKG 正确。"],
+      ["national_id","national_id/20260528143626552561.jpg","P0 资料/National ID/20260528143626552561.jpg","失败","no","姓/中间名对；DOB 被写成错误证件号；漏 Given Names。"],
+      ["national_id","national_id/20260528144309917732.jpg","P0 资料/National ID/20260528144309917732.jpg","可用","warn","姓/中间名/生日对；DONSOL 写成 DONSOOL；漏 CARLOS。"],
+      ["national_id","national_id/National ID-1.jpg","P0 资料/National ID/National ID-1.jpg","可用","warn","SALAZAR / GIEL / 地址正确；漏 JENALYN。"],
+      ["national_id","national_id/National ID-back.jpeg","P0 资料/National ID/National ID-back.jpeg","可用","warn","性别/婚况/出生地对；地址误填出生地。"],
+      ["national_id","national_id/National ID.jpeg","P0 资料/National ID/National ID.jpeg","字段错位","no","BALANQUIT、生日、地址对；JAIRA 进了 middle name。"],
+      ["national_id","national_id/反面.jpg","P0 资料/National ID/反面.jpg","通过","ok","F / SINGLE / CITY OF DAVAO, DAVAO DEL SUR 正确。"],
+      ["national_id","national_id/正面.jpg","P0 资料/National ID/正面.jpg","可用","warn","LAHOYLAHOY / ROSALEJOS / 地址正确；漏 ABIGAIL。"],
+      ["oec","oec/131f9e22….jpeg","P0 资料/OEC/131f9e22fb0242a1918915dea7615e26.jpeg","通过","ok","RENALYN 全套字段含 Principal / UAE / 10/10/2026。"],
+      ["oec","oec/895e8a6a….jpeg","P0 资料/OEC/895e8a6ab2ec4b83b9d04a72403c74ce.jpeg","通过","ok","GLAIZEL / QATAR / 8/31/2026，Principal 折行拼接正确。"],
+      ["oec","oec/OEC-1.jpeg","P0 资料/OEC/OEC-1.jpeg","字段错位","warn","姓名护照正确；Principal 写成 Direct Employer；Agency 少字母。"],
+      ["oec","oec/OEC.png","P0 资料/OEC/OEC.png","通过","ok","ALVIN EMPAY MUJAR / GREECE / 6/24/2026 全对。"],
+      ["oec","oec/e11d18b1….jpeg","P0 资料/OEC/e11d18b17c0948f9bf8e2e9ce391fee7.jpeg","通过","ok","ROY SOLAR FERRER，含涂改件上的 4/22/2023。"],
+      ["oec","oec/f53dc74b….jpeg","P0 资料/OEC/f53dc74b04db4a91863007582e55068f.jpeg","通过","ok","MICHAEL GUMBAN / ELECTRICIAN / UAE，含退出时间戳。"],
+      ["passport","passport/133668cb….jpeg","P0 资料/PassPort/133668cb1b9f488a91486ce26a769aff.jpeg","通过","ok","FERRER / ROY / SOLAR / P6374697B 全对。"],
+      ["passport","passport/1a75338f….jpeg","P0 资料/PassPort/1a75338f7a164266a0e956bc26acc4d8.jpeg","出生地错","no","BALBANIDA 主体正确；出生地 FILOLO ≠ BUENAVISTA ILOILO。"],
+      ["passport","passport/5d899996….jpeg","P0 资料/PassPort/5d8999960c28443487a3a016e5c5ed8c.jpeg","通过","ok","GUMBAN / MICHAEL / DAGUINOTAS / JOLO SULU 全对。"],
+      ["passport","passport/874987b3….jpeg","P0 资料/PassPort/874987b3a9c04585bf19d95323010427.jpeg","通过","ok","NABOS / GLAIZEL / MOGOL / STA CRUZ MDQ 全对。"],
+      ["passport","passport/Passport-1.jpeg","P0 资料/PassPort/Passport-1.jpeg","通过","ok","ASEO / JOLEVIR / CAN-AVID E SAMAR 全对。"],
+      ["passport","passport/Passport.jpeg","P0 资料/PassPort/Passport.jpeg","出生地错","no","MUJAR / ROSEMARIE / AMIT 对；出生地写成 FILIPINO。"],
+      ["passport","passport/fa745e19….jpeg","P0 资料/PassPort/fa745e1933934069928b15d30ba57c63.jpeg","通过","ok","SINCERO / VALERIE / LEGAZPI CITY 全对。"],
+      ["prc","prc/PRC.jpg","P0 资料/PRC ID/PRC.jpg","通过","ok","RIOS / MARTIN ADRIAN / VILLA / 0316776 全对。"],
+      ["proof_income","proof_income/下载.png","P0 资料/Proof of Income/下载.png","可用","warn","雇主/雇员结构化字段大体正确；多出 Friday 垃圾字段。样张实为阿联酋劳动合同。"],
+      ["umid","umid/20260528142627030787.jpg","P0 资料/UMID/20260528142627030787.jpg","通过","ok","MARIN / JUMAR / RESMEROS / CRN-0111-0318193-5 全对。"],
+      ["umid","umid/UMID-1.jpg","P0 资料/UMID/UMID-1.jpg","通过","ok","AQUENDE / CHARISSA / CRN-0111-0671345-2 全对。"],
+      ["umid","umid/UMID.jpg","P0 资料/UMID/UMID.jpg","号码截断","warn","NUEGAS 姓名对；CRN 截断；ANTIPOLO 多一个 L。"],
+      ["umid","umid/仅正面.jpg","P0 资料/UMID/仅正面.jpg","通过","ok","EVANGELISTA / CAMILLE 正确；ID 缺 CRN- 前缀。"],
+      ["visa","visa/VISA-1.jpeg","P0 资料/Visa/VISA-1.jpeg","可用","warn","签证号/护照/姓名/日期正确；MRZ 两行粘连。"]
+    ];
+
+    const FILTERS = [{id:"all",label:"全部 P0"}, ...TYPE_STATS.map(t => ({id:t.id,label:t.label}))];
+    let current = "all";
+
+    function esc(s) {
+      return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+    }
+
+    document.getElementById("type-bars").innerHTML = TYPE_STATS.map(t => `
+      <div class="bar-row"><span>${esc(t.label)}</span>
+        <div class="bar-track">
+          <div class="bar-fill ok" style="width:${t.usable}%"></div>
+        </div><span>${t.usable}%</span>
+      </div>
+      <div class="bar-row"><span></span>
+        <div class="bar-track">
+          <div class="bar-fill info" style="width:${t.exact}%"></div>
+        </div><span>${t.exact}%</span>
+      </div>`).join("");
+
+    const filterBox = document.getElementById("filters");
+    FILTERS.forEach(f => {
+      const b = document.createElement("button");
+      b.textContent = f.label;
+      b.dataset.id = f.id;
+      b.onclick = () => { current = f.id; render(); };
+      filterBox.appendChild(b);
+    });
+
+    function render() {
+      [...filterBox.children].forEach(b => b.classList.toggle("active", b.dataset.id === current));
+      const t = TYPE_STATS.find(x => x.id === current);
+      const stats = document.getElementById("filter-stats");
+      if (t) {
+        stats.innerHTML = `
+          <div class="stat"><b>${t.files}</b><span>PDF 中的文件数</span></div>
+          <div class="stat"><b>${t.exact}%</b><span>精确率</span></div>
+          <div class="stat ok"><b>${t.usable}%</b><span>可用率</span></div>
+          <div class="stat ${t.wrong ? "no" : "ok"}"><b>${t.wrong}</b><span>错值字段</span></div>`;
+      } else {
+        stats.innerHTML = `
+          <div class="stat"><b>30</b><span>已评文件</span></div>
+          <div class="stat"><b>230</b><span>已抽非空字段</span></div>
+          <div class="stat no"><b>9</b><span>错值字段</span></div>
+          <div class="stat warn"><b>5</b><span>漏抽 Given Names</span></div>`;
+      }
+      const findings = current === "all" ? FINDINGS : FINDINGS.filter(r => r[0] === current);
+      document.getElementById("finding-body").innerHTML = findings.map(r =>
+        `<tr class="${r[7]}"><td>${esc(r[1])}</td><td class="mono">${esc(r[2])}</td><td>${esc(r[3])}</td><td>${esc(r[4])}</td><td>${esc(r[5])}</td><td>${esc(r[6])}</td></tr>`
+      ).join("");
+      const files = current === "all" ? FILES : FILES.filter(r => r[0] === current);
+      document.getElementById("file-body").innerHTML = files.map(r =>
+        `<tr class="${r[4]}"><td class="mono">${esc(r[1])}</td><td>${esc(r[2])}</td><td><span class="tag ${r[4]}">${esc(r[3])}</span></td><td>${esc(r[5])}</td></tr>`
+      ).join("");
+    }
+    render();
+  </script>
+</body>
+</html>
