@@ -637,12 +637,24 @@
     }
     .rv-field-tip .help-pop { width: min(240px, 70vw); padding: 8px 10px; }
     .rv-field-tip.tip-new .rv-field-q { border-color: #2f6fed; color: #2f6fed; }
-    .rv-field-tip.tip-rename .rv-field-q { border-color: #b45309; color: #b45309; }
+    .rv-field-tip.tip-rename .rv-field-q { border-color: #ca8a04; color: #ca8a04; background: #fef9c3; }
+    .rv-field-tip.tip-removed .rv-field-q { border-color: #dc2626; color: #dc2626; }
     .rv-tip-legend {
       display: flex; flex-wrap: wrap; gap: 12px 20px; padding: 10px 14px; margin-bottom: 12px;
       background: #f8fafc; border: 1px solid var(--border); border-radius: 4px; font-size: 12px; color: var(--text-muted);
     }
     .rv-tip-legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .sf-removed-block {
+      margin-bottom: 12px; padding: 10px 14px; border: 1px dashed #fca5a5; background: #fef2f2;
+      border-radius: 4px; font-size: 12px; color: var(--text);
+    }
+    .sf-removed-block strong { display: block; margin-bottom: 8px; color: #b91c1c; }
+    .sf-removed-list { display: flex; flex-wrap: wrap; gap: 8px 14px; }
+    .sf-removed-item { display: inline-flex; align-items: center; gap: 4px; color: #7f1d1d; }
+    .file-pair { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start; }
+    .file-pair-slot { display: flex; flex-direction: column; gap: 4px; min-width: 100px; }
+    .file-pair-slot .slot-label { font-size: 11px; color: var(--text-muted); }
+    .file-pair-slot .kv-value-row { gap: 6px; }
   </style>
 
   <div id="notif-toast-stack" class="notif-toast-stack" aria-live="polite"></div>
@@ -765,10 +777,15 @@
         rv_complete_addr: '详细地址',
         rv_residential_addr: '住址',
         rv_tip_new: '原型新增',
-        rv_tip_new_note: '相对当前生产人审：生产没有，原型新增。',
+        rv_tip_new_note: '相对当前生产：生产没有，原型新增。',
         rv_tip_rename: '相对生产改名',
         rv_tip_rename_note: '生产有对应字段，原型展示名 / 结构已调整。',
-        rv_tip_legend: '相对生产标注',
+        rv_tip_removed: '生产有 · 原型无',
+        rv_tip_removed_note: '当前生产销售代填有该字段，本原型已移除或不再展示。',
+        rv_tip_legend: '相对生产销售代填标注',
+        sf_removed_title: '生产有 · 原型未展示的字段（红标）',
+        photo_front: '正面',
+        photo_back: '反面',
         rv_contact_borrower: '联系借款人',
         rv_module_borrower: '借款人信息审核',
         rv_module_comaker: '担保人信息审核',
@@ -1157,10 +1174,15 @@
         rv_complete_addr: 'Complete Address',
         rv_residential_addr: 'Residential Address',
         rv_tip_new: 'New vs prod',
-        rv_tip_new_note: 'Not on current production review; added in this prototype.',
+        rv_tip_new_note: 'Not on current production sales fill; added in this prototype.',
         rv_tip_rename: 'Renamed vs prod',
         rv_tip_rename_note: 'Exists in production under a different label / structure.',
-        rv_tip_legend: 'Markers vs production',
+        rv_tip_removed: 'In prod · not in prototype',
+        rv_tip_removed_note: 'On current production sales fill; removed or not shown in this prototype.',
+        rv_tip_legend: 'Markers vs production sales fill',
+        sf_removed_title: 'In production · not shown in prototype (red)',
+        photo_front: 'Front',
+        photo_back: 'Back',
         rv_contact_borrower: 'Contact Borrower',
         rv_module_borrower: 'Borrower Review',
         rv_module_comaker: 'Co-maker Review',
@@ -1456,6 +1478,18 @@
       'Occupation': '职业',
       'Monthly income': '月收入',
       'OFW Agency': 'OFW 中介',
+      'Name': '姓名',
+      'ID type': '证件类型',
+      'Additional Validation Type': '附加验证类型',
+      'Third-party Score': '第三方评分',
+      'Purpose of Loan': '借款用途',
+      'Current Loans(P)': '当前贷款(P)',
+      'Agency Proof (contract or group photo, etc.)': '中介证明（合同或合影等）',
+      "Comaker's ID back photo": '担保人证件背面照',
+      'Education': '教育',
+      'Medical': '医疗',
+      'Business': '经营',
+      'Personal': '个人',
       'Invitation Code': '邀请码',
       'Activity Code': '活动码',
       'Valid Visa': '有效签证',
@@ -1909,8 +1943,9 @@
       `;
     }
 
-    /** Phone identity: Backend cannot change; APP rebind = Phase 2.
-     *  mobile / cm_phone: always locked in Backend for edits. */
+    /** Phone + 固定只读字段：Backend 不可改 */
+    const READONLY_FIELD_KEYS = new Set(['purpose_of_loan']);
+
     function isPhoneIdentityLocked(key, dataObj) {
       if (key === 'mobile') return true;
       if (key === 'cm_phone') return true;
@@ -1970,6 +2005,7 @@
     }
     function canEditThisField(key, user) {
       if (key === 'mobile' || key === 'cm_phone') return false;
+      if (READONLY_FIELD_KEYS.has(key)) return false;
       if (isSalesMgmtMenu() && user && isBeforeFinalSubmit(user)) return true;
       if (!isMgmtOnlyField(key)) return true;
       return isSalesMgmtMenu() && canMgmtEditRestrictedField(user);
@@ -2093,7 +2129,7 @@
       guaranteeing:  { labelKey: 'cm_guaranteeing', color: 'warning' },
     };
 
-    /** Co-maker fields — aligned with APP comakerForm */
+    /** Co-maker fields — aligned with APP comakerForm；tip 对照生产销售代填 */
     const COMAKER_FIELDS = [
       { key: 'cm_phone', label: "Co-maker's Phone Number", type: 'tel' },
       { key: 'cm_first', label: "Co-maker's First Name", type: 'text' },
@@ -2104,18 +2140,18 @@
       { key: 'cm_gender', label: "Co-maker's Gender", type: 'select', options: ['Male', 'Female'] },
       { key: 'cm_id_type', label: "Co-maker's ID Type", type: 'select', options: ['UMID', 'Driver License', 'Passport', 'SSS ID', 'PhilHealth ID'] },
       { key: 'cm_id_number', label: "Co-maker's ID Number", type: 'text' },
-      { key: 'cm_id_photo', label: "Co-maker's ID photo", type: 'file' },
-      { key: 'cm_residential', label: "Co-maker's Residential Address", type: 'text' },
+      { key: 'cm_id_photo', label: "Co-maker's ID photo", type: 'file_front_back', backKey: 'cm_id_photo_back', tip: 'rename' },
+      { key: 'cm_residential', label: "Co-maker's Residential Address", type: 'text', tip: 'new' },
       { key: 'cm_complete', label: "Co-maker's Complete Address", type: 'text' },
       { key: 'cm_email', label: "Co-maker's Email", type: 'email' },
-      { key: 'cm_social', label: 'Social Media', type: 'select', options: ['Facebook', 'Whatsapp', 'Viber'] },
-      { key: 'cm_social_acc', label: 'Social Media Account', type: 'text' },
+      { key: 'cm_social', label: 'Social Media', type: 'select', options: ['Facebook', 'Whatsapp', 'Viber'], tip: 'new' },
+      { key: 'cm_social_acc', label: 'Social Media Account', type: 'text', tip: 'new' },
       { key: 'cm_occupation', label: "Co-maker's Occupation", type: 'select', options: ['Self-employed / Business Owner / Freelancer', 'BPO worker', 'Government Employee', 'Corporate Employee'] },
       { key: 'cm_income', label: "Co-maker's Monthly Income", type: 'select', options: ['P15,000 - P20,000', 'P20,000 - P25,000', 'P25,000 - P30,000', 'P30,000 - P40,000'] },
       { key: 'cm_rel_cert_type', label: 'Relationship Certificate Type', type: 'select', options: ['Marriage Certificate', 'Birth Certificate', 'Affidavit of Relationship'] },
       { key: 'cm_rel_cert', label: 'Relationship Certificate', type: 'file' },
-      { key: 'cm_validation_type', label: "Co-maker's Proof of Address Type", type: 'select', options: ['Bank Account Summary (past 3 months)', 'Utility Bills', 'Barangay Clearance'] },
-      { key: 'cm_validation', label: "Co-maker's Proof of Address", type: 'file' },
+      { key: 'cm_validation_type', label: "Co-maker's Proof of Address Type", type: 'select', options: ['Bank Account Summary (past 3 months)', 'Utility Bills', 'Barangay Clearance'], tip: 'rename' },
+      { key: 'cm_validation', label: "Co-maker's Proof of Address", type: 'file', tip: 'rename' },
     ];
 
     function newComakerId() { return 'cm_' + Math.random().toString(36).slice(2, 9); }
@@ -2223,6 +2259,7 @@
     function isFieldKeyEditable(user, key, dataObj, cmId) {
       if (!isSalesAssistMenu() || !ROLES[role].canEdit) return false;
       if (key === 'mobile') return false;
+      if (READONLY_FIELD_KEYS.has(key)) return false;
       const code = userStatus(user);
       const pendingHas = (k) => (user.pendingFields || []).some(pk => normalizeSalesAddrFlagKey(pk) === k);
 
@@ -2373,6 +2410,7 @@
         ph_province: 'Metro Manila (NCR)', ph_city: 'Quezon City', ph_barangay: 'Commonwealth',
         ph_address: '100 Demo St', social_media: 'Facebook', social_account: 'demo.user',
         credit_card: 'No', ofw_agency: 'Agency A', destination: 'Saudi Arabia',
+        purpose_of_loan: 'Other', agency_proof: MOCK_IMG.employer_contract,
         occupation: 'Healthcare / Medical', monthly_income: 'P40,000 - P50,000',
         ...extra,
       };
@@ -2384,6 +2422,7 @@
         gender: 'Female', dob: '1992-06-20', marital_status: 'Married',
         education: 'Secondary / High School', email: 'demo.ofw@email.com',
         social_media: 'Whatsapp', social_account: '+63 921 000 0000', credit_card: 'No',
+        purpose_of_loan: 'Other', agency_proof: MOCK_IMG.employer_contract,
         employer_type: 'Enterprises', visa_country: 'UAE', destination: 'UAE',
         occupation: 'Domestic Helper', monthly_income: 'P30,000 - P40,000',
         job_start: '2023-01-01', job_end: '2027-01-01',
@@ -2397,7 +2436,7 @@
         id, status: opts.status || 'ready',
         fields: {
           cm_first: first, cm_last: last, cm_phone: phone, cm_full_rel: opts.rel || 'Spouse',
-          cm_id_type: 'UMID', cm_id_photo: MOCK_IMG.cm_id_photo, cm_id_number: 'UMID-' + id.slice(-4),
+          cm_id_type: 'UMID', cm_id_photo: MOCK_IMG.cm_id_photo, cm_id_photo_back: MOCK_IMG.cm_id_photo, cm_id_number: 'UMID-' + id.slice(-4),
           cm_gender: opts.gender || 'Female', cm_dob: '1990-01-01',
           cm_occupation: 'Corporate Employee', cm_income: 'P25,000 - P30,000',
           cm_province: 'Metro Manila (NCR)', cm_city: 'Makati City', cm_barangay: 'Poblacion',
@@ -2774,7 +2813,7 @@
       b_id: 'passport_photo', b_live: 'liveness_photo', b_oec: 'oec', b_visa: 'valid_visa',
       b_flight: 'flight', b_contract: 'employer_contract', b_income: 'proof_income',
       b_gov: 'gov_id', b_emp: 'proof_emp',
-      c_id: 'cm_id_photo', c_rel: 'cm_rel_cert', c_val: 'cm_validation', c_live: 'cm_liveness',
+      c_id: 'cm_id_photo', c_id_back: 'cm_id_photo_back', c_rel: 'cm_rel_cert', c_val: 'cm_validation', c_live: 'cm_liveness',
     };
 
     const BIZ_TAG_KEYS = ['biz_not_first', 'biz_seaman', 'biz_fraud', 'biz_id', 'biz_comaker', 'biz_calling', 'biz_other'];
@@ -3065,7 +3104,8 @@
         kind: 'image',
       }));
       const comaker = cm ? [
-        { key: 'c_id', label: t('rv_id_photo'), url: cmf.cm_id_photo || MOCK_IMG.cm_id_photo },
+        { key: 'c_id', label: `${t('rv_id_photo')} · ${t('photo_front')}`, url: cmf.cm_id_photo || MOCK_IMG.cm_id_photo },
+        { key: 'c_id_back', label: `${t('rv_id_photo')} · ${t('photo_back')}`, url: cmf.cm_id_photo_back || MOCK_IMG.cm_id_photo },
         { key: 'c_rel', label: t('rv_rel_proof'), url: cmf.cm_rel_cert || MOCK_IMG.cm_rel_cert },
         { key: 'c_val', label: t('rv_id_proof'), url: cmf.cm_validation || MOCK_IMG.cm_validation },
         { key: 'c_live', label: t('rv_liveness_cm'), url: cmf.cm_liveness || MOCK_IMG.cm_id_photo, matchMode: true },
@@ -3146,7 +3186,9 @@
 
     function fieldTipMark(tip) {
       if (!tip) return '';
-      const title = tip === 'new' ? t('rv_tip_new') : (tip === 'rename' ? t('rv_tip_rename') : '');
+      const title = tip === 'new' ? t('rv_tip_new')
+        : (tip === 'rename' ? t('rv_tip_rename')
+          : (tip === 'removed' ? t('rv_tip_removed') : ''));
       if (!title) return '';
       return `<span class="rv-field-tip tip-${tip}" title="${esc(title)}" aria-label="${esc(title)}"><span class="help-q rv-field-q">?</span></span>`;
     }
@@ -3155,7 +3197,32 @@
       return `<div class="rv-tip-legend">
         <strong>${esc(t('rv_tip_legend'))}</strong>
         <span><span class="rv-field-tip tip-new"><span class="help-q rv-field-q">?</span></span>${esc(t('rv_tip_new'))} — ${esc(t('rv_tip_new_note'))}</span>
+        <span><span class="rv-field-tip tip-removed"><span class="help-q rv-field-q">?</span></span>${esc(t('rv_tip_removed'))} — ${esc(t('rv_tip_removed_note'))}</span>
         <span><span class="rv-field-tip tip-rename"><span class="help-q rv-field-q">?</span></span>${esc(t('rv_tip_rename'))} — ${esc(t('rv_tip_rename_note'))}</span>
+      </div>`;
+    }
+
+    /** 生产销售代填有、本原型未展示的字段（对照 2026-09 生产截图） */
+    function salesProdOnlyFields(flow) {
+      const common = [
+        'ID type',
+        'Additional Validation Type',
+        'Third-party Score',
+        'Current Loans(P)',
+      ];
+      if (flow === 'oversea') {
+        return common.concat(['OFW Agency']);
+      }
+      return common;
+    }
+
+    function renderSalesRemovedFields(user) {
+      const items = salesProdOnlyFields(user.flow);
+      return `<div class="sf-removed-block">
+        <strong>${esc(t('sf_removed_title'))}</strong>
+        <div class="sf-removed-list">${items.map(label =>
+          `<span class="sf-removed-item">${fieldTipMark('removed')}${esc(locLabel(label))}</span>`
+        ).join('')}</div>
       </div>`;
     }
 
@@ -3281,7 +3348,8 @@
 
       const comakerPendingCommon = cm ? [
         decisionTextItem('p_cm_id_type', 'cm_id_type', "Co-maker's ID Type", cp, cmf.cm_id_type, 'comaker'),
-        img('p_cm_id', 'cm_id_photo', "Co-maker's ID photo", 'comaker', cp, cmf.cm_id_photo || MOCK_IMG.cm_id_photo),
+        img('p_cm_id', 'cm_id_photo', "Co-maker's ID photo · Front", 'comaker', cp, cmf.cm_id_photo || MOCK_IMG.cm_id_photo),
+        img('p_cm_id_back', 'cm_id_photo_back', "Co-maker's ID photo · Back", 'comaker', cp, cmf.cm_id_photo_back || MOCK_IMG.cm_id_photo),
         decisionTextItem('p_cm_email', 'cm_email', "Co-maker's Email", cp, cmf.cm_email, 'comaker'),
         decisionTextItem('p_cm_occupation', 'cm_occupation', "Co-maker's Occupation", cp, cmf.cm_occupation, 'comaker'),
         img('p_cm_val', 'cm_validation', "Co-maker's Proof of Address", 'comaker', cp, cmf.cm_validation || MOCK_IMG.cm_validation),
@@ -3609,7 +3677,8 @@
 
       let comakerModule = '';
       const cmMaterials = [
-        { key: 'c_id', label: "Co-maker's ID photo", url: cmf.cm_id_photo || MOCK_IMG.cm_id_photo, fieldKey: 'cm_id_photo', tip: 'rename' },
+        { key: 'c_id', label: "Co-maker's ID photo · Front", url: cmf.cm_id_photo || MOCK_IMG.cm_id_photo, fieldKey: 'cm_id_photo', tip: 'rename' },
+        { key: 'c_id_back', label: "Co-maker's ID photo · Back", url: cmf.cm_id_photo_back || MOCK_IMG.cm_id_photo, fieldKey: 'cm_id_photo_back', tip: 'rename' },
         { key: 'c_rel', label: 'Relationship Certificate', url: cmf.cm_rel_cert || MOCK_IMG.cm_rel_cert, fieldKey: 'cm_rel_cert', tip: 'rename' },
         { key: 'c_val', label: "Co-maker's Proof of Address", url: cmf.cm_validation || MOCK_IMG.cm_validation, fieldKey: 'cm_validation', tip: 'rename' },
         { key: 'c_live', label: t('rv_liveness_cm'), url: cmf.cm_liveness || MOCK_IMG.cm_id_photo, fieldKey: 'cm_liveness', tip: null },
@@ -3723,39 +3792,41 @@
 
     const FIELD_SECTIONS = {
       domestic: [
-        { id: 'identity', title: 'ID Information', phase: '戳额前', fields: [
-          { key: 'passport_photo', label: 'Philippine Passport Photo', type: 'file' },
-          { key: 'passport_number', label: 'Passport Number', type: 'text' },
-          { key: 'first_name', label: 'First Name', type: 'text' },
-          { key: 'middle_name', label: 'Middle Name', type: 'text' },
-          { key: 'last_name', label: 'Last Name', type: 'text' },
-          { key: 'mother_maiden', label: "Mother's Maiden Name", type: 'text' },
+        { id: 'identity', title: 'ID Information', titleTip: 'rename', phase: '戳额前', fields: [
+          { key: 'passport_photo', label: 'Philippine Passport Photo', type: 'file', tip: 'new' },
+          { key: 'passport_number', label: 'Passport Number', type: 'text', tip: 'rename' },
+          { key: 'first_name', label: 'First Name', type: 'text', tip: 'new' },
+          { key: 'middle_name', label: 'Middle Name', type: 'text', tip: 'new' },
+          { key: 'last_name', label: 'Last Name', type: 'text', tip: 'new' },
+          { key: 'mother_maiden', label: "Mother's Maiden Name", type: 'text', tip: 'new' },
           { key: 'dob', label: 'Date of Birth', type: 'date' },
           { key: 'gender', label: 'Gender', type: 'select', options: ['Male', 'Female'] },
           { key: 'marital_status', label: 'Marital Status', type: 'select', options: ['Single', 'Married', 'Separated', 'Widowed'] },
-          { key: 'ph_residential', label: 'Residential Address', type: 'text' },
-          { key: 'ph_address', label: 'Complete Address with House/Unit Number', type: 'text' },
+          { key: 'ph_residential', label: 'Residential Address', type: 'text', tip: 'rename' },
+          { key: 'ph_address', label: 'Complete Address with House/Unit Number', type: 'text', tip: 'new' },
         ]},
-        { id: 'basics', title: 'Basic info', phase: '戳额前', fields: [
+        { id: 'basics', title: 'Basic info', titleTip: 'rename', phase: '戳额前', fields: [
+          { key: 'purpose_of_loan', label: 'Purpose of Loan', type: 'select', options: ['Other', 'Education', 'Medical', 'Business', 'Personal'], tip: null, readonly: true },
           { key: 'education', label: 'Education Level', type: 'select', options: ['Primary / Grade School', 'Secondary / High School', "Bachelor's Degree", 'Master Degree'] },
           { key: 'email', label: 'Email', type: 'email' },
           { key: 'social_media', label: 'Social Media', type: 'select', options: ['Facebook', 'Whatsapp', 'Viber'] },
           { key: 'social_account', label: 'Social Media Account', type: 'text' },
           { key: 'credit_card', label: 'Credit Card Ownership', type: 'select', options: ['Yes', 'No'] },
-          { key: 'destination', label: 'Country of Employment', type: 'select', options: ['Saudi Arabia', 'UAE', 'Hong Kong', 'Singapore', 'Qatar'] },
-          { key: 'occupation', label: 'Occupation', type: 'select', options: ['Domestic Helper', 'Healthcare / Medical', 'Catering', 'Construction Worker', 'BPO worker'] },
-          { key: 'monthly_income', label: 'Monthly income', type: 'select', options: ['P30,000 - P40,000', 'P40,000 - P50,000', 'P50,000 - P60,000'] },
+          { key: 'destination', label: 'Country of Employment', type: 'select', options: ['Saudi Arabia', 'UAE', 'Hong Kong', 'Singapore', 'Qatar'], tip: 'rename' },
+          { key: 'occupation', label: 'Occupation', type: 'select', options: ['Domestic Helper', 'Healthcare / Medical', 'Catering', 'Construction Worker', 'BPO worker'], tip: 'rename' },
+          { key: 'monthly_income', label: 'Monthly income', type: 'select', options: ['P30,000 - P40,000', 'P40,000 - P50,000', 'P50,000 - P60,000'], tip: 'rename' },
         ]},
-        { id: 'agency', title: 'Agency Information', phase: '戳额前', fields: [
+        { id: 'agency', title: 'Agency Information', titleTip: 'rename', phase: '戳额前', fields: [
           { key: 'ofw_agency', label: 'OFW Agency', type: 'select', options: ['Agency A', 'Agency B', 'Agency C', 'Other'] },
-          { key: 'invite_code', label: 'Invitation Code', type: 'text' },
-          { key: 'activity_code', label: 'Activity Code', type: 'text' },
+          { key: 'agency_proof', label: 'Agency Proof (contract or group photo, etc.)', type: 'file' },
+          { key: 'invite_code', label: 'Invitation Code', type: 'text', tip: 'new' },
+          { key: 'activity_code', label: 'Activity Code', type: 'text', tip: 'new' },
         ]},
-        { id: 'work', title: 'Work info', phase: '终审前', fields: [
-          { key: 'valid_visa', label: 'Valid Visa', type: 'file' },
-          { key: 'visa_expiry', label: 'Visa Expiration Date', type: 'date' },
-          { key: 'oec', label: 'Valid OEC', type: 'file' },
-          { key: 'oec_duration', label: 'Contract Duration on OEC', type: 'text', placeholder: 'Months, e.g. 24' },
+        { id: 'work', title: 'Work info', titleTip: 'rename', phase: '终审前', fields: [
+          { key: 'valid_visa', label: 'Valid Visa', type: 'file', tip: 'rename' },
+          { key: 'visa_expiry', label: 'Visa Expiration Date', type: 'date', tip: 'new' },
+          { key: 'oec', label: 'Valid OEC', type: 'file', tip: 'rename' },
+          { key: 'oec_duration', label: 'Contract Duration on OEC', type: 'text', placeholder: 'Months, e.g. 24', tip: 'new' },
           { key: 'flight', label: 'Flight Itinerary', type: 'file' },
           { key: 'departure_date', label: 'Departure Date', type: 'date' },
           { key: 'employer_name', label: 'Employer Name', type: 'text' },
@@ -3763,82 +3834,84 @@
           { key: 'employer_phone', label: 'Employer Phone Number', type: 'tel' },
           { key: 'employer_contract', label: 'Contract with Employer', type: 'file' },
           { key: 'payroll', label: 'Payroll Period', type: 'select', options: ['Daily', 'Weekly', 'Twice per month', 'Once a month'] },
-          { key: 'expected_payday', label: 'Expected Payday', type: 'text', placeholder: 'e.g. 15th or Monday · Friday · …' },
+          { key: 'expected_payday', label: 'Expected Payday', type: 'text', placeholder: 'e.g. 15th or Monday · Friday · …', tip: 'rename' },
           { key: 'est_start', label: 'Estimated Start Date of Work', type: 'date' },
         ]},
-        { id: 'contacts', title: 'Contacts', phase: '终审前', fields: [
-          { key: 'c1_name', label: 'Contact 1 · Name', type: 'text' },
-          { key: 'c1_phone', label: 'Contact 1 · Phone Number', type: 'tel' },
-          { key: 'c1_relationship', label: 'Contact 1 · Relationship', type: 'select', options: ['Spouse', 'Parent', 'Child', 'Sibling', 'Relative', 'Colleague', 'Friend'] },
-          { key: 'c1_residential', label: 'Contact 1 · Residential Address', type: 'text' },
-          { key: 'c1_complete', label: 'Contact 1 · Complete Address', type: 'text' },
-          { key: 'c2_name', label: 'Contact 2 · Name', type: 'text' },
-          { key: 'c2_phone', label: 'Contact 2 · Phone Number', type: 'tel' },
-          { key: 'c2_relationship', label: 'Contact 2 · Relationship', type: 'select', options: ['Spouse', 'Parent', 'Child', 'Sibling', 'Relative', 'Colleague', 'Friend'] },
-          { key: 'c2_residential', label: 'Contact 2 · Residential Address', type: 'text' },
-          { key: 'c2_complete', label: 'Contact 2 · Complete Address', type: 'text' },
+        { id: 'contacts', title: 'Contacts', titleTip: 'new', phase: '终审前', fields: [
+          { key: 'c1_name', label: 'Contact 1 · Name', type: 'text', tip: 'new' },
+          { key: 'c1_phone', label: 'Contact 1 · Phone Number', type: 'tel', tip: 'new' },
+          { key: 'c1_relationship', label: 'Contact 1 · Relationship', type: 'select', options: ['Spouse', 'Parent', 'Child', 'Sibling', 'Relative', 'Colleague', 'Friend'], tip: 'new' },
+          { key: 'c1_residential', label: 'Contact 1 · Residential Address', type: 'text', tip: 'new' },
+          { key: 'c1_complete', label: 'Contact 1 · Complete Address', type: 'text', tip: 'new' },
+          { key: 'c2_name', label: 'Contact 2 · Name', type: 'text', tip: 'new' },
+          { key: 'c2_phone', label: 'Contact 2 · Phone Number', type: 'tel', tip: 'new' },
+          { key: 'c2_relationship', label: 'Contact 2 · Relationship', type: 'select', options: ['Spouse', 'Parent', 'Child', 'Sibling', 'Relative', 'Colleague', 'Friend'], tip: 'new' },
+          { key: 'c2_residential', label: 'Contact 2 · Residential Address', type: 'text', tip: 'new' },
+          { key: 'c2_complete', label: 'Contact 2 · Complete Address', type: 'text', tip: 'new' },
         ]},
       ],
       oversea: [
-        { id: 'identity', title: 'ID Information', phase: '戳额前', fields: [
-          { key: 'nationality', label: 'Nationality', type: 'select', options: ['Philippines', 'Other'] },
-          { key: 'passport_photo', label: 'Philippine Passport Photo', type: 'file' },
-          { key: 'passport_number', label: 'Passport Number', type: 'text' },
-          { key: 'first_name', label: 'First Name', type: 'text' },
-          { key: 'middle_name', label: 'Middle Name', type: 'text' },
-          { key: 'last_name', label: 'Last Name', type: 'text' },
-          { key: 'mother_maiden', label: "Mother's Maiden Name", type: 'text' },
+        { id: 'identity', title: 'ID Information', titleTip: 'rename', phase: '戳额前', fields: [
+          { key: 'nationality', label: 'Nationality', type: 'select', options: ['Philippines', 'Other'], tip: 'new' },
+          { key: 'passport_photo', label: 'Philippine Passport Photo', type: 'file', tip: 'new' },
+          { key: 'passport_number', label: 'Passport Number', type: 'text', tip: 'rename' },
+          { key: 'first_name', label: 'First Name', type: 'text', tip: 'new' },
+          { key: 'middle_name', label: 'Middle Name', type: 'text', tip: 'new' },
+          { key: 'last_name', label: 'Last Name', type: 'text', tip: 'new' },
+          { key: 'mother_maiden', label: "Mother's Maiden Name", type: 'text', tip: 'new' },
           { key: 'dob', label: 'Date of Birth', type: 'date' },
           { key: 'gender', label: 'Gender', type: 'select', options: ['Male', 'Female'] },
           { key: 'marital_status', label: 'Marital Status', type: 'select', options: ['Single', 'Married', 'Separated', 'Widowed'] },
         ]},
-        { id: 'basics', title: 'Basic info', phase: '戳额前', fields: [
+        { id: 'basics', title: 'Basic info', titleTip: 'rename', phase: '戳额前', fields: [
+          { key: 'purpose_of_loan', label: 'Purpose of Loan', type: 'select', options: ['Other', 'Education', 'Medical', 'Business', 'Personal'], tip: null, readonly: true },
           { key: 'education', label: 'Education Level', type: 'select', options: ['Primary / Grade School', 'Secondary / High School', "Bachelor's Degree", 'Master Degree'] },
           { key: 'email', label: 'Email', type: 'email' },
           { key: 'social_media', label: 'Social Media', type: 'select', options: ['Facebook', 'Whatsapp', 'Viber'] },
           { key: 'social_account', label: 'Social Media Account', type: 'text' },
           { key: 'credit_card', label: 'Credit Card Ownership', type: 'select', options: ['Yes', 'No'] },
-          { key: 'employer_type', label: 'Employer Type', type: 'select', options: ['Public institutions', 'Enterprises', 'Private individuals'] },
-          { key: 'destination', label: 'Country of Employment', type: 'select', options: ['Saudi Arabia', 'UAE', 'Hong Kong', 'Singapore', 'Qatar'] },
-          { key: 'occupation', label: 'Occupation', type: 'select', options: ['Domestic Helper', 'Healthcare / Medical', 'Catering', 'Construction Worker', 'BPO worker'] },
-          { key: 'monthly_income', label: 'Monthly income', type: 'select', options: ['P30,000 - P40,000', 'P40,000 - P50,000', 'P50,000 - P60,000'] },
-          { key: 'job_start', label: 'Current Job Start Date', type: 'date' },
-          { key: 'job_end', label: 'Current Job End Date', type: 'date' },
+          { key: 'employer_type', label: 'Employer Type', type: 'select', options: ['Public institutions', 'Enterprises', 'Private individuals'], tip: 'new' },
+          { key: 'destination', label: 'Country of Employment', type: 'select', options: ['Saudi Arabia', 'UAE', 'Hong Kong', 'Singapore', 'Qatar'], tip: 'rename' },
+          { key: 'occupation', label: 'Occupation', type: 'select', options: ['Domestic Helper', 'Healthcare / Medical', 'Catering', 'Construction Worker', 'BPO worker'], tip: 'rename' },
+          { key: 'monthly_income', label: 'Monthly income', type: 'select', options: ['P30,000 - P40,000', 'P40,000 - P50,000', 'P50,000 - P60,000'], tip: 'rename' },
+          { key: 'job_start', label: 'Current Job Start Date', type: 'date', tip: 'new' },
+          { key: 'job_end', label: 'Current Job End Date', type: 'date', tip: 'new' },
         ]},
-        { id: 'agency', title: 'Agency Information', phase: '戳额前', fields: [
-          { key: 'invite_code', label: 'Invitation Code', type: 'text' },
-          { key: 'activity_code', label: 'Activity Code', type: 'text' },
+        { id: 'agency', title: 'Agency Information', titleTip: 'rename', phase: '戳额前', fields: [
+          { key: 'agency_proof', label: 'Agency Proof (contract or group photo, etc.)', type: 'file' },
+          { key: 'invite_code', label: 'Invitation Code', type: 'text', tip: 'new' },
+          { key: 'activity_code', label: 'Activity Code', type: 'text', tip: 'new' },
         ]},
-        { id: 'work', title: 'Work info', phase: '终审前', fields: [
-          { key: 'residence_doc_type', label: 'Overseas Residence Document Type', type: 'select', options: ['Employment / Work Visa', 'Residence Visa', 'Skilled Professional Visa', 'Permanent Resident', 'Dependent Visa with Work Permit', 'Special / Golden Visa', 'J1/H1B Visa', 'Other'] },
-          { key: 'valid_visa', label: 'Valid Visa / Document', type: 'file' },
-          { key: 'visa_issue', label: 'Issue Date', type: 'date' },
-          { key: 'visa_expiry', label: 'Expiration Date', type: 'date' },
-          { key: 'gov_id', label: 'Oversea Government-Issued ID', type: 'file' },
-          { key: 'overseas_mobile', label: 'Overseas Phone Number', type: 'tel' },
-          { key: 'oec', label: 'Valid OEC', type: 'file' },
-          { key: 'oec_duration', label: 'Contract Duration on OEC', type: 'text', placeholder: 'Months, e.g. 24' },
+        { id: 'work', title: 'Work info', titleTip: 'rename', phase: '终审前', fields: [
+          { key: 'residence_doc_type', label: 'Overseas Residence Document Type', type: 'select', options: ['Employment / Work Visa', 'Residence Visa', 'Skilled Professional Visa', 'Permanent Resident', 'Dependent Visa with Work Permit', 'Special / Golden Visa', 'J1/H1B Visa', 'Other'], tip: 'rename' },
+          { key: 'valid_visa', label: 'Valid Visa / Document', type: 'file', tip: 'rename' },
+          { key: 'visa_issue', label: 'Issue Date', type: 'date', tip: 'new' },
+          { key: 'visa_expiry', label: 'Expiration Date', type: 'date', tip: 'new' },
+          { key: 'gov_id', label: 'Oversea Government-Issued ID', type: 'file', tip: 'new' },
+          { key: 'overseas_mobile', label: 'Overseas Phone Number', type: 'tel', tip: 'new' },
+          { key: 'oec', label: 'Valid OEC', type: 'file', tip: 'rename' },
+          { key: 'oec_duration', label: 'Contract Duration on OEC', type: 'text', placeholder: 'Months, e.g. 24', tip: 'new' },
           { key: 'employer_name', label: 'Employer Name', type: 'text' },
           { key: 'employer_address', label: 'Employer Address', type: 'text' },
           { key: 'employer_phone', label: 'Employer Phone Number', type: 'tel' },
           { key: 'employer_contract', label: 'Contract with Employer', type: 'file' },
           { key: 'payroll', label: 'Payroll Period', type: 'select', options: ['Daily', 'Weekly', 'Twice per month', 'Once a month'] },
-          { key: 'expected_payday', label: 'Expected Payday', type: 'text', placeholder: 'e.g. 15th or Monday · Friday · …' },
-          { key: 'first_job_start', label: 'First Overseas Job Start Date', type: 'date' },
-          { key: 'proof_income', label: 'Proof of income', type: 'file' },
-          { key: 'proof_emp', label: 'Proof of employment', type: 'file' },
+          { key: 'expected_payday', label: 'Expected Payday', type: 'text', placeholder: 'e.g. 15th or Monday · Friday · …', tip: 'rename' },
+          { key: 'first_job_start', label: 'First Overseas Job Start Date', type: 'date', tip: 'new' },
+          { key: 'proof_income', label: 'Proof of income', type: 'file', tip: 'new' },
+          { key: 'proof_emp', label: 'Proof of employment', type: 'file', tip: 'new' },
         ]},
-        { id: 'contacts', title: 'Contacts', phase: '终审前', fields: [
-          { key: 'c1_name', label: 'Contact 1 · Name', type: 'text' },
-          { key: 'c1_phone', label: 'Contact 1 · Phone Number', type: 'tel' },
-          { key: 'c1_relationship', label: 'Contact 1 · Relationship', type: 'select', options: ['Spouse', 'Parent', 'Child', 'Sibling', 'Relative', 'Colleague', 'Friend'] },
-          { key: 'c1_residential', label: 'Contact 1 · Residential Address', type: 'text' },
-          { key: 'c1_complete', label: 'Contact 1 · Complete Address', type: 'text' },
-          { key: 'c2_name', label: 'Contact 2 · Name', type: 'text' },
-          { key: 'c2_phone', label: 'Contact 2 · Phone Number', type: 'tel' },
-          { key: 'c2_relationship', label: 'Contact 2 · Relationship', type: 'select', options: ['Spouse', 'Parent', 'Child', 'Sibling', 'Relative', 'Colleague', 'Friend'] },
-          { key: 'c2_residential', label: 'Contact 2 · Residential Address', type: 'text' },
-          { key: 'c2_complete', label: 'Contact 2 · Complete Address', type: 'text' },
+        { id: 'contacts', title: 'Contacts', titleTip: 'new', phase: '终审前', fields: [
+          { key: 'c1_name', label: 'Contact 1 · Name', type: 'text', tip: 'new' },
+          { key: 'c1_phone', label: 'Contact 1 · Phone Number', type: 'tel', tip: 'new' },
+          { key: 'c1_relationship', label: 'Contact 1 · Relationship', type: 'select', options: ['Spouse', 'Parent', 'Child', 'Sibling', 'Relative', 'Colleague', 'Friend'], tip: 'new' },
+          { key: 'c1_residential', label: 'Contact 1 · Residential Address', type: 'text', tip: 'new' },
+          { key: 'c1_complete', label: 'Contact 1 · Complete Address', type: 'text', tip: 'new' },
+          { key: 'c2_name', label: 'Contact 2 · Name', type: 'text', tip: 'new' },
+          { key: 'c2_phone', label: 'Contact 2 · Phone Number', type: 'tel', tip: 'new' },
+          { key: 'c2_relationship', label: 'Contact 2 · Relationship', type: 'select', options: ['Spouse', 'Parent', 'Child', 'Sibling', 'Relative', 'Colleague', 'Friend'], tip: 'new' },
+          { key: 'c2_residential', label: 'Contact 2 · Residential Address', type: 'text', tip: 'new' },
+          { key: 'c2_complete', label: 'Contact 2 · Complete Address', type: 'text', tip: 'new' },
         ]},
       ],
     };
@@ -3892,6 +3965,10 @@
       if (u && isSalesAssistMenu() && !isSalesMgmtMenu() && isUnassignedSales(u)) {
         u.salesRep = currentSalesRepId();
         alert(t('alert_auto_assign'));
+      }
+      if (u) {
+        u.fields = u.fields || {};
+        if (!u.fields.purpose_of_loan) u.fields.purpose_of_loan = 'Other';
       }
       selectedUserId = id;
       detailTab = tab || 'profile';
@@ -4417,7 +4494,7 @@
       return null;
     }
 
-    function openEditModal(userId, fieldKey, cmId) {
+    function openEditModal(userId, fieldKey, cmId, photoSide) {
       const user = getUser(userId);
       if (!user) return;
       const field = findFieldDef(user, fieldKey, cmId || null);
@@ -4425,12 +4502,16 @@
       const dataObjForGate = cmId
         ? (user.comakers.find(c => c.id === cmId)?.fields || {})
         : user.fields;
+      const writeKey = (field.type === 'file_front_back' && photoSide === 'back')
+        ? (field.backKey || `${field.key}_back`)
+        : field.key;
       if (field.key === 'mobile' || (field.key === 'cm_phone' && isPhoneIdentityLocked('cm_phone', dataObjForGate))) {
         alert(lang === 'zh'
           ? '手机号不可在后台修改，请用户 / 担保人在 APP 申请换绑（二期）。'
           : 'Phone cannot be changed in Backend. User / co-maker must apply rebind in APP (Phase 2).');
         return;
       }
+      if (READONLY_FIELD_KEYS.has(field.key) || field.readonly) return;
       if (field.key !== 'cm_phone' && !canEditThisField(field.key, user)) return;
       if (cmId) {
         const cm = user.comakers?.find(c => c.id === cmId);
@@ -4438,14 +4519,17 @@
       } else if (!isFieldKeyEditable(user, field.key, dataObjForGate)) {
         return;
       }
-      editCtx = { userId, cmId: cmId || null, field };
+      editCtx = { userId, cmId: cmId || null, field, writeKey };
       const dataObj = dataObjForGate;
-      const v = fieldDisplayValue(dataObj, field.key);
-      document.getElementById('edit-modal-title').textContent = `${t('edit')} · ${locLabel(field.label)}`;
+      const v = fieldDisplayValue(dataObj, writeKey);
+      const sideLabel = field.type === 'file_front_back'
+        ? ` · ${photoSide === 'back' ? t('photo_back') : t('photo_front')}`
+        : '';
+      document.getElementById('edit-modal-title').textContent = `${t('edit')} · ${locLabel(field.label)}${sideLabel}`;
       document.getElementById('edit-modal-cancel').textContent = t('cancel');
       document.getElementById('edit-modal-ok').textContent = t('confirm');
-      let body = `<label>${esc(locLabel(field.label))}</label>`;
-      if (field.type === 'file') {
+      let body = `<label>${esc(locLabel(field.label))}${sideLabel ? esc(sideLabel) : ''}</label>`;
+      if (field.type === 'file' || field.type === 'file_front_back') {
         body += `<div class="file-field" style="margin-top:4px">
           <span class="file-empty" id="edit-modal-file-status">${v ? t('file_ok') : t('not_uploaded')}</span>
           <button type="button" class="btn-sm" onclick="modalPickFile()">${v ? t('reupload') : t('upload')}</button>
@@ -4463,12 +4547,12 @@
       document.getElementById('edit-modal').classList.add('open');
       document.body.style.overflow = 'hidden';
       const input = document.getElementById('edit-modal-input');
-      if (input && field.type !== 'file') setTimeout(() => input.focus(), 50);
+      if (input && field.type !== 'file' && field.type !== 'file_front_back') setTimeout(() => input.focus(), 50);
     }
 
     function modalPickFile() {
       if (!editCtx) return;
-      const url = mockFileUrl(editCtx.field.key);
+      const url = mockFileUrl(editCtx.writeKey || editCtx.field.key);
       const input = document.getElementById('edit-modal-input');
       if (input) input.value = url;
       const st = document.getElementById('edit-modal-file-status');
@@ -4487,31 +4571,63 @@
       if (!editCtx) return;
       const input = document.getElementById('edit-modal-input');
       const value = input ? input.value : '';
-      const { userId, cmId, field } = editCtx;
+      const { userId, cmId, field, writeKey } = editCtx;
+      const key = writeKey || field.key;
       closeEditModal();
       if (cmId) {
-        updateComakerField(userId, cmId, field.key, value);
+        updateComakerField(userId, cmId, key, value);
       } else {
-        updateField(userId, field.key, value);
+        updateField(userId, key, value);
         render();
       }
     }
 
-    function renderEditBtn(userId, field, cmId) {
-      const cmArg = cmId ? `,'${cmId}'` : '';
-      return `<button type="button" class="btn-edit-icon" title="${esc(t('edit'))}" onclick="openEditModal('${userId}','${field.key}'${cmArg})">
+    function renderEditBtn(userId, field, cmId, photoSide) {
+      const cmArg = cmId ? `,'${cmId}'` : ',null';
+      const sideArg = photoSide ? `,'${photoSide}'` : '';
+      return `<button type="button" class="btn-edit-icon" title="${esc(t('edit'))}" onclick="openEditModal('${userId}','${field.key}'${cmArg}${sideArg})">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>
         </svg>
       </button>`;
     }
 
-    function renderKvValue(dataObj, field, editable, changeFn, uploadFn, editMeta) {
-      const v = fieldDisplayValue(dataObj, field.key);
-      const empty = !v;
+    function renderFileSlot(dataObj, field, slotKey, slotLabel, editable, editMeta) {
+      const v = fieldDisplayValue(dataObj, slotKey);
       const user = editMeta?.userId ? getUser(editMeta.userId) : null;
       const canEdit = editable && editMeta && (!user || canEditThisField(field.key, user));
+      const side = slotKey === field.key ? 'front' : 'back';
+      const editIcon = canEdit ? renderEditBtn(editMeta.userId, field, editMeta.cmId, side) : '';
+      let body;
+      if (!v) {
+        body = `<div class="kv-value-row"><span class="kv-empty">—</span>${editIcon}</div>`;
+      } else {
+        const url = isImageUrl(v) ? v : mockFileUrl(slotKey);
+        body = `<div class="kv-value-row file-field-img">
+          <button type="button" class="img-thumb-btn" onclick="openLightbox('${esc(url)}')">
+            <img class="field-thumb" src="${esc(url)}" alt="${esc(slotLabel)}" />
+          </button>${editIcon}
+        </div>`;
+      }
+      return `<div class="file-pair-slot"><span class="slot-label">${esc(slotLabel)}</span>${body}</div>`;
+    }
+
+    function renderKvValue(dataObj, field, editable, changeFn, uploadFn, editMeta) {
+      const user = editMeta?.userId ? getUser(editMeta.userId) : null;
+      const canEdit = editable && editMeta && (!user || canEditThisField(field.key, user))
+        && !READONLY_FIELD_KEYS.has(field.key) && !field.readonly;
       const editIcon = canEdit ? renderEditBtn(editMeta.userId, field, editMeta.cmId) : '';
+
+      if (field.type === 'file_front_back') {
+        const backKey = field.backKey || `${field.key}_back`;
+        return `<div class="file-pair">
+          ${renderFileSlot(dataObj, field, field.key, t('photo_front'), editable, editMeta)}
+          ${renderFileSlot(dataObj, field, backKey, t('photo_back'), editable, editMeta)}
+        </div>`;
+      }
+
+      const v = fieldDisplayValue(dataObj, field.key);
+      const empty = !v;
 
       if (field.type === 'file') {
         if (empty) {
@@ -4532,8 +4648,8 @@
     function renderKvRows(fields, dataObj, editable, changeFnFor, uploadFnFor, editMeta) {
       const user = editMeta?.userId ? getUser(editMeta.userId) : null;
       const flags = user ? flaggedFieldKeys(user) : [];
-      const textFields = fields.filter(f => f.type !== 'file');
-      const fileFields = fields.filter(f => f.type === 'file');
+      const textFields = fields.filter(f => f.type !== 'file' && f.type !== 'file_front_back');
+      const fileFields = fields.filter(f => f.type === 'file' || f.type === 'file_front_back');
       let html = '';
       const cell = (f) => {
         const fieldEdit = user ? isFieldKeyEditable(user, f.key, dataObj, editMeta?.cmId) : editable;
@@ -4543,7 +4659,7 @@
           : '';
         const labelCls = `kv-label${flagged ? ' kv-flagged-label' : ''}`;
         const valueCls = `kv-value${flagged ? ' kv-flagged' : ''}`;
-        return `<th class="${labelCls}">${esc(locLabel(f.label))}${flagTag}</th><td class="${valueCls}">${renderKvValue(dataObj, f, fieldEdit, changeFnFor(f), uploadFnFor(f), fieldEdit ? editMeta : null)}</td>`;
+        return `<th class="${labelCls}">${esc(locLabel(f.label))}${fieldTipMark(f.tip)}${flagTag}</th><td class="${valueCls}">${renderKvValue(dataObj, f, fieldEdit, changeFnFor(f), uploadFnFor(f), fieldEdit ? editMeta : null)}</td>`;
       };
       for (let i = 0; i < textFields.length; i += 3) {
         const chunk = textFields.slice(i, i + 3);
@@ -4561,7 +4677,7 @@
         const flagTag = flagged
           ? `<span class="tag tag-warning" style="margin-left:6px;font-size:10px">${esc(userStatus(user) === 'MANUAL_PENDING' ? t('flag_pending') : t('flag_return'))}</span>`
           : '';
-        html += `<tr><th class="kv-label kv-photo-label${flagged ? ' kv-flagged-label' : ''}">${esc(locLabel(f.label))}${flagTag}</th><td class="kv-value kv-photo-value${flagged ? ' kv-flagged' : ''}" colspan="5">${renderKvValue(dataObj, f, fieldEdit, changeFnFor(f), uploadFnFor(f), fieldEdit ? editMeta : null)}</td></tr>`;
+        html += `<tr><th class="kv-label kv-photo-label${flagged ? ' kv-flagged-label' : ''}">${esc(locLabel(f.label))}${fieldTipMark(f.tip)}${flagTag}</th><td class="kv-value kv-photo-value${flagged ? ' kv-flagged' : ''}" colspan="5">${renderKvValue(dataObj, f, fieldEdit, changeFnFor(f), uploadFnFor(f), fieldEdit ? editMeta : null)}</td></tr>`;
       });
       return html;
     }
@@ -4571,9 +4687,10 @@
       const changeFnFor = opts.changeFnFor || (() => '');
       const uploadFnFor = opts.uploadFnFor || (() => '');
       const editMeta = opts.editMeta || null;
+      const titleTip = opts.titleTip ? fieldTipMark(opts.titleTip) : '';
       return `
         <div class="info-block${opts.className ? ' ' + opts.className : ''}">
-          <div class="info-block-title">${esc(title)}${extra}</div>
+          <div class="info-block-title">${esc(title)}${titleTip}${extra}</div>
           <table class="kv-table">
             <tbody>${renderKvRows(fields, dataObj, editable, changeFnFor, uploadFnFor, editMeta)}</tbody>
           </table>
@@ -4640,6 +4757,7 @@
       }
       return lockNote + sections.map(sec =>
         renderKvSection(sectionTitle(sec.title), sec.fields, user.fields, editable, {
+          titleTip: sec.titleTip,
           changeFnFor: f => `updateField('${user.id}','${f.key}',this.value)`,
           uploadFnFor: f => `uploadField('${user.id}','${f.key}')`,
           editMeta: { userId: user.id, cmId: null },
@@ -4659,13 +4777,13 @@
             </tr>
             <tr>
               <th class="kv-label">${t('registered_at')}</th><td class="kv-value">${esc(user.registeredAt)}</td>
-              <th class="kv-label">${t('user_version')}</th><td class="kv-value">${flowBadge(user.flow)}</td>
-              <th class="kv-label">${t('profile_status')}</th><td class="kv-value">${profileStatusBadge(user)}</td>
+              <th class="kv-label">${t('user_version')}${fieldTipMark('new')}</th><td class="kv-value">${flowBadge(user.flow)}</td>
+              <th class="kv-label">${t('profile_status')}${fieldTipMark('new')}</th><td class="kv-value">${profileStatusBadge(user)}</td>
             </tr>
             <tr>
-              <th class="kv-label">${t('name')}</th><td class="kv-value">${esc(user.name)}</td>
-              <th class="kv-label">${t('attr_channel')}</th><td class="kv-value">${esc(user.channel)}</td>
-              <th class="kv-label">${t('sales_rep')}</th><td class="kv-value">${esc(user.salesRep)}</td>
+              <th class="kv-label">${t('name')}${fieldTipMark('new')}</th><td class="kv-value">${esc(user.name)}</td>
+              <th class="kv-label">${t('attr_channel')}${fieldTipMark('new')}</th><td class="kv-value">${esc(user.channel)}</td>
+              <th class="kv-label">${t('sales_rep')}${fieldTipMark('rename')}</th><td class="kv-value">${esc(user.salesRep)}</td>
             </tr>
           </tbody></table>
         </div>`;
@@ -4699,6 +4817,8 @@
           ? (lang === 'zh' ? '保存并通知审核员' : 'Save & notify reviewer')
           : t('save');
         return header + `
+          ${renderTipLegend()}
+          ${renderSalesRemovedFields(user)}
           <div class="alert ${showSave ? 'alert-ok' : 'alert-lock'}">${teamBEditHint(user)}${help}</div>
           <div class="tab-body">${renderProfileSections(user, profileEditable)}</div>
           ${showSave ? `<div class="save-bar"><button type="button" class="btn-primary" onclick="saveProfile('${user.id}')">${esc(saveLabel)}</button></div>` : ''}
