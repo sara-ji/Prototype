@@ -2868,6 +2868,8 @@
       if (!reviewAuditState[userId]) reviewAuditState[userId] = {};
       // Co-maker phone is display-only in review — cannot Return / Pending / Reject.
       if (key === 'cm_phone') return;
+      // Liveness: Pass / Reject only — no Return / Pending.
+      if (isLivenessFieldKey(key) && (normalizeMark(value) === 'return' || normalizeMark(value) === 'pending')) return;
       const next = normalizeMark(value);
       const cur = normalizeMark(reviewAuditState[userId][key]);
       if (!next) return;
@@ -2997,22 +2999,40 @@
       return 'return';
     }
 
-    /** requirePass: image cards only — text fields only get Return / Pending / Reject. */
+    /** requirePass: image cards only — text fields only get Return / Pending / Reject.
+     *  Liveness photos: Pass + Reject only (no Return / Pending). */
+    function isLivenessFieldKey(fieldKey) {
+      return fieldKey === 'liveness_photo' || fieldKey === 'cm_liveness';
+    }
+
+    function sanitizeLivenessMarks(userId) {
+      const s = reviewAuditState[userId];
+      if (!s) return;
+      ['liveness_photo', 'cm_liveness'].forEach(k => {
+        const m = normalizeMark(s[k]);
+        if (m === 'return' || m === 'pending') delete s[k];
+      });
+    }
+
     function renderMarkButtons(userId, fieldKey, allowPending, opts = {}) {
       if (!fieldKey) return '';
       // Co-maker phone: visible in review but not markable (cannot return / pending / reject).
       if (fieldKey === 'cm_phone') return '';
       const requirePass = !!opts.requirePass;
+      const livenessOnlyReject = isLivenessFieldKey(fieldKey);
       const state = normalizeMark(reviewAuditState[userId]?.[fieldKey]);
-      const pendingBtn = allowPending
+      const pendingBtn = (!livenessOnlyReject && allowPending)
         ? `<button type="button" class="rv-mark-btn pending${state === 'pending' ? ' on' : ''}" onclick="auditCheck('${userId}','${fieldKey}','pending')">${t('rv_mark_pending')}</button>`
         : '';
       const passBtn = requirePass
         ? `<button type="button" class="rv-mark-btn pass${state === 'pass' ? ' on' : ''}" onclick="auditCheck('${userId}','${fieldKey}','pass')">${t('rv_pass')}</button>`
         : '';
+      const returnBtn = livenessOnlyReject
+        ? ''
+        : `<button type="button" class="rv-mark-btn return${state === 'return' ? ' on' : ''}" onclick="auditCheck('${userId}','${fieldKey}','return')">${t('rv_reject')}</button>`;
       return `<div class="rv-mark-btns">
         ${passBtn}
-        <button type="button" class="rv-mark-btn return${state === 'return' ? ' on' : ''}" onclick="auditCheck('${userId}','${fieldKey}','return')">${t('rv_reject')}</button>
+        ${returnBtn}
         ${pendingBtn}
         <button type="button" class="rv-mark-btn reject${state === 'reject' ? ' on' : ''}" onclick="auditCheck('${userId}','${fieldKey}','reject')">${t('rv_mark_reject')}</button>
       </div>`;
@@ -3487,6 +3507,7 @@
     }
 
     function renderAuditCard(item, userId) {
+      sanitizeLivenessMarks(userId);
       const fieldKey = item.fieldKey || AUDIT_FIELD_MAP[item.key] || item.key;
       const state = normalizeMark(reviewAuditState[userId]?.[fieldKey]);
       const pendingKeys = getPendingFieldKeySet(getUser(userId));
