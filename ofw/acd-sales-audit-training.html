@@ -1,0 +1,1375 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OFW 专题 ACD｜销售 & 人审产品培训手册</title>
+  <style>
+    :root {
+      --bg: #f4f1eb;
+      --page: #fffdf9;
+      --ink: #1c1917;
+      --muted: #57534e;
+      --line: #e7e5e4;
+      --accent: #0f766e;
+      --accent-soft: #ccfbf1;
+      --warn: #b45309;
+      --warn-soft: #ffedd5;
+      --danger: #b91c1c;
+      --danger-soft: #fee2e2;
+      --ok: #15803d;
+      --ok-soft: #dcfce7;
+      --sales: #1d4ed8;
+      --sales-soft: #dbeafe;
+      --audit: #7c2d12;
+      --audit-soft: #ffedd5;
+      --app: #0e7490;
+      --app-soft: #cffafe;
+      --shadow: 0 8px 28px rgba(28, 25, 23, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #d6d3d1;
+      color: var(--ink);
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+
+    .deck {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 28px;
+      padding: 32px 16px 64px;
+    }
+
+    .page {
+      width: 1920px;
+      height: 1080px;
+      background: var(--page);
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+      page-break-after: always;
+      flex-shrink: 0;
+    }
+
+    .page-inner {
+      height: 100%;
+      padding: 40px 56px 36px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      min-height: 0;
+    }
+
+    .page-body {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 0;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--line);
+      flex-shrink: 0;
+    }
+    .brand {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: var(--accent);
+      text-transform: uppercase;
+    }
+    .section-tag {
+      font-size: 12px;
+      color: var(--muted);
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 4px 12px;
+    }
+    .page-no {
+      font-size: 13px;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: 48px;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+    }
+    h2 {
+      margin: 0;
+      font-size: 32px;
+      line-height: 1.2;
+      letter-spacing: -0.015em;
+      flex-shrink: 0;
+    }
+    h3 {
+      margin: 0 0 8px;
+      font-size: 20px;
+      line-height: 1.3;
+    }
+    p, li {
+      font-size: 18px;
+      line-height: 1.4;
+      color: var(--ink);
+    }
+    .lead {
+      font-size: 20px;
+      color: var(--muted);
+      max-width: 1500px;
+      margin: 0;
+      flex-shrink: 0;
+    }
+    .small { font-size: 15px; color: var(--muted); line-height: 1.35; }
+
+    .cover {
+      background:
+        radial-gradient(1200px 600px at 85% -10%, #99f6e4 0%, transparent 55%),
+        radial-gradient(900px 500px at -10% 110%, #fed7aa 0%, transparent 50%),
+        var(--page);
+    }
+    .cover .page-inner { justify-content: center; padding-left: 96px; gap: 0; }
+    .cover .eyebrow {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+    .cover h1 { font-size: 64px; max-width: 1200px; margin-bottom: 24px; }
+    .cover .lead { font-size: 26px; margin-bottom: 40px; }
+    .meta-row {
+      display: flex;
+      gap: 28px;
+      flex-wrap: wrap;
+      font-size: 18px;
+      color: var(--muted);
+    }
+    .meta-row strong { color: var(--ink); }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      min-height: 0;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      min-height: 0;
+    }
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+    .fill { flex: 1; min-height: 0; }
+    .grid-2.fill,
+    .grid-3.fill {
+      flex: 1;
+      min-height: 0;
+      grid-auto-rows: minmax(0, 1fr);
+    }
+    .grid-2.fill > *,
+    .grid-3.fill > * {
+      min-height: 0;
+      overflow: hidden;
+    }
+    /* 上行按内容，下行吃剩余高度（适合「两卡 + 贴图」） */
+    .grid-2.fill.two-row {
+      grid-template-rows: auto minmax(0, 1fr);
+      grid-auto-rows: initial;
+    }
+    .mt { margin-top: 12px; }
+    .page-inner > .img-slot.fill,
+    .page-body > .img-slot.fill { flex: 1; min-height: 0; }
+
+    .card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 16px 18px;
+      min-height: 0;
+      overflow: hidden;
+    }
+    .card.accent { border-color: #5eead4; background: linear-gradient(180deg, #f0fdfa, #fff); }
+    .card.sales { border-color: #93c5fd; background: linear-gradient(180deg, #eff6ff, #fff); }
+    .card.audit { border-color: #fdba74; background: linear-gradient(180deg, #fff7ed, #fff); }
+    .card.app { border-color: #67e8f9; background: linear-gradient(180deg, #ecfeff, #fff); }
+    .card.warn { border-color: #fcd34d; background: linear-gradient(180deg, #fffbeb, #fff); }
+    .card.danger { border-color: #fca5a5; background: linear-gradient(180deg, #fef2f2, #fff); }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 999px;
+      margin-bottom: 8px;
+    }
+    .pill.sales { background: var(--sales-soft); color: var(--sales); }
+    .pill.audit { background: var(--audit-soft); color: var(--audit); }
+    .pill.app { background: var(--app-soft); color: var(--app); }
+    .pill.ok { background: var(--ok-soft); color: var(--ok); }
+    .pill.warn { background: var(--warn-soft); color: var(--warn); }
+    .pill.danger { background: var(--danger-soft); color: var(--danger); }
+
+    ul { margin: 6px 0 0; padding-left: 20px; }
+    li { margin: 4px 0; }
+    .tight li { margin: 3px 0; font-size: 16px; }
+    ol { margin: 6px 0 0; padding-left: 22px; }
+    ol li { margin: 5px 0; font-size: 17px; }
+
+    .flow {
+      display: flex;
+      align-items: stretch;
+      gap: 8px;
+      flex-wrap: nowrap;
+      margin: 0;
+      flex-shrink: 0;
+    }
+    .flow-step {
+      flex: 1;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px 10px;
+      text-align: center;
+      min-width: 0;
+    }
+    .flow-step .n {
+      width: 26px; height: 26px; line-height: 26px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      margin: 0 auto 6px;
+    }
+    .flow-step strong { display: block; font-size: 15px; margin-bottom: 3px; }
+    .flow-step span { display: block; font-size: 13px; color: var(--muted); }
+    .flow-arrow {
+      display: flex;
+      align-items: center;
+      color: var(--muted);
+      font-size: 20px;
+      flex: 0 0 16px;
+    }
+
+    .img-slot {
+      border: 2px dashed #a8a29e;
+      background:
+        repeating-linear-gradient(-45deg, transparent, transparent 8px, rgba(168,162,158,0.08) 8px, rgba(168,162,158,0.08) 16px),
+        #fafaf9;
+      border-radius: 12px;
+      padding: 12px 14px;
+      color: #78716c;
+      font-size: 14px;
+      line-height: 1.35;
+      min-height: 72px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 4px;
+      overflow: hidden;
+    }
+    .img-slot b {
+      color: var(--ink);
+      font-size: 13px;
+      letter-spacing: 0.02em;
+    }
+    .img-slot.tall { min-height: 0; height: 100%; }
+    .img-slot.mid { min-height: 96px; }
+    .img-slot.fill { flex: 1; min-height: 0; }
+
+    table.matrix {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      background: #fff;
+      flex-shrink: 1;
+      min-height: 0;
+    }
+    table.matrix th, table.matrix td {
+      border: 1px solid var(--line);
+      padding: 6px 9px;
+      text-align: left;
+      vertical-align: top;
+    }
+    table.matrix th {
+      background: #f5f5f4;
+      font-weight: 700;
+      font-size: 14px;
+    }
+    table.matrix td { line-height: 1.35; }
+    .star { color: var(--warn); font-weight: 700; }
+
+    .callout {
+      border-left: 5px solid var(--accent);
+      background: var(--accent-soft);
+      padding: 12px 16px;
+      border-radius: 0 12px 12px 0;
+      margin: 0;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    .callout.warn { border-left-color: var(--warn); background: var(--warn-soft); }
+    .callout.danger { border-left-color: var(--danger); background: var(--danger-soft); }
+
+    .role-chip {
+      display: inline-block;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 6px;
+      margin-right: 4px;
+    }
+    .role-chip.app { background: var(--app-soft); color: var(--app); }
+    .role-chip.sales { background: var(--sales-soft); color: var(--sales); }
+    .role-chip.audit { background: var(--audit-soft); color: var(--audit); }
+
+    .seq {
+      display: grid;
+      grid-template-columns: 48px 1fr;
+      gap: 8px 12px;
+      align-items: start;
+    }
+    .seq .num {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--ink); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 15px;
+    }
+    .seq .body { padding-top: 4px; }
+    .seq .body strong { font-size: 17px; }
+    .seq .body p { margin: 3px 0 0; font-size: 15px; color: var(--muted); }
+
+    .footer-note {
+      margin-top: auto;
+      padding-top: 10px;
+      font-size: 13px;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+      flex-shrink: 0;
+    }
+
+    .toc-list {
+      columns: 2;
+      column-gap: 48px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      flex: 1;
+    }
+    .toc-list li {
+      break-inside: avoid;
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 8px 0;
+      border-bottom: 1px dashed var(--line);
+      font-size: 18px;
+    }
+    .toc-list .pg { color: var(--muted); font-variant-numeric: tabular-nums; }
+
+    @media print {
+      body { background: #fff; }
+      .deck { padding: 0; gap: 0; }
+      .page { box-shadow: none; margin: 0; }
+    }
+  </style>
+</head>
+<body>
+<div class="deck">
+
+  <!-- P01 Cover -->
+  <section class="page cover" id="p01">
+    <div class="page-inner">
+      <div class="eyebrow">OFW · Product Training</div>
+      <h1>专题 ACD<br/>销售 & 人审产品培训手册</h1>
+      <p class="lead">面向销售代填 / 销管 / 人审同学：讲清新用户流程、后台怎么跟、人审怎么审，以及三者互相怎么配合。</p>
+      <div class="meta-row">
+        <div><strong>受众</strong> · 销售、销管、人审</div>
+        <div><strong>依据</strong> · 专题 ACD PRD / 核心功能点</div>
+        <div><strong>版本</strong> · 2026-09</div>
+        <div><strong>页规格</strong> · 1920 × 1080</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- P02 TOC -->
+  <section class="page" id="p02">
+    <div class="page-inner">
+      <div class="topbar">
+        <div class="brand">OFW ACD Training</div>
+        <div class="section-tag">目录</div>
+        <div class="page-no">02 / 23</div>
+      </div>
+      <h2>培训目录</h2>
+      <ul class="toc-list">
+        <li><span>01 封面</span><span class="pg">01</span></li>
+        <li><span>02 目录</span><span class="pg">02</span></li>
+        <li><span>03 本期为什么改</span><span class="pg">03</span></li>
+        <li><span>04 角色与职责</span><span class="pg">04</span></li>
+        <li><span>05 用户主路径总览</span><span class="pg">05</span></li>
+        <li><span>06 预审 → 终审 → 发标</span><span class="pg">06</span></li>
+        <li><span>07 APP 关键体验变化</span><span class="pg">07</span></li>
+        <li><span>08 用户状态（销售怎么读）</span><span class="pg">08</span></li>
+        <li><span>09 销售优先跟进态</span><span class="pg">09</span></li>
+        <li><span>10 销售列表与认领</span><span class="pg">10</span></li>
+        <li><span>11 销售详情代填规则</span><span class="pg">11</span></li>
+        <li><span>12 销管专属 & 硬性禁止</span><span class="pg">12</span></li>
+        <li><span>13 人审作业主流程</span><span class="pg">13</span></li>
+        <li><span>14 人审四种结论</span><span class="pg">14</span></li>
+        <li><span>15 交互① 人审通过</span><span class="pg">15</span></li>
+        <li><span>16 交互② 人审退回（重点）</span><span class="pg">16</span></li>
+        <li><span>17 交互② 退回后销售 / 用户怎么做</span><span class="pg">17</span></li>
+        <li><span>18 交互③ Pending（重点）</span><span class="pg">18</span></li>
+        <li><span>19 交互④ 人审拒绝</span><span class="pg">19</span></li>
+        <li><span>20 三角对照：退回 vs Pending vs 拒绝</span><span class="pg">20</span></li>
+        <li><span>21 额度 / 材料失效怎么跟</span><span class="pg">21</span></li>
+        <li><span>22 常见误操作 & FAQ</span><span class="pg">22</span></li>
+        <li><span>23 一页速查卡</span><span class="pg">23</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- P03 Why -->
+  <section class="page" id="p03">
+    <div class="page-inner">
+      <div class="topbar">
+        <div class="brand">OFW ACD Training</div>
+        <div class="section-tag">背景</div>
+        <div class="page-no">03 / 23</div>
+      </div>
+      <h2>本期为什么改？</h2>
+      <p class="lead">先理解「痛点 → 本期方案」，后面的状态和按钮才有意义。</p>
+      <div class="page-body">
+        <div class="grid-2 fill">
+          <div class="card danger">
+            <h3>过去的问题</h3>
+            <ul class="tight">
+              <li>填资太重、太靠前 → 有价值用户筛得晚，销售介入晚</li>
+              <li>海外链路不完整 → 海外资料销售看不到 / 跟不下来</li>
+              <li>人审临近拒绝缺少规范退回 → 补件断流</li>
+              <li>材料说明不清 → 一次交件率低、反复驳回</li>
+              <li>销售不知道用户到哪一步 → 跟单时机乱</li>
+            </ul>
+          </div>
+          <div class="card accent">
+            <h3>本期怎么解</h3>
+            <ul class="tight">
+              <li><strong>分阶段填资</strong>：先预审戳额筛客，再终审详资</li>
+              <li><strong>本土 / 海外分流</strong>：同一套阶段，字段按流程属性区分</li>
+              <li><strong>用户状态</strong>：销售按状态决定何时跟、能改什么</li>
+              <li><strong>退回 / Pending</strong>：人审与销售协同补件，用户路径不同</li>
+              <li><strong>Sample + 多图/PDF</strong>：提升一次交件率</li>
+            </ul>
+          </div>
+        </div>
+        <div class="img-slot mid">
+          <b>【贴图占位】培训开场对比图</b>
+          建议：左「旧流程：一次填完全部再戳额」流程图；右「新流程：预审轻量 → 有额 → 终审详资」流程图。
+        </div>
+      </div>
+      <div class="footer-note">依据：专题 ACD 需求背景与价值 · 核心功能点「本期解决什么」</div>
+    </div>
+  </section>
+
+  <!-- P04 Roles -->
+  <section class="page" id="p04">
+    <div class="page-inner">
+      <div class="topbar">
+        <div class="brand">OFW ACD Training</div>
+        <div class="section-tag">角色</div>
+        <div class="page-no">04 / 23</div>
+      </div>
+      <h2>谁在这条链路上？</h2>
+      <div class="page-body">
+        <div class="grid-3 fill">
+          <div class="card app">
+            <span class="pill app">用户 APP</span>
+            <h3>借款人 / Co-maker</h3>
+            <ul class="tight">
+              <li>选本土 / 海外</li>
+              <li>完成预审 / 终审提交（戳额）</li>
+              <li>发标页选担保人、确认借款</li>
+              <li>人审退回：在退回页补件并重新提交终审</li>
+              <li>Pending：无感知，仍显示审核中</li>
+            </ul>
+          </div>
+          <div class="card sales">
+            <span class="pill sales">销售 / 销管</span>
+            <h3>销售代填后台</h3>
+            <ul class="tight">
+              <li>看用户状态，决定跟进时机</li>
+              <li>协助填本人资料 / 维护已有担保人</li>
+              <li><strong>只能保存，不能代提交戳额</strong></li>
+              <li>退回：改资料后催用户 APP 提交</li>
+              <li>Pending：改标红项 → 保存并通知审核员</li>
+            </ul>
+          </div>
+          <div class="card audit">
+            <span class="pill audit">人审</span>
+            <h3>人审后台</h3>
+            <ul class="tight">
+              <li>按借款人 → 联系人 → 担保人审阅</li>
+              <li>Materials 须逐项 Pass</li>
+              <li>结论：通过 / 退回 / Pending / 拒绝</li>
+              <li>退回 / Pending 字段会下发给销售标红</li>
+              <li>Pending 等销售改完或 3 日到期再继续审</li>
+            </ul>
+          </div>
+        </div>
+        <div class="callout">
+          <strong>记住一句话：</strong>用户负责「提交戳额 / 确认借款」；销售负责「帮填与催办」；人审负责「审材料与下结论」。三角交互最常出在 <strong>退回</strong> 和 <strong>Pending</strong>。
+        </div>
+      </div>
+      <div class="footer-note">角色菜单：销售代填 · 销售代填管理 · 人审普通 / 管理员</div>
+    </div>
+  </section>
+
+  <!-- P05 User journey overview -->
+  <section class="page" id="p05">
+    <div class="page-inner">
+      <div class="topbar">
+        <div class="brand">OFW ACD Training</div>
+        <div class="section-tag">用户流程</div>
+        <div class="page-no">05 / 23</div>
+      </div>
+      <h2>新用户主路径（一页看全）</h2>
+      <div class="page-body">
+        <div class="flow">
+          <div class="flow-step"><div class="n">1</div><strong>选本土/海外</strong><span>流程属性分流</span></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step"><div class="n">2</div><strong>预审填资</strong><span>活体+身份+基础</span></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step"><div class="n">3</div><strong>预审戳额</strong><span>出初审额/拒绝</span></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step"><div class="n">4</div><strong>终审填资</strong><span>工作+联系人+可选担保人</span></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step"><div class="n">5</div><strong>终审戳额</strong><span>出终审额</span></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step"><div class="n">6</div><strong>发标</strong><span>选担保人·确认借款</span></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step"><div class="n">7</div><strong>担保确认</strong><span>H5+活体=真正发标</span></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step"><div class="n">8</div><strong>机审/人审</strong><span>通过·退回·Pending·拒绝</span></div>
+        </div>
+        <div class="grid-2 fill">
+          <div class="img-slot tall">
+            <b>【贴图占位】APP 用户旅程长图</b>
+            建议截取：首页选本土/海外 → 预审页 → 预审结果有额 → 终审填资 → 终审结果 → 发标页选 Co-maker。
+          </div>
+          <div class="card">
+            <h3>销售要盯的「高价值节点」</h3>
+            <ul>
+              <li><span class="star">★</span> <strong>终审填资</strong>：已有初审额，催补详资</li>
+              <li><span class="star">★</span> <strong>有额未借</strong>：推确认借款</li>
+              <li><span class="star">★</span> <strong>待担保确认</strong>：催 Co-maker</li>
+              <li><span class="star">★</span> <strong>人审退回 / Pending</strong>：立刻改资料协同</li>
+            </ul>
+            <div class="callout warn mt">
+              <strong>名词提醒：</strong>用户点「确认借款」≠ 发标。只有 Co-maker 确认后才创建标的、进入发标审核。
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- P06 Pre / Final / Listing -->
+  <section class="page" id="p06">
+    <div class="page-inner">
+      <div class="topbar">
+        <div class="brand">OFW ACD Training</div>
+        <div class="section-tag">用户流程</div>
+        <div class="page-no">06 / 23</div>
+      </div>
+      <h2>预审 · 终审 · 发标：分别填什么？</h2>
+      <div class="page-body">
+        <div class="grid-3 fill">
+          <div class="card app">
+            <span class="pill app">预审戳额节点</span>
+            <h3>轻量筛客</h3>
+            <ul class="tight">
+              <li>活体</li>
+              <li>身份信息（护照等）</li>
+              <li>基础信息</li>
+              <li>中介信息（本土含 Agency Proof 等）</li>
+            </ul>
+            <p class="small mt">提交后触发<strong>预审戳额</strong> → 初审额或拒绝。</p>
+          </div>
+          <div class="card accent">
+            <span class="pill ok">终审戳额节点</span>
+            <h3>详资拿终审额</h3>
+            <ul class="tight">
+              <li>工作 / 雇主信息</li>
+              <li>联系人 1 / 2</li>
+              <li>可选预填 Co-maker（不完整不拦提交）</li>
+            </ul>
+            <p class="small mt">提交后触发<strong>终审戳额</strong>。销售可在终审提交前协助代填。</p>
+          </div>
+          <div class="card sales">
+            <span class="pill sales">发标页</span>
+            <h3>选担保人借出</h3>
+            <ul class="tight">
+              <li>选择已有 / 新增担保人</li>
+              <li>已注册担保人手机号不可改</li>
+              <li>确认借款 → 等担保人 H5 确认</li>
+            </ul>
+            <p class="small mt">担保确认后进入机审 + 人审。</p>
+          </div>
+        </div>
+        <div class="img-slot mid">
+          <b>【贴图占位】三节点页面对照</b>
+          左：预审填资截图；中：终审 Work/Contacts；右：发标页 Co-maker 选择（含 Edit）。
+        </div>
+      </div>
+      <div class="footer-note">节点内可来回改页；只有点「提交戳额」才做整段完整性校验。</div>
+    </div>
+  </section>
+
+  <!-- P07 APP changes -->
+  <section class="page" id="p07">
+    <div class="page-inner">
+      <div class="topbar">
+        <div class="brand">OFW ACD Training</div>
+        <div class="section-tag">用户流程</div>
+        <div class="page-no">07 / 23</div>
+      </div>
+      <h2>APP 侧：销售需要会向用户解释的变化</h2>
+      <div class="page-body">
+        <div class="grid-2 fill two-row">
+          <div class="card">
+            <h3>材料与上传</h3>
+            <ul class="tight">
+              <li><strong>强制 Sample</strong>：Visa / 收入证明 / 担保人住址证明 —— 点上传先看样例</li>
+              <li>其它材料：字段旁 Sample 链接</li>
+              <li>合同 / 收入 / 住址证明：最多 6 图 <strong>或</strong> 1 份 PDF（不能混传）</li>
+              <li>Co-maker 证件照：<strong>同一字段正面 + 反面</strong></li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>结论相关的 APP 表现</h3>
+            <ul class="tight">
+              <li><strong>退回</strong>：独立退回页，只改被退回项 → 提交后二次终审</li>
+              <li><strong>Pending</strong>：用户仍看「审核中」，无补件页</li>
+              <li><strong>拒绝</strong>：发标拒绝页；人审可勾选本次不禁言</li>
+              <li>「我的页面」编辑入口隐藏，避免乱重戳额</li>
+            </ul>
+          </div>
+          <div class="card warn">
+            <h3>额度失效 / 材料失效（对客话术）</h3>
+            <ul class="tight">
+              <li><strong>额度失效</strong>：首页 Renew → <strong>只重新终审</strong>（不做预审）</li>
+              <li><strong>材料失效</strong>：同退回补件页 → 只补失效材料 → <strong>重新终审</strong></li>
+            </ul>
+          </div>
+          <div class="img-slot">
+            <b>【贴图占位】Sample 弹窗 / 退回页 / Renew 入口</b>
+            各贴一张典型截图即可。
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- P08 Status map -->
+  <section class="page" id="p08">
+    <div class="page-inner">
+      <div class="topbar">
+        <div class="brand">OFW ACD Training</div>
+        <div class="section-tag">销售后台</div>
+        <div class="page-no">08 / 23</div>
+      </div>
+      <h2>用户状态：销售怎么读进度？</h2>
+      <p class="lead">后台统一叫「用户状态」。填资阶段看人维度；Co-maker 确认发标后看标的维度——但都落在同一套标签里。</p>
+      <div class="page-body">
+        <table class="matrix fill">
+          <thead>
+            <tr>
+              <th style="width:18%">阶段</th>
+              <th>关键销售标签</th>
+              <th style="width:42%">你该做什么</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>筛客前</td>
+              <td>注册未填资 · 初审中 · 初审拒绝</td>
+              <td>可协助预审资料；初审中勿催改；拒绝一般少跟</td>
+            </tr>
+            <tr>
+              <td>拿终审额</td>
+              <td><span class="star">★</span> 终审填资 · 终审中 · 终审拒绝</td>
+              <td>有初审额时重点催终审资料；提交后等结果</td>
+            </tr>
+            <tr>
+              <td>借出前</td>
+              <td><span class="star">★</span> 有额未借 · <span class="star">★</span> 待担保确认</td>
+              <td>推确认借款；催 Co-maker；本人资料已锁</td>
+            </tr>
+            <tr>
+              <td>发标后</td>
+              <td>发标审核中 · 发标拒绝 · 放款中/成功/失败</td>
+              <td>审核中只读；拒绝结案告知；放款异常走救回</td>
+            </tr>
+            <tr>
+              <td>人审协同</td>
+              <td><span class="star">★</span> 人审退回 · <span class="star">★</span> 人审 Pending</td>
+              <td>退回改完催用户 APP 提交；Pending 改完通知审核员</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="img-slot mid">
+          <b>【贴图占位】状态流转图</b>
+          建议复用 PRD 流转：FILLING_PRE → … → LIMIT_READY → LOAN_COMAKER_CONFIRM → LOAN_REVIEWING → 退回/Pending/拒绝/放款。
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- P09 Priority statuses -->
+  <section class="page" id="p09">
+    <div class="page-inner">
+      <div class="topbar">
+        <div class="brand">OFW ACD Training</div>
+        <div class="section-tag">销售后台</div>
+        <div class="page-no">09 / 23</div>
+      </div>
+      <h2>优先跟进的 5 个状态（带行动提示）</h2>
+      <div class="page-body">
+        <div class="grid-2 fill two-row">
+          <div class="card sales">
+            <h3><span class="star">★</span> 终审填资</h3>
+            <p>已有初审额，催补详资冲终审。</p>
+            <ul class="tight"><li>本人资料：可代填（权限内）</li><li>保存后：提醒用户 APP 提交终审</li></ul>
+          </div>
+          <div class="card sales">
+            <h3><span class="star">★</span> 有额未借</h3>
+            <p>推确认借款 / 补担保与账户。</p>
+            <ul class="tight"><li>本人资料：只读</li><li>可维护未担保中的 Co-maker</li></ul>
+          </div>
+          <div class="card sales">
+            <h3><span class="star">★</span> 待担保确认</h3>
+            <p>催 Co-maker 确认；必要时取消借款换人。</p>
+            <ul class="tight"><li>本人资料：只读</li><li>担保中的 Co-maker 不可改</li></ul>
+          </div>
+          <div class="card warn">
+            <h3><span class="star">★</span> 人审退回 / Pending</h3>
+            <p>协同补件，响应要快。</p>
+            <ul class="tight">
+              <li>退回：标红优先，可改权限内全部本人资料 → <strong>仅保存</strong></li>
+              <li>Pending：只改标红 → <strong>保存并通知审核员</strong></li>
+            </ul>
+          </div>
+        </div>
+        <div class="img-slot mid">
+          <b>【贴图占位】销售列表默认队列截图</b>
+          标注：置顶的「人审退回 / Pending」、状态标签、编辑入口。
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- P10 Sales list -->
+  <section class="page" id="p10">
+    <div class="page-inner">
+      <div class="topbar">
+        <div class="brand">OFW ACD Training</div>
+        <div class="section-tag">销售后台</div>
+        <div class="page-no">10 / 23</div>
+      </div>
+      <h2>销售列表：默认看谁？怎么搜？</h2>
+      <div class="page-body">
+        <div class="grid-2 fill">
+          <div class="card sales">
+            <span class="pill sales">普通销售</span>
+            <h3>默认队列</h3>
+            <ul class="tight">
+              <li>仅<strong>本人名下</strong>（用户归属）</li>
+              <li>状态：终审填资 / 人审退回 / Pending / 待担保确认</li>
+              <li>退回、Pending <strong>置顶高亮</strong></li>
+              <li>其余按注册时间近→远</li>
+            </ul>
+            <p class="small mt">未分配用户不在默认列表；用手机号 / User ID 搜出后点编辑 → <strong>自动认领</strong>为当前销售。</p>
+          </div>
+          <div class="card">
+            <h3>筛选项 / 搜索项</h3>
+            <ul class="tight">
+              <li><strong>筛选项</strong>：流程属性、用户状态</li>
+              <li><strong>搜索项</strong>：User ID / 手机号</li>
+              <li><strong>用户归属</strong>：是否在销售名下</li>
+            </ul>
+            <div class="callout mt">
+              <strong>规则：</strong><br/>
+              · 筛选项受用户归属控制 → 只能筛<strong>本人名下</strong><br/>
+              · 搜索项<strong>不受</strong>归属控制，也<strong>不受</strong>筛选项限制 → 用 User ID / 手机号搜，无论流程/状态筛了什么，都能搜出
+            </div>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="card audit">
+            <span class="pill audit">销管</span>
+            <h3>默认队列</h3>
+            <ul class="tight">
+              <li>默认只看<strong>全部</strong>人审退回 / Pending</li>
+              <li>可按销售筛选、换绑跟进销售</li>
+              <li>可改销管专属字段</li>
+            </ul>
+          </div>
+          <div class="callout warn">
+            <strong>搜索注意：</strong>额度失效后后台可能<strong>搜不到</strong>该用户；用户重新获额后才能再搜到，并以最新可监听状态展示。
+            <div class="img-slot mid mt">
+              <b>【贴图占位】列表筛选条 + 搜索框 + 销管换绑</b>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- P11 Sales detail rules -->
+  <section class="page" id="p11">
+    <div class="page-inner">
+      <div class="topbar">
+        <div class="brand">OFW ACD Training</div>
+        <div class="section-tag">销售后台</div>
+        <div class="page-no">11 / 23</div>
+      </div>
+      <h2>详情代填：能改什么？</h2>
+      <div class="page-body">
+        <div class="grid-2 fill">
+          <div>
+            <table class="matrix">
+              <thead><tr><th>场景</th><th>本人资料</th><th>保存后</th></tr></thead>
+              <tbody>
+                <tr><td>终审提交前（如终审填资）</td><td>权限内可编</td><td>仅保存 · 催用户 APP 提交</td></tr>
+                <tr><td>人审退回</td><td>可编（退回项标红必改）</td><td>仅保存 · 用户 APP 重提终审</td></tr>
+                <tr><td>人审 Pending</td><td><strong>仅</strong>标红项</td><td>保存并通知审核员（不重跑终审）</td></tr>
+                <tr><td>审核中 / 有额未借 / 待担保确认等</td><td>本人只读</td><td>—</td></tr>
+              </tbody>
+            </table>
+            <div class="callout danger mt">
+              <strong>铁律：</strong>BK <strong>任何状态都不能</strong>代用户提交预审 / 终审戳额。
+            </div>
+          </div>
+          <div class="img-slot tall">
+            <b>【贴图占位】销售详情页</b>
+            建议标注：① 用户状态与行动提示条 ② 退回/Pending 标红字段 ③ 保存按钮文案差异（保存 vs 保存并通知审核员）④ 担保人正反面证件。
+          </div>
+        </div>
+      </div>
+      <div class="footer-note">资料始终可见；没有值显示空白。字段范围与 APP 填资对齐。</div>
+    </div>
+  </section>
+
+  <!-- P12 Mgmt + bans -->
+  <section class="page" id="p12">
+    <div class="page-inner">
+      <div class="topbar">
+        <div class="brand">OFW ACD Training</div>
+        <div class="section-tag">销售后台</div>
+        <div class="page-no">12 / 23</div>
+      </div>
+      <h2>销管专属 & 硬性禁止项</h2>
+      <div class="page-body">
+        <div class="grid-2 fill two-row">
+          <div class="card warn">
+            <h3>仅销管可改（普通销售永远不能改）</h3>
+            <ul class="tight">
+              <li>姓名三分、护照号、性别、生日、母亲娘家姓</li>
+              <li>护照照、PH 住址省市区、OFW Agency、邀请码 / 活动码</li>
+              <li>联系人姓名 / 手机 / 关系</li>
+              <li>Co-maker 姓名、关系、证件类型/号、性别、生日、住址</li>
+            </ul>
+            <p class="small">细则以填资表 / PRD F08.3 为准，培训时以系统权限提示为准。</p>
+          </div>
+          <div class="card danger">
+            <h3>任何人都不能在后台做的事</h3>
+            <ul class="tight">
+              <li>改用户注册手机号 / Co-maker 手机号</li>
+              <li>后台<strong>新增</strong>担保人（只能维护用户已添加的）</li>
+              <li>改担保中的 Co-maker</li>
+              <li>改 <strong>Purpose of Loan</strong>（默认 Other，只读）</li>
+              <li>代提交预审 / 终审戳额</li>
+            </ul>
+          </div>
+          <div class="card accent">
+            <h3>可改提醒</h3>
+            <ul class="tight">
+              <li><strong>Agency Proof</strong>：销售在可编窗口可改</li>
+              <li><strong>Co-maker ID photo</strong>：正面 + 反面同一字段</li>
+            </ul>
+          </div>
+          <div class="img-slot">
+            <b>【贴图占位】销管专属字段锁图标 / Purpose of Loan 只读</b>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- P13 Audit flow -->
+  <section class="page" id="p13">
+    <div class="page-inner">
+      <div class="topbar">
+        <div class="brand">OFW ACD Training</div>
+        <div class="section-tag">人审操作</div>
+        <div class="page-no">13 / 23</div>
+      </div>
+      <h2>人审作业主流程</h2>
+      <div class="page-body">
+        <div class="seq">
+          <div class="num">1</div><div class="body"><strong>领单 / 被分配</strong><p>列表有 Pending 列，标识挂起等销售改资料的单。</p></div>
+          <div class="num">2</div><div class="body"><strong>按模块审阅</strong><p>借款人 → 联系人 → 担保人。证件图（Materials）必须逐项点过。</p></div>
+          <div class="num">3</div><div class="body"><strong>文本字段</strong><p>默认视为通过；有问题再标退回 / Pending / 拒绝。</p></div>
+          <div class="num">4</div><div class="body"><strong>材料门禁</strong><p>Materials 未全部打标 → 四按钮置灰，提示先完成材料审核。</p></div>
+          <div class="num">5</div><div class="body"><strong>提交结论</strong><p>通过：底部直接提交。退回 / Pending / 拒绝：打开确认结论弹窗。</p></div>
+        </div>
+        <div class="grid-2 fill">
+          <div class="img-slot tall">
+            <b>【贴图占位】人审详情整页</b>
+            标注模块分区、Materials Pass、底部四按钮。
+          </div>
+          <div class="card audit">
+            <h3>互斥规则（必记）</h3>
+            <ul>
+              <li>有<strong>退回</strong>或<strong>拒绝</strong>标记时，不能点 Pending</li>
+              <li>担保人手机号：可看，不能退回 / Pending / 拒绝</li>
+              <li>通过：要求全部必审图片已 Pass，且无问题标</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- P14 Four conclusions -->
+  <section class="page" id="p14">
+    <div class="page-inner">
+      <div class="topbar">
+        <div class="brand">OFW ACD Training</div>
+        <div class="section-tag">人审操作</div>
+        <div class="page-no">14 / 23</div>
+      </div>
+      <h2>四种结论：标的怎么变？谁会收到？</h2>
+      <div class="page-body">
+        <table class="matrix fill">
+          <thead>
+            <tr>
+              <th>结论</th>
+              <th>标的</th>
+              <th>APP</th>
+              <th>销售</th>
+              <th>人审下一步</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>通过</strong></td>
+              <td>进入放款</td>
+              <td>后续放款/还款</td>
+              <td>只读</td>
+              <td>结束本案审阅</td>
+            </tr>
+            <tr>
+              <td><strong>退回</strong></td>
+              <td><strong>失败</strong></td>
+              <td>退回页补件 → 二次终审</td>
+              <td>字段标红；可代改<strong>仅保存</strong>；通知跟进销售/销管</td>
+              <td>等补件重提后再进入后续审核链路</td>
+            </tr>
+            <tr>
+              <td><strong>Pending</strong></td>
+              <td><strong>不变</strong>（仍审核中）</td>
+              <td><strong>无感知</strong>，仍审核中</td>
+              <td>只改标红；保存或 3 日到期回待审</td>
+              <td>释放后原审核员继续审</td>
+            </tr>
+            <tr>
+              <td><strong>拒绝</strong></td>
+              <td><strong>失败</strong></td>
+              <td>发标拒绝页</td>
+              <td>只读；可勾选禁言豁免</td>
+              <td>结案</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="img-slot mid">
+          <b>【贴图占位】确认结论弹窗四态对照</b>
+          通过可不弹窗；退回 / Pending / 拒绝弹窗字段清单示意。
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- P15 Pass interaction -->
+  <section class="page" id="p15">
+    <div class="page-inner">
+      <div class="topbar">
+        <div class="brand">OFW ACD Training</div>
+        <div class="section-tag">三角交互</div>
+        <div class="page-no">15 / 23</div>
+      </div>
+      <h2>交互① 人审通过</h2>
+      <div class="page-body">
+        <div class="grid-2 fill">
+          <div>
+            <div class="seq">
+              <div class="num">1</div><div class="body"><strong><span class="role-chip audit">人审</span> Materials 全 Pass，无问题标</strong><p>底部直接提交通过（不打开确认弹窗）。</p></div>
+              <div class="num">2</div><div class="body"><strong>系统</strong><p>进入放款链路。</p></div>
+              <div class="num">3</div><div class="body"><strong><span class="role-chip sales">销售</span></strong><p>状态变放款中 / 成功；资料只读，结案跟进即可。</p></div>
+              <div class="num">4</div><div class="body"><strong><span class="role-chip app">用户</span></strong><p>按现网进入放款 / 还款体验。</p></div>
+            </div>
+            <div class="callout mt">这是三角里交互最少的一条：销售不需要改资料，也没有补件任务。</div>
+          </div>
+          <div class="img-slot tall">
+            <b>【贴图占位】通过提交成功 / 放款中状态</b>
+            人审侧成功反馈 + 销售列表状态变为放款中。
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- P16 Return interaction -->
+  <section class="page" id="p16">
+    <div class="page-inner">
+      <div class="topbar">
+        <div class="brand">OFW ACD Training</div>
+        <div class="section-tag">三角交互 · 重点</div>
+        <div class="page-no">16 / 23</div>
+      </div>
+      <h2>交互② 人审退回 — 系统怎么走？</h2>
+      <p class="lead">退回 = 标的失败 + 前台把退回字段同时下发给 APP 与销售。</p>
+      <div class="page-body">
+        <div class="seq">
+          <div class="num">1</div><div class="body"><strong><span class="role-chip audit">人审</span> 标退回字段 → 确认结论提交</strong><p>走风控 / 资产 → 标的失败。</p></div>
+          <div class="num">2</div><div class="body"><strong>业务前台闭环</strong><p>落库退回清单；清空旧值；用户状态 → 人审退回。</p></div>
+          <div class="num">3</div><div class="body"><strong>同时下发两路</strong><p><span class="role-chip app">APP</span> 退回页只展示退回字段；<span class="role-chip sales">销售</span> 详情标红 + 通知跟进销售 / 销管。</p></div>
+          <div class="num">4</div><div class="body"><strong>补件完成后</strong><p>用户 APP 提交 → <strong>二次终审</strong>（不重走整段预审）。</p></div>
+        </div>
+        <div class="img-slot fill">
+          <b>【贴图占位】退回时序示意 / 三端对照</b>
+          左人审打标；中销售标红详情；右 APP 退回页。可用箭头标「同时下发」。
+        </div>
+      </div>
+      <div class="footer-note">退回场景允许重新跑额覆盖；以最后一次提交为准。用户生命周期可多次退回。</div>
+    </div>
+  </section>
+
+  <!-- P17 Return what sales/user do -->
+  <section class="page" id="p17">
+    <div class="page-inner">
+      <div class="topbar">
+        <div class="brand">OFW ACD Training</div>
+        <div class="section-tag">三角交互 · 重点</div>
+        <div class="page-no">17 / 23</div>
+      </div>
+      <h2>交互② 退回后：销售 / 用户怎么配合？</h2>
+      <div class="page-body">
+        <div class="grid-2 fill">
+          <div class="card sales">
+            <span class="pill sales">销售动作</span>
+            <ol>
+              <li>打开退回任务（默认队列置顶）</li>
+              <li>优先改<strong>标红字段</strong>；权限内其它本人资料也可改</li>
+              <li>点<strong>保存</strong>（不是提交终审）</li>
+              <li>通知用户：请到 APP 退回页检查并<strong>提交</strong></li>
+            </ol>
+            <div class="callout danger mt">销售保存<strong>不会</strong>触发二次终审。</div>
+          </div>
+          <div class="card app">
+            <span class="pill app">用户动作</span>
+            <ol>
+              <li>首页进入退回补件</li>
+              <li>只改被退回项（销售已改的会回显）</li>
+              <li>提交 → 进入终审审核中</li>
+              <li>出新额度后再走发标</li>
+            </ol>
+            <div class="callout mt">用户与销售可并行改；最终以提交时刻的正式资料为准。</div>
+          </div>
+        </div>
+        <div class="img-slot mid">
+          <b>【贴图占位】销售「仅保存」提示条 + APP 退回提交按钮</b>
+          强调按钮文案差异，避免销售以为已重新提交。
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- P18 Pending -->
+  <section class="page" id="p18">
+    <div class="page-inner">
+      <div class="topbar">
+        <div class="brand">OFW ACD Training</div>
+        <div class="section-tag">三角交互 · 重点</div>
+        <div class="page-no">18 / 23</div>
+      </div>
+      <h2>交互③ Pending — 用户无感知</h2>
+      <div class="page-body">
+        <div class="grid-2 fill">
+          <div>
+            <div class="seq">
+              <div class="num">1</div><div class="body"><strong><span class="role-chip audit">人审</span> 只勾 Pending 字段（不能同时有退回/拒绝）</strong><p>审核单挂起；标的<strong>不变</strong>；不经风控/资产失败。</p></div>
+              <div class="num">2</div><div class="body"><strong><span class="role-chip app">APP</span></strong><p>仍显示审核中，用户<strong>不能改</strong>、也没有补件页。</p></div>
+              <div class="num">3</div><div class="body"><strong><span class="role-chip sales">销售</span></strong><p>只改标红 Pending 项 → 点「保存并通知审核员」。</p></div>
+              <div class="num">4</div><div class="body"><strong>释放</strong><p>销售保存成功，或<strong>3 日到期</strong>自动释放 → 回人审待审，通知原审核员继续审。<strong>不重跑终审。</strong></p></div>
+            </div>
+            <div class="callout warn mt">
+              Pending 是「人审 ↔ 销售」闭环；对用户尽量少打扰。
+            </div>
+          </div>
+          <div class="img-slot tall">
+            <b>【贴图占位】Pending 列表标识 + 销售仅可编标红项 + 倒计时/到期说明</b>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- P19 Reject -->
+  <section class="page" id="p19">
+    <div class="page-inner">
+      <div class="topbar">
+        <div class="brand">OFW ACD Training</div>
+        <div class="section-tag">三角交互</div>
+        <div class="page-no">19 / 23</div>
+      </div>
+      <h2>交互④ 人审拒绝</h2>
+      <div class="page-body">
+        <div class="grid-2 fill">
+          <div class="card danger">
+            <h3>链路</h3>
+            <ul>
+              <li>人审打拒绝标 → 确认结论提交</li>
+              <li>经风控 / 资产 → 标的失败</li>
+              <li>用户看到<strong>发标拒绝</strong>页</li>
+              <li>销售侧只读，结案告知</li>
+            </ul>
+            <h3 class="mt">禁言豁免</h3>
+            <p>人审可勾选「本次不禁言」。无论是否豁免，对外状态仍是发标拒绝。</p>
+          </div>
+          <div class="img-slot tall">
+            <b>【贴图占位】拒绝确认弹窗（含禁言豁免勾选）+ APP 拒绝页</b>
+          </div>
+        </div>
+        <div class="callout">
+          拒绝与退回都会让标的失败；差别是：拒绝一般结案，退回期望补件后二次终审再继续。
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- P20 Comparison -->
+  <section class="page" id="p20">
+    <div class="page-inner">
+      <div class="topbar">
+        <div class="brand">OFW ACD Training</div>
+        <div class="section-tag">三角交互</div>
+        <div class="page-no">20 / 23</div>
+      </div>
+      <h2>一张表分清：退回 vs Pending vs 拒绝</h2>
+      <div class="page-body">
+        <table class="matrix fill">
+          <thead>
+            <tr>
+              <th style="width:14%"></th>
+              <th>退回</th>
+              <th>Pending</th>
+              <th>拒绝</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>标的</strong></td>
+              <td>失败</td>
+              <td>不变（仍审核中）</td>
+              <td>失败</td>
+            </tr>
+            <tr>
+              <td><strong>用户感知</strong></td>
+              <td>有退回页，要自己提交</td>
+              <td>无感知，仍审核中</td>
+              <td>发标拒绝页</td>
+            </tr>
+            <tr>
+              <td><strong>销售</strong></td>
+              <td>可代改（标红优先）仅保存</td>
+              <td>只改标红，保存并通知审核员</td>
+              <td>只读</td>
+            </tr>
+            <tr>
+              <td><strong>是否重跑终审</strong></td>
+              <td>是（用户 APP 提交后）</td>
+              <td>否</td>
+              <td>否</td>
+            </tr>
+            <tr>
+              <td><strong>人审后续</strong></td>
+              <td>等补件后新链路</td>
+              <td>释放后原审核员继续审</td>
+              <td>结案</td>
+            </tr>
+            <tr>
+              <td><strong>典型话术</strong></td>
+              <td>「材料要补一下，我先帮你改，你在 APP 点提交」</td>
+              <td>「后台再核对一项资料，你先等审核结果就好」</td>
+              <td>「这次发标未通过，按拒绝结果告知」</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="img-slot mid">
+          <b>【贴图占位】三结论对比信息图（可选）</b>
+          用三列色块：橙=退回、蓝=Pending、红=拒绝。
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- P21 Expiry -->
+  <section class="page" id="p21">
+    <div class="page-inner">
+      <div class="topbar">
+        <div class="brand">OFW ACD Training</div>
+        <div class="section-tag">销售跟进</div>
+        <div class="page-no">21 / 23</div>
+      </div>
+      <h2>额度失效 / 材料失效：怎么跟？</h2>
+      <div class="page-body">
+        <div class="grid-2">
+          <div class="card warn">
+            <h3>对用户（APP）</h3>
+            <ul>
+              <li><strong>额度失效</strong>：Renew → 重新发起终审（不做预审）</li>
+              <li><strong>材料失效</strong>：补件页只更新失效材料 → 重新终审</li>
+            </ul>
+          </div>
+          <div class="card sales">
+            <h3>对销售（BK）</h3>
+            <ul>
+              <li>失效本身<strong>可能不刷新</strong>后台状态（无监听消息时）</li>
+              <li>额度失效后可能<strong>搜不到</strong>用户；重新获额后再搜</li>
+              <li>若当时本就不可编，仍不能改；需用户先走 APP 入口推进</li>
+              <li>依旧：只能保存，不能代提交</li>
+            </ul>
+          </div>
+        </div>
+        <div class="img-slot fill">
+          <b>【贴图占位】APP Renew / 材料失效入口 + 销售搜索不到示意</b>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- P22 FAQ -->
+  <section class="page" id="p22">
+    <div class="page-inner">
+      <div class="topbar">
+        <div class="brand">OFW ACD Training</div>
+        <div class="section-tag">FAQ</div>
+        <div class="page-no">22 / 23</div>
+      </div>
+      <h2>常见误操作 & 问答</h2>
+      <div class="grid-2">
+        <div class="card danger">
+          <h3>容易做错</h3>
+          <ul class="tight">
+            <li>退回后销售以为点保存就等于重新终审</li>
+            <li>Pending 时去催用户改 APP（用户改不了）</li>
+            <li>普通销售改销管专属字段失败后反复点</li>
+            <li>想在后台新增担保人 / 改已注册手机号</li>
+            <li>人审有退回标还点 Pending</li>
+            <li>Materials 没点完就想提交结论</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>快问快答</h3>
+          <ul class="tight">
+            <li><strong>Q：销售改完退回，用户 APP 能看到吗？</strong><br/>A：能回显；但必须用户自己提交。</li>
+            <li><strong>Q：Pending 会不会把标的打失败？</strong><br/>A：不会。</li>
+            <li><strong>Q：确认借款算发标吗？</strong><br/>A：不算；Co-maker 确认后才发标。</li>
+            <li><strong>Q：Purpose of Loan 为什么改不了？</strong><br/>A：默认 Other，双端只读。</li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-note">更多字段级规则以填资 Excel / 原型标注为准。</div>
+    </div>
+  </section>
+
+  <!-- P23 Cheat sheet -->
+  <section class="page" id="p23">
+    <div class="page-inner">
+      <div class="topbar">
+        <div class="brand">OFW ACD Training</div>
+        <div class="section-tag">速查</div>
+        <div class="page-no">23 / 23</div>
+      </div>
+      <h2>一页速查卡（建议打印）</h2>
+      <div class="page-body">
+        <div class="grid-3 fill">
+          <div class="card app">
+            <span class="pill app">用户</span>
+            <ul class="tight">
+              <li>预审轻 → 有额 → 终审详</li>
+              <li>戳额必须自己提交</li>
+              <li>退回：退回页补件</li>
+              <li>Pending：无感知</li>
+              <li>失效：只重新终审</li>
+            </ul>
+          </div>
+          <div class="card sales">
+            <span class="pill sales">销售</span>
+            <ul class="tight">
+              <li>看状态再决定跟不跟</li>
+              <li>默认跟：终审填资/退回/Pending/待担保</li>
+              <li>只能保存，不代提交</li>
+              <li>退回：改完催用户提交</li>
+              <li>Pending：改完通知审核员</li>
+            </ul>
+          </div>
+          <div class="card audit">
+            <span class="pill audit">人审</span>
+            <ul class="tight">
+              <li>材料逐项 Pass</li>
+              <li>四结论：过/退/挂/拒</li>
+              <li>退回与拒绝互斥 Pending</li>
+              <li>退回下发 APP+销售</li>
+              <li>Pending 只找销售，3 日到期</li>
+            </ul>
+          </div>
+        </div>
+        <div class="callout">
+          <strong>协同口诀：</strong>退回找用户提交；Pending 找销售保存；拒绝就结案；通过去放款。
+        </div>
+        <div class="img-slot mid">
+          <b>【贴图占位】团队合影 / 培训现场（可选）或原型二维码</b>
+          可放：销售后台在线原型链接、人审原型链接。
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+</div>
+</body>
+</html>
