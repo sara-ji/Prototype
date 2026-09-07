@@ -158,8 +158,38 @@
       flex-wrap: wrap;
       font-size: 18px;
       color: var(--muted);
+      margin-bottom: 28px;
     }
     .meta-row strong { color: var(--ink); }
+    .cover-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+    .cover-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 12px 22px;
+      border-radius: 12px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 18px;
+      font-weight: 700;
+      text-decoration: none;
+      border: none;
+      box-shadow: 0 6px 16px rgba(15, 118, 110, 0.22);
+      transition: transform 0.15s ease, background 0.15s ease;
+    }
+    .cover-link:hover { background: #0d9488; transform: translateY(-1px); }
+    .cover-link.secondary {
+      background: #fff;
+      color: var(--accent);
+      border: 1.5px solid #5eead4;
+      box-shadow: none;
+    }
+    .cover-link.secondary:hover { background: #f0fdfa; }
 
     .grid-2 {
       display: grid;
@@ -407,9 +437,12 @@
       <p class="lead">面向销售代填 / 销管 / 人审同学：讲清新用户流程、后台怎么跟、人审怎么审，以及三者互相怎么配合。</p>
       <div class="meta-row">
         <div><strong>受众</strong> · 销售、销管、人审</div>
-        <div><strong>依据</strong> · 专题 ACD PRD / 核心功能点</div>
         <div><strong>版本</strong> · 2026-09</div>
-        <div><strong>页规格</strong> · 1920 × 1080</div>
+      </div>
+      <div class="cover-links">
+        <a class="cover-link" href="https://mastergo.com/goto/VTCDUPHw?page_id=4411:70732&file=152120833755427" target="_blank" rel="noopener noreferrer">APP-UI图</a>
+        <a class="cover-link secondary" href="https://sara-ji.github.io/Prototype/ofw/kidlatpeso-admin-0814.html" target="_blank" rel="noopener noreferrer">Backend 原型图</a>
+        <a class="cover-link secondary" href="https://page.weixin.qq.com/smartpage/p/b1_AcIAigYNALUp5Wevk7cSU66ks1R?p=JdP87J" target="_blank" rel="noopener noreferrer">PRD文档</a>
       </div>
     </div>
   </section>
@@ -486,7 +519,7 @@
         </div>
         <div class="img-slot mid">
           <b>【贴图占位】培训开场对比图</b>
-          建议：左「旧流程：一次填完全部再戳额」流程图；右「新流程：预审轻量 → 有额 → 终审详资」流程图。
+          左：旧流程——一次填完全部再戳额；右：新流程——预审轻量 → 有额 → 终审详资。
         </div>
       </div>
       <div class="footer-note">依据：专题 ACD 需求背景与价值 · 核心功能点「本期解决什么」</div>
@@ -576,7 +609,7 @@
         <div class="grid-2 fill">
           <div class="img-slot tall">
             <b>【贴图占位】APP 用户旅程长图</b>
-            建议截取：首页选本土/海外 → 预审页 → 预审结果有额 → 终审填资 → 终审结果 → 发标页选 Co-maker。
+            截图顺序：首页选本土/海外 → 预审页 → 预审结果有额 → 终审填资 → 终审结果 → 发标页选 Co-maker。
           </div>
           <div class="card">
             <h3>销售要盯的「高价值节点」</h3>
@@ -640,7 +673,7 @@
         </div>
         <div class="img-slot mid">
           <b>【贴图占位】三节点页面对照</b>
-          左：预审填资截图；中：终审 Work/Contacts；右：发标页 Co-maker 选择（含 Edit）。
+          左：预审填资；中：终审 Work / Contacts；右：发标页选 Co-maker（含 Edit）。
         </div>
       </div>
       <div class="footer-note">节点内可来回改页；只有点「提交戳额」才做整段完整性校验。</div>
@@ -685,7 +718,7 @@
           </div>
           <div class="img-slot">
             <b>【贴图占位】Sample 弹窗 / 退回页 / Renew 入口</b>
-            各贴一张典型截图即可。
+            Sample 弹窗、退回页、Renew 入口，各一张。
           </div>
         </div>
       </div>
@@ -741,7 +774,7 @@
         </table>
         <div class="img-slot mid">
           <b>【贴图占位】状态流转图</b>
-          建议复用 PRD 流转：FILLING_PRE → … → LIMIT_READY → LOAN_COMAKER_CONFIRM → LOAN_REVIEWING → 退回/Pending/拒绝/放款。
+          流转：FILLING_PRE → … → LIMIT_READY → LOAN_COMAKER_CONFIRM → LOAN_REVIEWING → 退回 / Pending / 拒绝 / 放款。
         </div>
       </div>
     </div>
@@ -784,7 +817,7 @@
         </div>
         <div class="img-slot mid">
           <b>【贴图占位】销售列表默认队列截图</b>
-          标注：置顶的「人审退回 / Pending」、状态标签、编辑入口。
+          要标出：置顶的「人审退回 / Pending」、状态标签、编辑入口。
         </div>
       </div>
     </div>
@@ -840,6 +873,7 @@
             <strong>搜索注意：</strong>额度失效后后台可能<strong>搜不到</strong>该用户；用户重新获额后才能再搜到，并以最新可监听状态展示。
             <div class="img-slot mid mt">
               <b>【贴图占位】列表筛选条 + 搜索框 + 销管换绑</b>
+              列表顶部：流程属性 / 用户状态筛选、User ID·手机号搜索；销管换绑弹窗。
             </div>
           </div>
         </div>
@@ -874,7 +908,7 @@
           </div>
           <div class="img-slot tall">
             <b>【贴图占位】销售详情页</b>
-            建议标注：① 用户状态与行动提示条 ② 退回/Pending 标红字段 ③ 保存按钮文案差异（保存 vs 保存并通知审核员）④ 担保人正反面证件。
+            要标出：① 用户状态与行动提示条 ② 退回 / Pending 标红字段 ③ 保存 vs「保存并通知审核员」 ④ 担保人证件正反面。
           </div>
         </div>
       </div>
@@ -922,6 +956,7 @@
           </div>
           <div class="img-slot">
             <b>【贴图占位】销管专属字段锁图标 / Purpose of Loan 只读</b>
+            销管专属字段的锁态示意；Purpose of Loan 只读展示。
           </div>
         </div>
       </div>
@@ -948,7 +983,7 @@
         <div class="grid-2 fill">
           <div class="img-slot tall">
             <b>【贴图占位】人审详情整页</b>
-            标注模块分区、Materials Pass、底部四按钮。
+            要标出：模块分区、Materials Pass、底部四个结论按钮。
           </div>
           <div class="card audit">
             <h3>互斥规则（必记）</h3>
@@ -1016,7 +1051,7 @@
         </table>
         <div class="img-slot mid">
           <b>【贴图占位】确认结论弹窗四态对照</b>
-          通过可不弹窗；退回 / Pending / 拒绝弹窗字段清单示意。
+          通过可直接提交不弹窗；退回 / Pending / 拒绝弹窗里带字段清单。
         </div>
       </div>
     </div>
@@ -1044,7 +1079,7 @@
           </div>
           <div class="img-slot tall">
             <b>【贴图占位】通过提交成功 / 放款中状态</b>
-            人审侧成功反馈 + 销售列表状态变为放款中。
+            人审侧提交成功反馈；销售列表状态变为放款中。
           </div>
         </div>
       </div>
@@ -1070,7 +1105,7 @@
         </div>
         <div class="img-slot fill">
           <b>【贴图占位】退回时序示意 / 三端对照</b>
-          左人审打标；中销售标红详情；右 APP 退回页。可用箭头标「同时下发」。
+          左：人审打标；中：销售标红详情；右：APP 退回页。箭头标「同时下发」。
         </div>
       </div>
       <div class="footer-note">退回场景允许重新跑额覆盖；以最后一次提交为准。用户生命周期可多次退回。</div>
@@ -1111,7 +1146,7 @@
         </div>
         <div class="img-slot mid">
           <b>【贴图占位】销售「仅保存」提示条 + APP 退回提交按钮</b>
-          强调按钮文案差异，避免销售以为已重新提交。
+          对照两边按钮文案：销售是保存，用户才是提交——别搞混。
         </div>
       </div>
     </div>
@@ -1141,6 +1176,7 @@
           </div>
           <div class="img-slot tall">
             <b>【贴图占位】Pending 列表标识 + 销售仅可编标红项 + 倒计时/到期说明</b>
+            人审列表 Pending 标识；销售侧只可改标红项；以及 3 日倒计时 / 到期说明。
           </div>
         </div>
       </div>
@@ -1171,6 +1207,7 @@
           </div>
           <div class="img-slot tall">
             <b>【贴图占位】拒绝确认弹窗（含禁言豁免勾选）+ APP 拒绝页</b>
+            人审拒绝确认弹窗（含「本次不禁言」）；APP 发标拒绝页。
           </div>
         </div>
         <div class="callout">
@@ -1239,8 +1276,8 @@
           </tbody>
         </table>
         <div class="img-slot mid">
-          <b>【贴图占位】三结论对比信息图（可选）</b>
-          用三列色块：橙=退回、蓝=Pending、红=拒绝。
+          <b>【贴图占位】三结论对比信息图</b>
+          三列色块：橙 = 退回，蓝 = Pending，红 = 拒绝。
         </div>
       </div>
     </div>
@@ -1276,6 +1313,7 @@
         </div>
         <div class="img-slot fill">
           <b>【贴图占位】APP Renew / 材料失效入口 + 销售搜索不到示意</b>
+          APP：额度失效 Renew、材料失效补件入口；BK：额度失效后搜不到该用户的示意。
         </div>
       </div>
     </div>
@@ -1324,7 +1362,7 @@
         <div class="section-tag">速查</div>
         <div class="page-no">23 / 23</div>
       </div>
-      <h2>一页速查卡（建议打印）</h2>
+      <h2>一页速查卡（可打印）</h2>
       <div class="page-body">
         <div class="grid-3 fill">
           <div class="card app">
@@ -1362,8 +1400,8 @@
           <strong>协同口诀：</strong>退回找用户提交；Pending 找销售保存；拒绝就结案；通过去放款。
         </div>
         <div class="img-slot mid">
-          <b>【贴图占位】团队合影 / 培训现场（可选）或原型二维码</b>
-          可放：销售后台在线原型链接、人审原型链接。
+          <b>【贴图占位】原型二维码 / 手册分享短链</b>
+          销售后台原型、人审原型、本手册分享链接。
         </div>
       </div>
     </div>
