@@ -680,7 +680,7 @@
         menu_review_sub: '待审核案件 · 领单 · 审核',
         hint_team_b: '销售代填：默认展示本人名下终审填资 / 人审退回 / Pending / 待担保确认；退回与 Pending 置顶。状态筛可选全部用户状态。未分配可用 User ID / 手机号搜出，点编辑自动分配。',
         hint_team_mgmt: '销管：默认只展示人审退回 / Pending；状态筛可选全部用户状态或指定态，亦可搜索 / 按销售筛。用户提交终审前可编辑资料并维护已有 Co-maker；退回 / Pending 后按规则继续修改。用户/Co-maker 手机号不可改，Backend 不开放新增担保人。',
-        hint_reviewer: '普通审核员：图片资料须逐项点「通过」（防漏看）；文本等其它资料仅在有问题时标退回/Pending/拒绝。底部「还有 N 待审核」只统计未审图片。全部图片通过且无问题标记才可提交通过；有退回不可点 Pending。',
+        hint_reviewer: '普通审核员：图片资料须逐项点「通过」（防漏看）；文本等其它资料仅在有问题时标退回/Pending/拒绝。底部四个结论按钮常显，按权重只点亮一个：拒绝 > 退回 > Pending > 通过。全部图片通过且无问题标记才可提交通过。',
         hint_review_admin: '人审管理员：含普通审核员能力；可筛选全部案件，勾选后分配给审核人员。',
         mgmt_only_help_title: '仅代填管理可修改的字段',
         mgmt_only_help_note: '普通销售任意时点都不可改以上字段；销管在用户提交终审前均可修改，退回后可继续修改，Pending 仅可修改被标红字段。Co-maker 手机号始终锁定，Backend 不开放新增担保人。',
@@ -854,14 +854,16 @@
         rv_stat_idle: '未标',
         rv_gate_has_issue: '存在退回 / Pending / 拒绝标记，不可通过。',
         rv_gate_has_return: '存在退回或拒绝标记，不可 Pending。',
+        rv_gate_reject_blocks_return: '已有拒绝标记，结论优先为拒绝（拒绝 > 退回 > Pending > 通过）。',
         rv_gate_need_return: '当前没有待退回的证件',
         rv_gate_need_pending: '当前没有待 Pending 的证件',
         rv_gate_need_reject: '当前没有待拒绝的证件',
         rv_gate_need_pass: '请先将全部证件标记为通过',
         rv_gate_materials_incomplete: '请先完成材料的审核',
+        rv_decision_priority_hint: '结论权重：拒绝 > 退回 > Pending > 通过（有多项标记时只点亮最高优先级按钮）',
         dec_title: '确认结论',
         dec_outcome: '请选择结论',
-        dec_outcome_hint: '先选结论，再核对已标记资料。',
+        dec_outcome_hint: '结论按权重锁定最高优先级；再核对已标记资料。',
         dec_return_title: '退回',
         dec_return_desc: '用户或销售补件。',
         dec_pending_title: '暂挂',
@@ -1078,7 +1080,7 @@
         menu_review_sub: 'Pending cases · claim · review',
         hint_team_b: 'Sales: default = your Final filling / Manual return / Pending / Awaiting co-maker; Return & Pending pinned. Status filter can show all user statuses. Search User ID/mobile to claim unassigned.',
         hint_team_mgmt: 'Mgmt: default = Manual return / Pending only; status filter can show all user statuses or a specific one; also sales filter / search. Before final submission, can edit data and maintain existing co-maker; after return / pending, follow the stage rules. Borrower/co-maker phone locked, and Backend cannot add co-makers.',
-        hint_reviewer: 'Auditor: image materials require Pass (so each photo is reviewed); other fields only need Return / Pending / Reject when flagged. Bottom “N left” counts unreviewed images only. Overall Pass needs all images Passed and no issue marks; Pending blocked if any Return.',
+        hint_reviewer: 'Auditor: image materials require Pass (so each photo is reviewed); other fields only need Return / Pending / Reject when flagged. Bottom always shows four decision buttons; only the highest priority is enabled: Reject > Return > Pending > Pass. Overall Pass needs all images Passed and no issue marks.',
         hint_review_admin: 'Review admin: auditor features plus filter all cases and assign to auditors.',
         mgmt_only_help_title: 'Sales Assist Admin only',
         mgmt_only_help_note: 'Regular sales can never edit these fields. Sales Assist Admin can edit them any time before final submission, can continue after manual return, and in manual pending only for highlighted fields. Co-maker phone is always locked, and Backend cannot add co-makers.',
@@ -1245,14 +1247,16 @@
         rv_audit_pending_fmt: '{n} image(s) left to review',
         rv_gate_has_issue: 'Return / Pending / Reject marks exist — cannot Pass.',
         rv_gate_has_return: 'Return or Reject marks exist — cannot Pending.',
+        rv_gate_reject_blocks_return: 'Reject marks exist — decision priority is Reject (Reject > Return > Pending > Pass).',
         rv_gate_need_return: 'No documents marked for return',
         rv_gate_need_pending: 'No documents marked for Pending',
         rv_gate_need_reject: 'No documents marked for reject',
         rv_gate_need_pass: 'Mark all documents as Pass first',
         rv_gate_materials_incomplete: 'Please finish reviewing materials first',
+        rv_decision_priority_hint: 'Priority: Reject > Return > Pending > Pass (only the highest-priority button is enabled when multiple marks exist).',
         dec_title: 'Confirm decision',
         dec_outcome: 'Choose an outcome',
-        dec_outcome_hint: 'Choose the outcome, then review marked items.',
+        dec_outcome_hint: 'Outcome is locked to the highest priority; then review marked items.',
         dec_return_title: 'Return',
         dec_return_desc: 'User or sales fixes materials.',
         dec_pending_title: 'Pending',
@@ -2926,47 +2930,57 @@
       return img.total > 0 && img.idle === 0;
     }
 
-    function canSubmitPass(user) {
-      if (!user || isPendingHoldActive(user)) return false;
-      if (!materialsAuditComplete(user)) return false;
-      const img = imageAuditProgress(user);
+    /**
+     * 结论权重：拒绝 > 退回 > Pending > 通过。
+     * 底部 / 弹窗每次只展示最高优先级那一个可提交结论。
+     */
+    function getDominantDecisionOutcome(user) {
+      if (!user || isPendingHoldActive(user)) return null;
+      if (!materialsAuditComplete(user)) return null;
       const marks = countFieldMarks(user.id);
-      return img.passed === img.total
+      if (marks.rejected > 0) return 'reject';
+      if (marks.returned > 0) return 'return';
+      if (marks.pending > 0) return 'pending';
+      const img = imageAuditProgress(user);
+      if (img.passed === img.total
         && marks.returned === 0
         && marks.pending === 0
-        && marks.rejected === 0;
+        && marks.rejected === 0) {
+        return 'pass';
+      }
+      return null;
+    }
+
+    function canSubmitPass(user) {
+      return getDominantDecisionOutcome(user) === 'pass';
     }
 
     function canSubmitReturn(user) {
-      if (!user || isPendingHoldActive(user)) return false;
-      if (!materialsAuditComplete(user)) return false;
-      return countFieldMarks(user.id).returned > 0;
+      return getDominantDecisionOutcome(user) === 'return';
     }
 
     function canSubmitReject(user) {
-      if (!user || isPendingHoldActive(user)) return false;
-      if (!materialsAuditComplete(user)) return false;
-      return countFieldMarks(user.id).rejected > 0;
+      return getDominantDecisionOutcome(user) === 'reject';
     }
 
     function canSubmitPending(user) {
-      if (!user || isPendingHoldActive(user)) return false;
-      if (!materialsAuditComplete(user)) return false;
-      const marks = countFieldMarks(user.id);
-      return marks.pending > 0 && marks.returned === 0 && marks.rejected === 0;
+      return getDominantDecisionOutcome(user) === 'pending';
     }
 
     function passBlockReason(user) {
       if (!materialsAuditComplete(user)) return t('rv_gate_materials_incomplete');
-      const img = imageAuditProgress(user);
       const marks = countFieldMarks(user.id);
-      if (marks.returned > 0 || marks.pending > 0 || marks.rejected > 0) return t('rv_gate_has_issue');
+      if (marks.rejected > 0 || marks.returned > 0 || marks.pending > 0) return t('rv_gate_has_issue');
+      const img = imageAuditProgress(user);
       if (img.passed < img.total) return t('rv_pass_need_all');
       return t('rv_gate_need_pass');
     }
 
     function returnBlockReason(user) {
       if (!materialsAuditComplete(user)) return t('rv_gate_materials_incomplete');
+      const marks = countFieldMarks(user.id);
+      if (marks.rejected > 0) return t('rv_gate_reject_blocks_return');
+      if (marks.returned === 0) return t('rv_gate_need_return');
       return t('rv_gate_need_return');
     }
 
@@ -3776,12 +3790,13 @@
               return `
               <p class="rv-audit-status primary">${t('rv_must_mark_materials')}：${img.marked}/${img.total}</p>
               <p class="rv-audit-status secondary">${t('rv_current_marks')}：${t('rv_stat_pass')} ${marks.passed} · ${t('rv_stat_return')} ${marks.returned} · ${t('rv_stat_pending')} ${marks.pending} · ${t('rv_stat_reject')} ${marks.rejected}</p>
+              <p class="rv-audit-status secondary">${esc(t('rv_decision_priority_hint'))}</p>
               ${hold ? `<p class="rv-pending-hold">${t('rv_pending_countdown')} <span class="cd" id="pending-countdown">${esc(formatPendingCountdown(user.pendingUntil))}</span> · ${t('rv_pending_hold')}</p>` : ''}
               <div class="rv-action-row">
-                <button type="button" class="btn-suggest${canPass ? '' : ' disabled'}" title="${passTitle}" onclick="reviewDecision('${user.id}', 'pass')">${t('rv_suggest_pass')}</button>
-                <button type="button" class="btn-suggest return${canReturn ? '' : ' disabled'}" title="${returnTitle}" onclick="reviewDecision('${user.id}', 'return')">${t('rv_suggest_return')}</button>
-                <button type="button" class="btn-suggest reject${canReject ? '' : ' disabled'}" title="${rejectTitle}" onclick="reviewDecision('${user.id}', 'reject')">${t('rv_suggest_reject')}</button>
-                <button type="button" class="btn-suggest pending${canPending ? '' : ' disabled'}" title="${pendingTitle}" onclick="reviewDecision('${user.id}', 'pending')">${t('rv_suggest_pending')}</button>
+                <button type="button" class="btn-suggest${canPass ? '' : ' disabled'}" ${canPass ? '' : 'disabled'} title="${passTitle}" onclick="reviewDecision('${user.id}', 'pass')">${t('rv_suggest_pass')}</button>
+                <button type="button" class="btn-suggest return${canReturn ? '' : ' disabled'}" ${canReturn ? '' : 'disabled'} title="${returnTitle}" onclick="reviewDecision('${user.id}', 'return')">${t('rv_suggest_return')}</button>
+                <button type="button" class="btn-suggest reject${canReject ? '' : ' disabled'}" ${canReject ? '' : 'disabled'} title="${rejectTitle}" onclick="reviewDecision('${user.id}', 'reject')">${t('rv_suggest_reject')}</button>
+                <button type="button" class="btn-suggest pending${canPending ? '' : ' disabled'}" ${canPending ? '' : 'disabled'} title="${pendingTitle}" onclick="reviewDecision('${user.id}', 'pending')">${t('rv_suggest_pending')}</button>
               </div>`;
             })() : `<div class="alert alert-lock">${t('comaker_pending_lock')}</div>`}
           </div>
@@ -4918,11 +4933,17 @@
     function openDecisionModal(userId, presetOutcome) {
       const user = getUser(userId);
       if (!user || isPendingHoldActive(user)) return;
-      const outcome = presetOutcome || 'return';
       if (!materialsAuditComplete(user)) {
         showToast(t('rv_gate_materials_incomplete'));
         return;
       }
+      const dominant = getDominantDecisionOutcome(user);
+      if (!dominant || dominant === 'pass') {
+        showToast(t('rv_gate_materials_incomplete'));
+        return;
+      }
+      // 强制使用当前最高优先级结论，忽略更低优先级的入口
+      const outcome = dominant;
       if (outcome === 'return' && !canSubmitReturn(user)) {
         showToast(returnBlockReason(user));
         return;
@@ -4957,6 +4978,11 @@
       if (!decisionDraft) return;
       const user = getUser(decisionDraft.userId);
       if (!user) return;
+      const dominant = getDominantDecisionOutcome(user);
+      if (!dominant || outcome !== dominant) {
+        showToast(t('rv_decision_priority_hint'));
+        return;
+      }
       if (outcome === 'return' && !canSubmitReturn(user)) { showToast(returnBlockReason(user)); return; }
       if (outcome === 'reject' && !canSubmitReject(user)) { showToast(rejectBlockReason(user)); return; }
       if (outcome === 'pending' && !canSubmitPending(user)) { showToast(pendingBlockReason(user)); return; }
@@ -5050,20 +5076,22 @@
       document.getElementById('decision-modal-cancel').textContent = t('dec_cancel');
       document.getElementById('decision-modal-ok').textContent = t('dec_confirm');
 
+      const dominant = getDominantDecisionOutcome(user);
       const outcomeMeta = {
         return: { count: countFieldMarks(user.id).returned, enabled: canSubmitReturn(user), title: returnBlockReason(user) },
         pending: { count: countFieldMarks(user.id).pending, enabled: canSubmitPending(user), title: pendingBlockReason(user) },
         reject: { count: countFieldMarks(user.id).rejected, enabled: canSubmitReject(user), title: rejectBlockReason(user) },
       };
+      // 弹窗结论卡常显；仅最高优先级可点（通过不进弹窗）
       const outcomeCards = [
         { id: 'return', title: t('dec_return_title'), desc: t('dec_return_desc'), cls: 'return' },
         { id: 'pending', title: t('dec_pending_title'), desc: t('dec_pending_desc'), cls: 'pending' },
         { id: 'reject', title: t('dec_reject_title'), desc: t('dec_reject_desc'), cls: 'reject' },
       ].map(o => `
-        <button type="button" class="dec-outcome ${o.cls}${outcome === o.id ? ' on' : ''}${outcomeMeta[o.id].enabled ? '' : ' disabled'}" title="${esc(outcomeMeta[o.id].enabled ? '' : outcomeMeta[o.id].title)}" onclick="setDecisionOutcome('${o.id}')">
+        <button type="button" class="dec-outcome ${o.cls}${outcome === o.id ? ' on' : ''}${outcomeMeta[o.id].enabled ? '' : ' disabled'}" ${outcomeMeta[o.id].enabled ? '' : 'disabled'} title="${esc(outcomeMeta[o.id].enabled ? '' : outcomeMeta[o.id].title)}" onclick="setDecisionOutcome('${o.id}')">
           <div class="dec-outcome-title">${esc(o.title)}</div>
           <div class="dec-outcome-desc">${esc(o.desc)}</div>
-          <div class="dec-outcome-meta">${esc(String(outcomeMeta[o.id].count))} 项材料</div>
+          <div class="dec-outcome-meta">${esc(String(outcomeMeta[o.id].count))} 项材料 · ${dominant === o.id ? '可提交' : '低优先级'}</div>
         </button>
       `).join('');
 
