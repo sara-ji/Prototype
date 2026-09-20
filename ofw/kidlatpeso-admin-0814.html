@@ -923,6 +923,21 @@
         alert_saved_pending: '已更新 Pending 资料，已通知原审核员继续审核（不重新终审）。',
         flag_return: '人审退回',
         flag_pending: '暂挂',
+        flag_reject: '人审拒绝',
+        sales_decision_title: '人审结论原因',
+        sales_decision_hint: '以下为人审提交的结论与逐项原因，便于销售跟进补件 / 改资料。标红字段见上方表单。',
+        sales_decision_outcome: '结论',
+        sales_decision_time: '提交时间',
+        sales_decision_reviewer: '审核员',
+        sales_decision_biz: '业务标签',
+        sales_decision_items: '问题资料与原因',
+        sales_decision_field: '资料项',
+        sales_decision_reason: '原因',
+        sales_decision_remark: '备注',
+        sales_decision_person: '对象',
+        sales_decision_empty: '暂无人审结论原因',
+        sales_decision_mute: '禁言豁免',
+        sales_decision_mute_yes: '是（本次不禁言）',
         notif_title: '通知',
         notif_mark_all: '全部已读',
         notif_empty: '暂无通知',
@@ -1314,6 +1329,21 @@
         alert_saved_pending: 'Pending fields updated; original reviewer notified — no re-final.',
         flag_return: 'Returned',
         flag_pending: 'Pending',
+        flag_reject: 'Rejected',
+        sales_decision_title: 'Manual review reasons',
+        sales_decision_hint: 'Outcome and per-field reasons from manual review, for sales follow-up. Highlighted fields are in the form above.',
+        sales_decision_outcome: 'Outcome',
+        sales_decision_time: 'Submitted at',
+        sales_decision_reviewer: 'Reviewer',
+        sales_decision_biz: 'Biz tags',
+        sales_decision_items: 'Flagged materials & reasons',
+        sales_decision_field: 'Field',
+        sales_decision_reason: 'Reason',
+        sales_decision_remark: 'Remark',
+        sales_decision_person: 'Party',
+        sales_decision_empty: 'No manual-review reasons yet',
+        sales_decision_mute: 'Mute exemption',
+        sales_decision_mute_yes: 'Yes (not muted this round)',
         notif_title: 'Notifications',
         notif_mark_all: 'Mark all read',
         notif_empty: 'No notifications',
@@ -2559,6 +2589,17 @@
         selectedComakerId: 'cm_o1',
         fields: baseDom({ first_name: 'Oscar', last_name: 'Tan', passport_number: 'P1000010I' }),
         comakers: [mkCm('cm_o1', 'Pam Tan', '+63 917 101 0010', { status: 'ready' })],
+        reviewDecision: {
+          outcome: 'reject',
+          at: '2026-07-26 10:22:08',
+          reviewer: 'zenaida',
+          bizTags: ['biz_fraud', 'biz_id'],
+          muteExempt: false,
+          issues: [
+            { fieldKey: 'passport_photo', label: 'Philippine Passport Photo', person: 'borrower', reason: 'reason_forged', remark: '疑似翻拍 / 非原件' },
+            { fieldKey: 'oec', label: 'Valid OEC', person: 'borrower', reason: 'reason_key_mismatch', remark: '姓名与护照不一致' },
+          ],
+        },
       },
       {
         id: 'U1010c', name: 'Ivy Cruz', mobile: '+63 900 111 0103',
@@ -2573,6 +2614,17 @@
           employer_phone: '02-123-outdated', flight: MOCK_IMG.flight,
         }),
         comakers: [mkCm('cm_iv1', 'Ben Cruz', '+63 917 101 0103')],
+        reviewDecision: {
+          outcome: 'return',
+          at: '2026-08-04 14:18:33',
+          reviewer: 'zenaida',
+          bizTags: ['biz_calling'],
+          muteExempt: false,
+          issues: [
+            { fieldKey: 'employer_phone', label: 'Employer Phone Number', person: 'borrower', reason: 'reason_key_unqualified', remark: '号码打不通，请核实雇主电话' },
+            { fieldKey: 'flight', label: 'Flight Itinerary', person: 'borrower', reason: 'reason_expired', remark: '行程单日期已过期，请上传最新行程' },
+          ],
+        },
       },
       {
         id: 'U1010d', name: 'Jade Lim', mobile: '+63 900 111 0104',
@@ -2589,6 +2641,17 @@
           employer_phone: '+971-50-000-1111', proof_income: MOCK_IMG.proof_income,
         }),
         comakers: [mkCm('cm_jd1', 'Ken Lim', '+63 917 101 0104', { status: 'guaranteeing', gender: 'Male' })],
+        reviewDecision: {
+          outcome: 'pending',
+          at: '2026-08-05 16:40:12',
+          reviewer: 'zenaida',
+          bizTags: ['biz_other'],
+          muteExempt: false,
+          issues: [
+            { fieldKey: 'employer_phone', label: 'Employer Phone Number', person: 'borrower', reason: 'reason_key_mismatch', remark: '与合同上雇主电话不一致，请销售核对后改回' },
+            { fieldKey: 'proof_income', label: 'Proof of income', person: 'borrower', reason: 'reason_not_target', remark: '上传的不是工资流水，请换近 3 个月银行流水' },
+          ],
+        },
       },
       {
         id: 'U1011', name: 'Paula Go', mobile: '+63 900 111 0011',
@@ -2639,6 +2702,17 @@
         selectedComakerId: 'cm_kw1',
         fields: baseDom({ first_name: 'Kai', last_name: 'Wong', passport_number: 'P1000105E', employer_phone: '02-outdated' }),
         comakers: [mkCm('cm_kw1', 'Mia Wong', '+63 917 101 0105')],
+        reviewDecision: {
+          outcome: 'return',
+          at: '2026-08-06 09:05:44',
+          reviewer: 'lena',
+          bizTags: ['biz_id'],
+          muteExempt: false,
+          issues: [
+            { fieldKey: 'employer_phone', label: 'Employer Phone Number', person: 'borrower', reason: 'reason_other', remark: '请销售外呼核实后更新' },
+            { fieldKey: 'oec', label: 'Valid OEC', person: 'borrower', reason: 'reason_key_mismatch', remark: 'OEC 合同期限与填写不一致' },
+          ],
+        },
       },
       {
         id: 'U1014', name: 'Isabel Guillermo', mobile: '+63 900 111 0014',
@@ -3258,6 +3332,125 @@
           `<span class="sf-removed-item">${fieldTipMark('removed')}${esc(locLabel(label))}</span>`
         ).join('')}</div>
       </div>`;
+    }
+
+    function salesFieldLabelByKey(user, fieldKey) {
+      const flow = user?.flow === 'oversea' ? 'oversea' : 'domestic';
+      const sections = FIELD_SECTIONS[flow] || [];
+      for (const sec of sections) {
+        const hit = (sec.fields || []).find(f => f.key === fieldKey);
+        if (hit) return locLabel(hit.label);
+      }
+      for (const sec of (FIELD_SECTIONS.domestic || [])) {
+        const hit = (sec.fields || []).find(f => f.key === fieldKey);
+        if (hit) return locLabel(hit.label);
+      }
+      return fieldKey;
+    }
+
+    function getSalesReviewDecision(user) {
+      if (!user) return null;
+      if (user.reviewDecision && (user.reviewDecision.issues || []).length) {
+        return user.reviewDecision;
+      }
+      const code = userStatus(user);
+      let outcome = null;
+      let keys = [];
+      if (code === 'MANUAL_RETURNED') {
+        outcome = 'return';
+        keys = user.returnFields || [];
+      } else if (code === 'MANUAL_PENDING') {
+        outcome = 'pending';
+        keys = user.pendingFields || [];
+      } else if (code === 'LOAN_REJECTED' && user.reviewNote) {
+        outcome = 'reject';
+        keys = [];
+      } else {
+        return null;
+      }
+      if (!keys.length && !user.reviewNote) return null;
+      return {
+        outcome,
+        at: user.reviewReturnAt || user.reviewDecision?.at || '—',
+        reviewer: user.pendingReviewer || user.reviewDecision?.reviewer || '—',
+        bizTags: user.reviewDecision?.bizTags || [],
+        muteExempt: !!user.reviewDecision?.muteExempt,
+        issues: keys.map(k => ({
+          fieldKey: k,
+          label: salesFieldLabelByKey(user, k),
+          person: String(k).startsWith('cm_') ? 'comaker' : 'borrower',
+          reason: 'reason_other',
+          remark: '',
+        })),
+        note: user.reviewNote || '',
+      };
+    }
+
+    function renderSalesDecisionReason(user) {
+      const dec = getSalesReviewDecision(user);
+      if (!dec) return '';
+      const outcomeMeta = {
+        return: { tag: 'tag-warning', label: t('flag_return') },
+        pending: { tag: 'tag-info', label: t('flag_pending') },
+        reject: { tag: 'tag-danger', label: t('flag_reject') },
+      };
+      const om = outcomeMeta[dec.outcome] || outcomeMeta.return;
+      const bizHtml = (dec.bizTags || []).length
+        ? `<div class="sdr-biz">${(dec.bizTags || []).map(k => `<span class="sdr-chip">${esc(t(k))}</span>`).join('')}</div>`
+        : `<span class="sdr-muted">—</span>`;
+      const rows = (dec.issues || []).length
+        ? (dec.issues || []).map(issue => {
+            const person = issue.person === 'comaker' ? t('dec_person_comaker') : t('dec_person_borrower');
+            const label = locLabel(issue.label || salesFieldLabelByKey(user, issue.fieldKey));
+            const reason = issue.reason ? t(issue.reason) : '—';
+            return `<tr>
+              <td><span class="sdr-person ${issue.person === 'comaker' ? 'cm' : 'br'}">${esc(person)}</span></td>
+              <td class="sdr-field">${esc(label)}</td>
+              <td><span class="sdr-reason">${esc(reason)}</span></td>
+              <td class="sdr-remark">${esc(issue.remark || '—')}</td>
+            </tr>`;
+          }).join('')
+        : `<tr><td colspan="4" class="sdr-muted">${esc(dec.note || t('sales_decision_empty'))}</td></tr>`;
+      const muteRow = dec.outcome === 'reject'
+        ? `<div class="sdr-meta-item"><span>${esc(t('sales_decision_mute'))}</span><strong>${esc(dec.muteExempt ? t('sales_decision_mute_yes') : (lang === 'zh' ? '否' : 'No'))}</strong></div>`
+        : '';
+      return `
+        <section class="sdr-panel sdr-${esc(dec.outcome)}" aria-label="${esc(t('sales_decision_title'))}">
+          <div class="sdr-head">
+            <div>
+              <h3>${esc(t('sales_decision_title'))}</h3>
+              <p class="sdr-hint">${esc(t('sales_decision_hint'))}</p>
+            </div>
+            <span class="tag ${om.tag}">${esc(om.label)}</span>
+          </div>
+          <div class="sdr-meta">
+            <div class="sdr-meta-item"><span>${esc(t('sales_decision_outcome'))}</span><strong>${esc(om.label)}</strong></div>
+            <div class="sdr-meta-item"><span>${esc(t('sales_decision_time'))}</span><strong>${esc(dec.at || '—')}</strong></div>
+            <div class="sdr-meta-item"><span>${esc(t('sales_decision_reviewer'))}</span><strong>${esc(dec.reviewer || '—')}</strong></div>
+            ${muteRow}
+          </div>
+          <div class="sdr-block">
+            <div class="sdr-block-label">${esc(t('sales_decision_biz'))}</div>
+            ${bizHtml}
+          </div>
+          <div class="sdr-block">
+            <div class="sdr-block-label">${esc(t('sales_decision_items'))}</div>
+            <div class="sdr-table-wrap">
+              <table class="sdr-table">
+                <thead>
+                  <tr>
+                    <th>${esc(t('sales_decision_person'))}</th>
+                    <th>${esc(t('sales_decision_field'))}</th>
+                    <th>${esc(t('sales_decision_reason'))}</th>
+                    <th>${esc(t('sales_decision_remark'))}</th>
+                  </tr>
+                </thead>
+                <tbody>${rows}</tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      `;
     }
 
     /** Return / Reject：回显人审资料（原字段 + 表格补齐） */
@@ -4857,6 +5050,7 @@
           ${renderSalesRemovedFields(user)}
           <div class="alert ${showSave ? 'alert-ok' : 'alert-lock'}">${teamBEditHint(user)}${help}</div>
           <div class="tab-body">${renderProfileSections(user, profileEditable)}</div>
+          ${renderSalesDecisionReason(user)}
           ${showSave ? `<div class="save-bar"><button type="button" class="btn-primary" onclick="saveProfile('${user.id}')">${esc(saveLabel)}</button></div>` : ''}
         `;
       }
@@ -5186,8 +5380,22 @@
       }
 
       const marked = [...new Set(issues.map(i => i.fieldKey).filter(Boolean))];
+      const decisionSnapshot = {
+        outcome,
+        at: new Date().toISOString().slice(0, 19).replace('T', ' '),
+        reviewer: currentAuditorId() || (auditCases.find(c => c.userId === userId)?.auditOwner) || 'zenaida',
+        bizTags: [...bizTags],
+        muteExempt: !!muteExempt,
+        issues: issues.map(i => ({
+          fieldKey: i.fieldKey,
+          label: i.label,
+          person: i.person || 'borrower',
+          reason: i.reason,
+          remark: i.remark || '',
+        })),
+      };
       closeDecisionModal();
-      applyReviewDecision(userId, outcome, marked, composedNote);
+      applyReviewDecision(userId, outcome, marked, composedNote, decisionSnapshot);
     }
 
     function reviewDecision(userId, action) {
@@ -5220,7 +5428,7 @@
       openDecisionModal(userId, action);
     }
 
-    function applyReviewDecision(userId, action, markedKeys, note) {
+    function applyReviewDecision(userId, action, markedKeys, note, decisionSnapshot) {
       const u = getUser(userId);
       if (!u) return;
 
@@ -5238,6 +5446,7 @@
         u.returnFields = [];
         u.pendingFields = [];
         u.pendingReviewer = '';
+        u.reviewDecision = null;
         if (ac) ac.auditStatus = 'done';
         alert(t('alert_approved'));
       } else if (action === 'reject') {
@@ -5246,6 +5455,7 @@
         u.returnFields = [];
         u.pendingFields = [];
         u.reviewNote = note;
+        u.reviewDecision = decisionSnapshot || null;
         if (ac) ac.auditStatus = 'done';
         alert(t('alert_rejected'));
       } else if (action === 'return') {
@@ -5255,6 +5465,7 @@
         u.pendingFields = [];
         u.reviewNote = note;
         u.reviewReturnAt = new Date().toISOString().slice(0, 19).replace('T', ' ');
+        u.reviewDecision = decisionSnapshot || null;
         if (ac) ac.auditStatus = 'returned';
         notifySalesForUser(u, 'return');
         alert(t('alert_returned') + '\n' + (lang === 'zh' ? '标红字段：' : 'Fields: ') + marked.join(', '));
@@ -5265,6 +5476,7 @@
         u.returnFields = [];
         u.reviewNote = note;
         u.pendingReviewer = (ac && ac.auditOwner) || 'zenaida';
+        u.reviewDecision = decisionSnapshot || null;
         setPendingHold(u);
         if (ac) ac.auditStatus = 'pending_hold';
         notifySalesForUser(u, 'pending');
@@ -5325,7 +5537,56 @@
       color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px;
     }
     .tab.on { color: var(--brand); border-bottom-color: var(--brand); font-weight: 600; background: var(--surface); }
-    .tab-body { margin-bottom: 72px; }
+    .tab-body { margin-bottom: 24px; }
+    .sdr-panel {
+      margin: 0 0 88px; background: var(--surface); border: 1px solid var(--border);
+      border-radius: 6px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,.04);
+    }
+    .sdr-panel.sdr-return { border-top: 3px solid var(--warning); }
+    .sdr-panel.sdr-pending { border-top: 3px solid #6366f1; }
+    .sdr-panel.sdr-reject { border-top: 3px solid var(--danger); }
+    .sdr-head {
+      display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+      padding: 14px 16px; background: var(--label-bg); border-bottom: 1px solid var(--border);
+    }
+    .sdr-head h3 { font-size: 14px; font-weight: 600; margin: 0 0 4px; }
+    .sdr-hint { font-size: 12px; color: var(--text-muted); line-height: 1.5; max-width: 640px; }
+    .sdr-meta {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 10px 16px; padding: 12px 16px; border-bottom: 1px solid var(--border);
+    }
+    .sdr-meta-item span { display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 2px; }
+    .sdr-meta-item strong { font-size: 13px; font-weight: 600; }
+    .sdr-block { padding: 12px 16px 14px; border-bottom: 1px solid var(--border); }
+    .sdr-block:last-child { border-bottom: none; }
+    .sdr-block-label { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+    .sdr-biz { display: flex; flex-wrap: wrap; gap: 6px; }
+    .sdr-chip {
+      display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 12px;
+      background: var(--brand-light); color: var(--brand); border: 1px solid #91caff;
+    }
+    .sdr-muted { color: var(--text-muted); font-size: 12px; }
+    .sdr-table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 4px; }
+    .sdr-table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 640px; }
+    .sdr-table th, .sdr-table td {
+      padding: 9px 12px; text-align: left; border-bottom: 1px solid var(--border); vertical-align: top;
+    }
+    .sdr-table th { background: #fafafa; font-weight: 600; color: var(--text-muted); font-size: 11px; }
+    .sdr-table tbody tr:last-child td { border-bottom: none; }
+    .sdr-table tbody tr:hover td { background: #fafcff; }
+    .sdr-person {
+      display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: 11px; font-weight: 600;
+    }
+    .sdr-person.br { background: #e6f4ff; color: #0958d9; }
+    .sdr-person.cm { background: #f9f0ff; color: #531dab; }
+    .sdr-field { font-weight: 600; color: var(--text); }
+    .sdr-reason {
+      display: inline-block; padding: 2px 8px; border-radius: 4px; background: #fff7e6;
+      color: #ad6800; border: 1px solid #ffd591; font-weight: 500;
+    }
+    .sdr-reject .sdr-reason { background: #fff2f0; color: #a8071a; border-color: #ffa39e; }
+    .sdr-pending .sdr-reason { background: #eef2ff; color: #4338ca; border-color: #c7d2fe; }
+    .sdr-remark { color: var(--text-muted); line-height: 1.45; max-width: 320px; }
     .info-block {
       background: var(--surface); border: 1px solid var(--border);
       margin-bottom: 12px; overflow: hidden;
