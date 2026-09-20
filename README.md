@@ -17,6 +17,7 @@ https://sara-ji.github.io/Prototype/
 | OFW KidlatPeso V3 | https://sara-ji.github.io/Prototype/ofw/kidlatpeso-v3-0818.html |
 | OFW Admin | https://sara-ji.github.io/Prototype/ofw/kidlatpeso-admin-0814.html |
 | OFW OCR 字段抽取对照报告 | https://sara-ji.github.io/Prototype/ofw/ocr-field-accuracy-report.html |
+| OFW 人审审核记录分析 | https://sara-ji.github.io/Prototype/ofw/manual-review-analysis.html |
 
 ## 注意
 
