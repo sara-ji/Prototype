@@ -318,6 +318,39 @@
     table.list.contact-table th, table.list.contact-table td { text-align: left; }
     .risk-label-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
     .review-pass-bar .btn.success { background: #52c41a; border-color: #52c41a; color: #fff; }
+    .review-assign-bar {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+      margin-top: 12px; padding: 10px 0 4px;
+    }
+    .review-assign-bar select {
+      height: 32px; min-width: 220px; padding: 0 10px;
+      border: 1px solid var(--border); border-radius: var(--radius); background: #fff;
+    }
+    .review-assign-bar .btn.warn { min-width: 96px; }
+    .review-pager {
+      margin-left: auto; display: flex; align-items: center; gap: 6px;
+      font-size: 13px; color: var(--text-muted);
+    }
+    .review-pager .pg {
+      min-width: 28px; height: 28px; padding: 0 8px; border: 1px solid var(--border);
+      border-radius: var(--radius); background: #fff; color: var(--text); cursor: pointer;
+    }
+    .review-pager .pg.active { border-color: var(--brand); color: var(--brand); }
+    .review-pager .pg:disabled { opacity: .45; cursor: not-allowed; }
+    .review-stats { margin-top: 20px; }
+    .review-stats .stats-hd {
+      font-size: 14px; font-weight: 600; margin-bottom: 10px; color: var(--text);
+    }
+    table.list.review-stats-table { min-width: 720px; }
+    table.list.review-stats-table th, table.list.review-stats-table td { text-align: center; }
+    table.list.review-stats-table td.left { text-align: left; }
+    .role-switch {
+      display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted);
+    }
+    .role-switch select {
+      height: 28px; padding: 0 8px; border: 1px solid var(--border); border-radius: 12px;
+      background: #fff; color: var(--brand); font-weight: 500;
+    }
     .id-tag-group { margin-bottom: 14px; }
     .id-tag-group h4 { font-size: 13px; font-weight: 600; margin: 0 0 8px; color: var(--text); }
     .photo-block { margin-bottom: 16px; }
@@ -436,7 +469,13 @@
           <h2 id="page-title">页面</h2>
           <div class="meta" id="page-sub"></div>
         </div>
-        <span class="topbar-user">运营 · Demo</span>
+        <label class="role-switch">当前角色
+          <select id="role-switch" onchange="switchRole(this.value)">
+            <option value="Admin">Admin（管理员）</option>
+            <option value="Underwriter">Underwriter（审核员）</option>
+          </select>
+        </label>
+        <span class="topbar-user" id="topbar-role-label">Admin · Demo</span>
       </header>
       <div class="content" id="content"></div>
     </div>
@@ -706,16 +745,18 @@ const USERS = [
   }
 ];
 
-/** 人审队列（复用 JH；类型固定 INSTALLMENT；列表字段对齐 JH + 用户标签） */
+/** 人审队列（复用 JH；类型固定 INSTALLMENT；列表字段对齐 JH + 用户标签；touched=是否已打开/拨打过） */
 const REVIEW_QUEUE = [
-  { listingId: '76638215', userId: 'SN10028641', type: 'INSTALLMENT', rating: 'C', tag: 'Normal', userTag: '尊享', amount: 6000, term: '3月', idStatus: '通过', listedAt: '2026-08-25 14:42:30', lastCallAt: '2026-08-25 14:45:03', underwriter: 'Angelica Gonzales', channel: 'GCash', withdrawAccount: '09502584963', idType: "Driver's License", idNumber: 'D1313001399', regChannel: 'iOS Google-paipaidai', name: 'Etprim Mark Felipe', hasLiveness: true },
-  { listingId: '76491652', userId: 'SN10028702', type: 'INSTALLMENT', rating: 'F', tag: 'Normal', userTag: '普通', amount: 2000, term: '1月', idStatus: '通过', listedAt: '2026-08-25 14:41:15', lastCallAt: '2026-08-25 14:44:55', underwriter: 'Angelica Gonzales', channel: 'Maya', withdrawAccount: '09189876543', idType: 'UMID', idNumber: '987654321098', regChannel: 'Android Organic', name: 'Maria Lopez', hasLiveness: false },
-  { listingId: '76491605', userId: 'SN10028641', type: 'INSTALLMENT', rating: 'E', tag: 'Normal', userTag: '尊享', amount: 2000, term: '1月', idStatus: '通过', listedAt: '2026-08-25 14:40:02', lastCallAt: '2026-08-25 14:42:18', underwriter: 'Milagros Rivera', channel: 'GCash', withdrawAccount: '09171234567', idType: 'UMID', idNumber: '123456789012', regChannel: 'iOS Google-paipaidai', name: 'Juan Dela Cruz', hasLiveness: true },
-  { listingId: '76491452', userId: 'SN10028702', type: 'INSTALLMENT', rating: 'D', tag: 'Skip_call', userTag: '普通', amount: 4500, term: '3月', idStatus: '通过', listedAt: '2026-08-25 14:28:33', lastCallAt: '2026-08-25 14:30:01', underwriter: 'Milagros Rivera', channel: 'Bank', withdrawAccount: 'BDO****4521', idType: 'Passport', idNumber: 'P1234567A', regChannel: 'Android Facebook', name: 'Maria Lopez', hasLiveness: false },
-  { listingId: '76491399', userId: 'SN10028641', type: 'INSTALLMENT', rating: 'C', tag: 'Skip_call', userTag: '尊享', amount: 2700, term: '1月', idStatus: '通过', listedAt: '2026-08-25 14:20:28', lastCallAt: '2026-08-25 14:22:10', underwriter: 'Marybeth Pagao', channel: 'GCash', withdrawAccount: '09171234567', idType: 'UMID', idNumber: '123456789012', regChannel: 'iOS Google-paipaidai', name: 'Juan Dela Cruz', hasLiveness: true },
-  { listingId: '76491346', userId: 'SN10028702', type: 'INSTALLMENT', rating: 'B', tag: 'Normal', userTag: '普通', amount: 5200, term: '3月', idStatus: '通过', listedAt: '2026-08-25 14:05:04', lastCallAt: '2026-08-25 14:08:44', underwriter: 'Angelica Gonzales', channel: 'Maya', withdrawAccount: '09189876543', idType: 'UMID', idNumber: '987654321098', regChannel: 'Android Organic', name: 'Maria Lopez', hasLiveness: true },
-  { listingId: '76491288', userId: 'SN10028641', type: 'INSTALLMENT', rating: 'A', tag: 'Normal', userTag: '尊享', amount: 8000, term: '3月', idStatus: '通过', listedAt: '2026-08-25 13:44:11', lastCallAt: '2026-08-25 13:50:00', underwriter: 'Milagros Rivera', channel: 'GCash', withdrawAccount: '09171234567', idType: 'UMID', idNumber: '123456789012', regChannel: 'iOS Google-paipaidai', name: 'Juan Dela Cruz', hasLiveness: false },
-  { listingId: '76491201', userId: 'SN10028702', type: 'INSTALLMENT', rating: 'C', tag: 'Skip_call', userTag: '普通', amount: 3000, term: '1月', idStatus: '通过', listedAt: '2026-08-25 13:12:40', lastCallAt: '2026-08-25 13:15:22', underwriter: 'Marybeth Pagao', channel: 'Bank', withdrawAccount: 'UB****8899', idType: 'Driver\'s License', idNumber: 'N01-12-345678', regChannel: 'Android Organic', name: 'Maria Lopez', hasLiveness: true }
+  { listingId: '76638215', userId: 'SN10028641', type: 'INSTALLMENT', rating: 'C', tag: 'Normal', userTag: '尊享', amount: 6000, term: '3月', idStatus: '通过', listedAt: '2026-08-25 14:42:30', lastCallAt: '2026-08-25 14:45:03', underwriter: 'Angelica Gonzales', channel: 'GCash', withdrawAccount: '09502584963', idType: "Driver's License", idNumber: 'D1313001399', regChannel: 'iOS Google-paipaidai', name: 'Etprim Mark Felipe', hasLiveness: true, touched: true },
+  { listingId: '76491652', userId: 'SN10028702', type: 'INSTALLMENT', rating: 'F', tag: 'Normal', userTag: '普通', amount: 2000, term: '1月', idStatus: '通过', listedAt: '2026-08-25 14:41:15', lastCallAt: '—', underwriter: 'Angelica Gonzales', channel: 'Maya', withdrawAccount: '09189876543', idType: 'UMID', idNumber: '987654321098', regChannel: 'Android Organic', name: 'Maria Lopez', hasLiveness: false, touched: false },
+  { listingId: '76491605', userId: 'SN10028641', type: 'INSTALLMENT', rating: 'E', tag: 'Normal', userTag: '尊享', amount: 2000, term: '1月', idStatus: '通过', listedAt: '2026-08-25 14:40:02', lastCallAt: '2026-08-25 14:42:18', underwriter: 'Milagros Rivera', channel: 'GCash', withdrawAccount: '09171234567', idType: 'UMID', idNumber: '123456789012', regChannel: 'iOS Google-paipaidai', name: 'Juan Dela Cruz', hasLiveness: true, touched: true },
+  { listingId: '76491452', userId: 'SN10028702', type: 'INSTALLMENT', rating: 'D', tag: 'Skip_call', userTag: '普通', amount: 4500, term: '3月', idStatus: '通过', listedAt: '2026-08-25 14:28:33', lastCallAt: '—', underwriter: 'Milagros Rivera', channel: 'Bank', withdrawAccount: 'BDO****4521', idType: 'Passport', idNumber: 'P1234567A', regChannel: 'Android Facebook', name: 'Maria Lopez', hasLiveness: false, touched: false },
+  { listingId: '76491399', userId: 'SN10028641', type: 'INSTALLMENT', rating: 'C', tag: 'Skip_call', userTag: '尊享', amount: 2700, term: '1月', idStatus: '通过', listedAt: '2026-08-25 14:20:28', lastCallAt: '2026-08-25 14:22:10', underwriter: 'Marybeth Pagao', channel: 'GCash', withdrawAccount: '09171234567', idType: 'UMID', idNumber: '123456789012', regChannel: 'iOS Google-paipaidai', name: 'Juan Dela Cruz', hasLiveness: true, touched: true },
+  { listingId: '76491346', userId: 'SN10028702', type: 'INSTALLMENT', rating: 'B', tag: 'Normal', userTag: '普通', amount: 5200, term: '3月', idStatus: '通过', listedAt: '2026-08-25 14:05:04', lastCallAt: '—', underwriter: 'Juliana Mae Ferrer', channel: 'Maya', withdrawAccount: '09189876543', idType: 'UMID', idNumber: '987654321098', regChannel: 'Android Organic', name: 'Maria Lopez', hasLiveness: true, touched: false },
+  { listingId: '76491288', userId: 'SN10028641', type: 'INSTALLMENT', rating: 'A', tag: 'Normal', userTag: '尊享', amount: 8000, term: '3月', idStatus: '通过', listedAt: '2026-08-25 13:44:11', lastCallAt: '2026-08-25 13:50:00', underwriter: 'Milagros Rivera', channel: 'GCash', withdrawAccount: '09171234567', idType: 'UMID', idNumber: '123456789012', regChannel: 'iOS Google-paipaidai', name: 'Juan Dela Cruz', hasLiveness: false, touched: true },
+  { listingId: '76491201', userId: 'SN10028702', type: 'INSTALLMENT', rating: 'C', tag: 'Skip_call', userTag: '普通', amount: 3000, term: '1月', idStatus: '通过', listedAt: '2026-08-25 13:12:40', lastCallAt: '—', underwriter: 'Anny-Wai Paring', channel: 'Bank', withdrawAccount: 'UB****8899', idType: 'Driver\'s License', idNumber: 'N01-12-345678', regChannel: 'Android Organic', name: 'Maria Lopez', hasLiveness: true, touched: false },
+  { listingId: '76491155', userId: 'SN10028641', type: 'INSTALLMENT', rating: 'B', tag: 'Normal', userTag: '尊享', amount: 4500, term: '3月', idStatus: '通过', listedAt: '2026-08-25 12:55:10', lastCallAt: '—', underwriter: 'Mary Ann B. Domantay', channel: 'GCash', withdrawAccount: '09171234567', idType: 'UMID', idNumber: '123456789012', regChannel: 'iOS Google-paipaidai', name: 'Juan Dela Cruz', hasLiveness: true, touched: false },
+  { listingId: '76491088', userId: 'SN10028702', type: 'INSTALLMENT', rating: 'C', tag: 'Normal', userTag: '普通', amount: 3500, term: '1月', idStatus: '通过', listedAt: '2026-08-25 12:40:22', lastCallAt: '2026-08-25 12:48:01', underwriter: 'Juliana Mae Ferrer', channel: 'Maya', withdrawAccount: '09189876543', idType: 'UMID', idNumber: '987654321098', regChannel: 'Android Organic', name: 'Maria Lopez', hasLiveness: false, touched: true }
 ];
 
 /** 人审拒绝标签（复用 JH 口径，示意） */
@@ -743,20 +784,65 @@ const CALL_CODES = ['Answer', 'No Answer', 'Hang Up', 'Not Activated', 'Wrong Nu
 
 /** 增信项审核队列（一单一用户；增信项取该用户已填全部增信材料；ownerName=审核员） */
 const CERT_REVIEW_QUEUE = [
-  { appliedAt: '2026-08-21 12:44:51', userId: 'SN10028641', displayUserId: '23738381', ownerName: 'Angelica Gonzales' },
-  { appliedAt: '2026-08-21 12:48:00', userId: 'SN10028702', displayUserId: '23301904', ownerName: 'Milagros Rivera' },
-  { appliedAt: '2026-08-21 11:22:18', userId: 'SN10028641', displayUserId: '23738381', ownerName: 'Marybeth Pagao' },
-  { appliedAt: '2026-08-21 10:05:33', userId: 'SN10028702', displayUserId: '23301904', ownerName: 'Angelica Gonzales' },
-  { appliedAt: '2026-08-21 09:41:07', userId: 'SN10028641', displayUserId: '23738381', ownerName: 'Milagros Rivera' },
-  { appliedAt: '2026-08-20 22:15:44', userId: 'SN10028702', displayUserId: '23301904', ownerName: 'Marybeth Pagao' },
-  { appliedAt: '2026-08-20 21:08:29', userId: 'SN10028641', displayUserId: '23738381', ownerName: 'Angelica Gonzales' },
-  { appliedAt: '2026-08-20 19:33:12', userId: 'SN10028702', displayUserId: '23301904', ownerName: 'Demo Operator' }
+  { id: 'CR001', appliedAt: '2026-08-21 12:44:51', userId: 'SN10028641', displayUserId: '23738381', ownerName: 'Angelica Gonzales' },
+  { id: 'CR002', appliedAt: '2026-08-21 12:48:00', userId: 'SN10028702', displayUserId: '23301904', ownerName: 'Milagros Rivera' },
+  { id: 'CR003', appliedAt: '2026-08-21 11:22:18', userId: 'SN10028641', displayUserId: '23738381', ownerName: 'Marybeth Pagao' },
+  { id: 'CR004', appliedAt: '2026-08-21 10:05:33', userId: 'SN10028702', displayUserId: '23301904', ownerName: 'Angelica Gonzales' },
+  { id: 'CR005', appliedAt: '2026-08-21 09:41:07', userId: 'SN10028641', displayUserId: '23738381', ownerName: 'Milagros Rivera' },
+  { id: 'CR006', appliedAt: '2026-08-20 22:15:44', userId: 'SN10028702', displayUserId: '23301904', ownerName: 'Juliana Mae Ferrer' },
+  { id: 'CR007', appliedAt: '2026-08-20 21:08:29', userId: 'SN10028641', displayUserId: '23738381', ownerName: 'Anny-Wai Paring' },
+  { id: 'CR008', appliedAt: '2026-08-20 19:33:12', userId: 'SN10028702', displayUserId: '23301904', ownerName: 'Mary Ann B. Domantay' },
+  { id: 'CR009', appliedAt: '2026-08-20 18:10:05', userId: 'SN10028641', displayUserId: '23738381', ownerName: 'Juliana Mae Ferrer' },
+  { id: 'CR010', appliedAt: '2026-08-20 17:02:44', userId: 'SN10028702', displayUserId: '23301904', ownerName: 'Demo Operator' }
 ];
 
-const UNDERWRITERS = ['Angelica Gonzales', 'Milagros Rivera', 'Marybeth Pagao', 'Demo Operator'];
+/** 增信项审核 · 今日已完成量（示意；案件数由队列实时聚合；无「未触碰」列） */
+const CERT_DONE_TODAY = {
+  'Juliana Mae Ferrer': 312,
+  'Anny-Wai Paring': 262,
+  'Milagros Rivera': 244,
+  'Angelica Gonzales': 238,
+  'Marybeth Pagao': 190,
+  'Mary Ann B. Domantay': 156,
+  'HARRY TUZON': 120,
+  'Ma. Cristina Borca': 88,
+  'Jenelyn Garnace': 64,
+  'Shanine Yuson': 41,
+  'Demo Operator': 18
+};
+
+const UNDERWRITERS = [
+  'Juliana Mae Ferrer',
+  'Anny-Wai Paring',
+  'Milagros Rivera',
+  'Angelica Gonzales',
+  'Marybeth Pagao',
+  'Mary Ann B. Domantay',
+  'HARRY TUZON',
+  'Ma. Cristina Borca',
+  'Jenelyn Garnace',
+  'Shanine Yuson',
+  'Demo Operator'
+];
+
+/** 今日已完成量（示意；案件数 / 未触碰由队列实时聚合） */
+const REVIEW_DONE_TODAY = {
+  'Juliana Mae Ferrer': 107,
+  'Anny-Wai Paring': 94,
+  'Milagros Rivera': 85,
+  'Angelica Gonzales': 72,
+  'Marybeth Pagao': 61,
+  'Mary Ann B. Domantay': 48,
+  'HARRY TUZON': 33,
+  'Ma. Cristina Borca': 21,
+  'Jenelyn Garnace': 18,
+  'Shanine Yuson': 12,
+  'Demo Operator': 5
+};
 
 const state = {
   page: 'review',
+  role: 'Admin',
   openGroups: { audit: true, biz: false, antifraud: false, cs: true, settings: false },
   detailUserId: null,
   detailFrom: 'review',
@@ -773,12 +859,16 @@ const state = {
   reviewListingId: null,
   reviewCallCodes: {},
   reviewIdentityTags: {},
+  reviewPage: 1,
+  reviewPageSize: 8,
   certFilter: {
     account: '',
     userId: ''
   },
   certClaimQty: 0,
   certSortAsc: false,
+  certPage: 1,
+  certPageSize: 8,
   certFocusItem: '',
   certVerdicts: {},
   certPayslipIncome: {},
@@ -1243,6 +1333,7 @@ function runReviewSearch() {
     toast('筛选值不可为空');
     return;
   }
+  state.reviewPage = 1;
   renderPage();
   toast(`已搜索，共 ${filteredReviewQueue().length} 条`);
 }
@@ -1268,8 +1359,72 @@ function toggleReviewSort() {
   renderPage();
 }
 
+function switchRole(role) {
+  state.role = role === 'Underwriter' ? 'Underwriter' : 'Admin';
+  const label = document.getElementById('topbar-role-label');
+  if (label) label.textContent = state.role + ' · Demo';
+  const sel = document.getElementById('role-switch');
+  if (sel) sel.value = state.role;
+  if (state.page === 'review' || state.page === 'cert-review') renderPage();
+  else toast('已切换为 ' + state.role);
+}
+
 function toggleReviewAll(checked) {
   document.querySelectorAll('.rv-row-check').forEach(el => { el.checked = checked; });
+}
+
+function selectedReviewListingIds() {
+  return Array.from(document.querySelectorAll('.rv-row-check:checked'))
+    .map(el => el.dataset.listingId)
+    .filter(Boolean);
+}
+
+function assignReviewOwner() {
+  if (state.role !== 'Admin') {
+    toast('仅管理员可分配 Owner');
+    return;
+  }
+  const owner = document.getElementById('rv-assign-owner')?.value || '';
+  if (!owner) {
+    toast('请先选择审核员');
+    return;
+  }
+  const ids = selectedReviewListingIds();
+  if (!ids.length) {
+    toast('请先勾选要分配的案件');
+    return;
+  }
+  let n = 0;
+  ids.forEach(id => {
+    const row = REVIEW_QUEUE.find(r => r.listingId === id);
+    if (row) {
+      row.underwriter = owner;
+      n += 1;
+    }
+  });
+  toast(`已将 ${n} 件案件分配给 ${owner}`);
+  renderPage();
+}
+
+function buildReviewOwnerStats() {
+  const map = {};
+  UNDERWRITERS.forEach(name => {
+    map[name] = { owner: name, cases: 0, untouched: 0, doneToday: REVIEW_DONE_TODAY[name] || 0 };
+  });
+  REVIEW_QUEUE.forEach(r => {
+    const name = r.underwriter || '—';
+    if (!map[name]) map[name] = { owner: name, cases: 0, untouched: 0, doneToday: REVIEW_DONE_TODAY[name] || 0 };
+    map[name].cases += 1;
+    if (!r.touched) map[name].untouched += 1;
+  });
+  return Object.values(map)
+    .filter(s => s.cases > 0 || s.doneToday > 0)
+    .sort((a, b) => b.doneToday - a.doneToday || b.cases - a.cases);
+}
+
+function setReviewPage(page) {
+  state.reviewPage = Math.max(1, page);
+  renderPage();
 }
 
 function findReviewCase(listingId) {
@@ -1277,16 +1432,32 @@ function findReviewCase(listingId) {
 }
 
 function openReviewCase(listingId, userId) {
+  const row = REVIEW_QUEUE.find(r => r.listingId === listingId);
+  if (row) row.touched = true;
   go('review-detail', { userId, listingId, from: 'review' });
 }
 
 function renderReview() {
   setTitle('人审', '审核相关');
   const f = state.reviewFilter;
-  const list = filteredReviewQueue();
+  const all = filteredReviewQueue();
+  const total = all.length;
+  const pageSize = state.reviewPageSize || 8;
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  if (state.reviewPage > totalPages) state.reviewPage = totalPages;
+  const page = state.reviewPage;
+  const list = all.slice((page - 1) * pageSize, page * pageSize);
+  const isAdmin = state.role === 'Admin';
   const accountOpts = UNDERWRITERS.map(n =>
     `<option value="${n}" ${f.account === n ? 'selected' : ''}>${n}</option>`
   ).join('');
+  const assignOpts = UNDERWRITERS.map(n => `<option value="${n}">${n}</option>`).join('');
+  const stats = buildReviewOwnerStats();
+  const pagerBtns = Array.from({ length: totalPages }, (_, i) => {
+    const p = i + 1;
+    return `<button type="button" class="pg ${p === page ? 'active' : ''}" onclick="setReviewPage(${p})">${p}</button>`;
+  }).join('');
+
   return `
     <div class="breadcrumb">审核相关 <span>/</span> 人审</div>
     <div class="review-filters">
@@ -1325,7 +1496,7 @@ function renderReview() {
       <table class="list review-table">
         <thead>
           <tr>
-            <th><input type="checkbox" onclick="toggleReviewAll(this.checked)" title="全选" /></th>
+            <th><input type="checkbox" ${isAdmin ? '' : 'disabled'} onclick="toggleReviewAll(this.checked)" title="全选" /></th>
             <th>序号</th>
             <th class="th-sort ${state.reviewSortAsc ? '' : 'desc'}" style="cursor:pointer" onclick="toggleReviewSort()" title="按发标时间排序">发标时间</th>
             <th>Listing ID</th>
@@ -1345,8 +1516,8 @@ function renderReview() {
         <tbody>
           ${list.length ? list.map((r, i) => `
             <tr>
-              <td><input class="rv-row-check" type="checkbox" /></td>
-              <td>${i + 1}</td>
+              <td><input class="rv-row-check" type="checkbox" data-listing-id="${r.listingId}" ${isAdmin ? '' : 'disabled'} /></td>
+              <td>${(page - 1) * pageSize + i + 1}</td>
               <td class="num">${r.listedAt}</td>
               <td class="num">${r.listingId}</td>
               <td><button class="link" type="button" onclick="openReviewCase('${r.listingId}','${r.userId}')">${r.userId}</button></td>
@@ -1363,6 +1534,47 @@ function renderReview() {
             </tr>`).join('') : '<tr><td colspan="15" class="empty">暂无待审案件</td></tr>'}
         </tbody>
       </table>
+    </div>
+    <div class="review-assign-bar">
+      ${isAdmin ? `
+        <select id="rv-assign-owner">
+          <option value="">选择审核员</option>
+          ${assignOpts}
+        </select>
+        <button class="btn warn" type="button" onclick="assignReviewOwner()">owner分配</button>
+      ` : `<span style="color:var(--text-muted);font-size:12px;">当前为审核员视角，分配 Owner 仅管理员可见</span>`}
+      <div class="review-pager">
+        <span>共 ${total} 条</span>
+        <button type="button" class="pg" ${page <= 1 ? 'disabled' : ''} onclick="setReviewPage(${page - 1})">‹</button>
+        ${pagerBtns}
+        <button type="button" class="pg" ${page >= totalPages ? 'disabled' : ''} onclick="setReviewPage(${page + 1})">›</button>
+      </div>
+    </div>
+    <div class="review-stats">
+      <div class="stats-hd">当前审核案件统计</div>
+      <div class="card table-wrap">
+        <table class="list review-stats-table">
+          <thead>
+            <tr>
+              <th>排名</th>
+              <th>审核Owner</th>
+              <th>案件数</th>
+              <th>今日已完成案件量</th>
+              <th>未触碰案件数量</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${stats.length ? stats.map((s, i) => `
+              <tr>
+                <td>${i + 1}</td>
+                <td class="left">${s.owner}</td>
+                <td>${s.cases}</td>
+                <td>${s.doneToday}</td>
+                <td>${s.untouched}</td>
+              </tr>`).join('') : '<tr><td colspan="5" class="empty">暂无统计</td></tr>'}
+          </tbody>
+        </table>
+      </div>
     </div>`;
 }
 
@@ -1643,13 +1855,84 @@ function openCertCase(userId) {
   go('cert-detail', { userId, from: 'cert-review', certItem: '' });
 }
 
+function toggleCertAll(checked) {
+  document.querySelectorAll('.cert-row-check').forEach(el => { el.checked = checked; });
+}
+
+function selectedCertIds() {
+  return Array.from(document.querySelectorAll('.cert-row-check:checked'))
+    .map(el => el.dataset.certId)
+    .filter(Boolean);
+}
+
+function assignCertOwner() {
+  if (state.role !== 'Admin') {
+    toast('仅管理员可分配 Owner');
+    return;
+  }
+  const owner = document.getElementById('cert-assign-owner')?.value || '';
+  if (!owner) {
+    toast('请先选择审核员');
+    return;
+  }
+  const ids = selectedCertIds();
+  if (!ids.length) {
+    toast('请先勾选要分配的案件');
+    return;
+  }
+  let n = 0;
+  ids.forEach(id => {
+    const row = CERT_REVIEW_QUEUE.find(r => r.id === id);
+    if (row) {
+      row.ownerName = owner;
+      n += 1;
+    }
+  });
+  toast(`已将 ${n} 件增信案件分配给 ${owner}`);
+  renderPage();
+}
+
+function buildCertOwnerStats() {
+  const map = {};
+  UNDERWRITERS.forEach(name => {
+    map[name] = { owner: name, cases: 0, doneToday: CERT_DONE_TODAY[name] || 0 };
+  });
+  CERT_REVIEW_QUEUE.forEach(r => {
+    const name = r.ownerName || '—';
+    if (!map[name]) map[name] = { owner: name, cases: 0, doneToday: CERT_DONE_TODAY[name] || 0 };
+    map[name].cases += 1;
+  });
+  return Object.values(map)
+    .filter(s => s.cases > 0 || s.doneToday > 0)
+    .sort((a, b) => b.doneToday - a.doneToday || b.cases - a.cases);
+}
+
+function setCertPage(page) {
+  state.certPage = Math.max(1, page);
+  renderPage();
+}
+
 function renderCertReview() {
   setTitle('增信项审核', '审核相关');
   const f = state.certFilter;
-  const list = filteredCertQueue();
+  const all = filteredCertQueue();
+  const total = all.length;
+  const pageSize = state.certPageSize || 8;
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  if (state.certPage > totalPages) state.certPage = totalPages;
+  const page = state.certPage;
+  const list = all.slice((page - 1) * pageSize, page * pageSize);
+  const isAdmin = state.role === 'Admin';
   const accountOpts = UNDERWRITERS.map(n =>
     `<option value="${n}" ${f.account === n ? 'selected' : ''}>${n}</option>`
   ).join('');
+  const assignOpts = UNDERWRITERS.map(n => `<option value="${n}">${n}</option>`).join('');
+  const stats = buildCertOwnerStats();
+  const pagerBtns = Array.from({ length: totalPages }, (_, i) => {
+    const p = i + 1;
+    return `<button type="button" class="pg ${p === page ? 'active' : ''}" onclick="setCertPage(${p})">${p}</button>`;
+  }).join('');
+
   return `
     <div class="breadcrumb">审核相关 <span>/</span> 增信项审核</div>
     <div class="review-filters">
@@ -1669,6 +1952,8 @@ function renderCertReview() {
       <table class="list review-table">
         <thead>
           <tr>
+            <th><input type="checkbox" ${isAdmin ? '' : 'disabled'} onclick="toggleCertAll(this.checked)" title="全选" /></th>
+            <th>序号</th>
             <th class="th-sort ${state.certSortAsc ? '' : 'desc'}" style="cursor:pointer" onclick="toggleCertSort()" title="按申请时间排序">申请时间</th>
             <th>User ID</th>
             <th>增信项</th>
@@ -1677,16 +1962,57 @@ function renderCertReview() {
           </tr>
         </thead>
         <tbody>
-          ${list.length ? list.map(r => `
+          ${list.length ? list.map((r, i) => `
             <tr>
+              <td><input class="cert-row-check" type="checkbox" data-cert-id="${r.id}" ${isAdmin ? '' : 'disabled'} /></td>
+              <td>${(page - 1) * pageSize + i + 1}</td>
               <td class="num">${r.appliedAt}</td>
               <td><button class="link" type="button" onclick="openCertCase('${r.userId}')">${r.displayUserId}</button></td>
               <td class="left cert-items-cell">${certItemsLabelHtml(r.userId)}</td>
               <td class="left">${r.ownerName}</td>
               <td><button class="link" type="button" onclick="openCertCase('${r.userId}')">审核</button></td>
-            </tr>`).join('') : '<tr><td colspan="5" class="empty">暂无待审增信项</td></tr>'}
+            </tr>`).join('') : '<tr><td colspan="7" class="empty">暂无待审增信项</td></tr>'}
         </tbody>
       </table>
+    </div>
+    <div class="review-assign-bar">
+      ${isAdmin ? `
+        <select id="cert-assign-owner">
+          <option value="">请选择</option>
+          ${assignOpts}
+        </select>
+        <button class="btn warn" type="button" onclick="assignCertOwner()">owner分配</button>
+      ` : `<span style="color:var(--text-muted);font-size:12px;">当前为审核员视角，分配 Owner 仅管理员可见</span>`}
+      <div class="review-pager">
+        <span>共 ${total} 条</span>
+        <button type="button" class="pg" ${page <= 1 ? 'disabled' : ''} onclick="setCertPage(${page - 1})">‹</button>
+        ${pagerBtns}
+        <button type="button" class="pg" ${page >= totalPages ? 'disabled' : ''} onclick="setCertPage(${page + 1})">›</button>
+      </div>
+    </div>
+    <div class="review-stats">
+      <div class="stats-hd">当前审核案件统计</div>
+      <div class="card table-wrap">
+        <table class="list review-stats-table">
+          <thead>
+            <tr>
+              <th>排名</th>
+              <th>审核Owner</th>
+              <th>案件数</th>
+              <th>今日已完成案件量</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${stats.length ? stats.map((s, i) => `
+              <tr>
+                <td>${i + 1}</td>
+                <td class="left">${s.owner}</td>
+                <td>${s.cases}</td>
+                <td>${s.doneToday}</td>
+              </tr>`).join('') : '<tr><td colspan="4" class="empty">暂无统计</td></tr>'}
+          </tbody>
+        </table>
+      </div>
     </div>`;
 }
 
@@ -1699,6 +2025,7 @@ function syncCertFiltersFromDom() {
 
 function runCertSearch() {
   syncCertFiltersFromDom();
+  state.certPage = 1;
   renderPage();
   toast(`已搜索，共 ${filteredCertQueue().length} 条`);
 }
@@ -2784,6 +3111,10 @@ function renderPage() {
     'user-detail': renderUserDetail
   };
   root.innerHTML = (map[state.page] || map['fund-borrower'])();
+  const roleSel = document.getElementById('role-switch');
+  if (roleSel) roleSel.value = state.role;
+  const label = document.getElementById('topbar-role-label');
+  if (label) label.textContent = state.role + ' · Demo';
 }
 
 renderNav();
