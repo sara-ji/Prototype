@@ -421,6 +421,19 @@
       cursor: pointer; padding: 4px 0; color: var(--text);
     }
     .tag-grid input { width: 14px; height: 14px; accent-color: var(--brand); }
+    .cert-tag-modal .modal { width: min(840px, 94vw); }
+    .cert-qa-item { padding: 12px 0; border-bottom: 1px solid #ebeef5; }
+    .cert-qa-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .cert-qa-q { font-size: 13px; font-weight: 600; color: #303133; margin-bottom: 10px; line-height: 1.45; }
+    .cert-qa-opts { display: flex; flex-wrap: wrap; gap: 8px 16px; }
+    .cert-qa-opts label {
+      display: inline-flex; align-items: flex-start; gap: 6px; font-size: 13px; color: #606266;
+      cursor: pointer; line-height: 1.4; max-width: 100%;
+    }
+    .cert-qa-opts input { width: 14px; height: 14px; margin-top: 2px; flex-shrink: 0; accent-color: var(--brand); }
+    .cert-qa-echo { display: flex; flex-direction: column; gap: 6px; }
+    .cert-qa-echo .qa-line { font-size: 12px; color: #606266; line-height: 1.45; }
+    .cert-qa-echo .qa-line b { color: #303133; font-weight: 600; }
     .reject-remark { margin-top: 12px; }
     .reject-remark label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 6px; }
     .reject-remark textarea {
@@ -2051,17 +2064,69 @@ function toggleCertSort() {
   renderPage();
 }
 
-/** 增信项材料标签（增加增信项标签弹窗） */
-const CERT_MATERIAL_TAGS = [
-  'Normal',
-  'Reject-Not himself',
-  'Reject-Not the right file',
-  "Reject-Can't recognize key infor",
-  'Reject-Fake file',
-  'Expired',
-  'Suspicious information',
-  'Missing key information'
-];
+/**
+ * 增信项审核打标问卷（由风险中台按材料类型下发；原型示意固定配置）
+ * key 对齐 enhanceMaterials.key；展示名对齐风险口径（CC / Bank statement / …）
+ */
+const RISK_CERT_TAG_SCHEMA = {
+  CREDIT_CARD: {
+    label: 'CC',
+    questions: [
+      { id: 'required', text: 'Whether it is a required document', options: ['yes', 'no'] },
+      { id: 'authentic', text: 'Is the material authentic (with no signs of Photoshop or forgery)?', options: ['yes', 'no'] },
+      { id: 'belong_self', text: 'Whether the materials belong to the person themselves', options: ['yes', 'no', 'not enough information'] },
+      { id: 'expired', text: 'Whether the materials have expired', options: ['yes', 'no', 'not enough information'] }
+    ]
+  },
+  BANK_STATEMENT: {
+    label: 'Bank statement',
+    questions: [
+      { id: 'required', text: 'Whether it is a required document', options: ['yes', 'no'] },
+      { id: 'authentic', text: 'Is the material authentic (with no signs of Photoshop or forgery)?', options: ['yes', 'no'] },
+      { id: 'belong_self', text: 'Whether the materials belong to the person themselves', options: ['yes', 'no', 'not enough information'] },
+      { id: 'within_3m', text: 'Is the statement within past 3 month', options: ['yes', 'no', 'not enough information'] }
+    ]
+  },
+  EWALLET_STATEMENT: {
+    label: 'E-Wallet bill',
+    questions: [
+      { id: 'required', text: 'Whether it is a required document', options: ['yes', 'no'] },
+      { id: 'authentic', text: 'Is the material authentic (with no signs of Photoshop or forgery)?', options: ['yes', 'no'] },
+      { id: 'belong_self', text: 'Whether the materials belong to the person themselves', options: ['yes', 'no', 'not enough information'] },
+      { id: 'within_3m', text: 'Is the statement within past 3 month', options: ['yes', 'no', 'not enough information'] }
+    ]
+  },
+  PRC_ID: {
+    label: 'PRC ID',
+    questions: [
+      { id: 'required', text: 'Whether it is a required document', options: ['yes', 'no'] },
+      { id: 'authentic', text: 'Is the material authentic (with no signs of Photoshop or forgery)?', options: ['yes', 'no'] },
+      {
+        id: 'verify',
+        text: 'Is the verification successful',
+        options: ['yes - information match', 'no - information not match', 'others - not able to verify']
+      }
+    ]
+  },
+  PAYSLIP: {
+    label: 'Payslip',
+    questions: [
+      { id: 'required', text: 'Whether it is a required document', options: ['yes', 'no'] },
+      { id: 'authentic', text: 'Is the material authentic (with no signs of Photoshop or forgery)?', options: ['yes', 'no'] },
+      { id: 'belong_self', text: 'Whether the materials belong to the person themselves', options: ['yes', 'no', 'not enough information'] },
+      { id: 'within_3m', text: 'Is the payslip within past 3 month', options: ['yes', 'no', 'not enough information'] },
+      {
+        id: 'income_consistent',
+        text: 'Is the income on the payslip consistent with the income filled in by the user?',
+        options: [
+          'yes (almost the same)',
+          'no (payslip income is much higher)',
+          'no (payslip income is much lower)'
+        ]
+      }
+    ]
+  }
+};
 
 /** PRC 菲律宾当地校验网址（占位，上线前替换为正式地址） */
 const PRC_VERIFY_URL = 'https://example.com/ph-prc-verify-placeholder';
@@ -2070,38 +2135,83 @@ function getCertMaterials(u) {
   return u.enhanceMaterials || [];
 }
 
-function materialTags(key) {
-  const v = state.certVerdicts[key];
-  return (v && v.tags) || [];
+function getCertTagSchema(key) {
+  return RISK_CERT_TAG_SCHEMA[key] || null;
 }
 
+function materialAnswers(key) {
+  const v = state.certVerdicts[key];
+  return (v && v.answers) || {};
+}
+
+/** 兼容旧原型 { tags: string[] }；新口径为 answers 问卷全答完才算已打标 */
 function materialHasTags(key) {
-  return materialTags(key).length > 0;
+  const schema = getCertTagSchema(key);
+  if (!schema || !schema.questions.length) return false;
+  const answers = materialAnswers(key);
+  return schema.questions.every(q => !!(answers[q.id] || '').trim());
 }
 
 function allMaterialsTagged(materials) {
   return materials.length > 0 && materials.every(m => materialHasTags(m.key));
 }
 
+function escapeAttr(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+function escapeHtml(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function formatCertAnswersEcho(key) {
+  const schema = getCertTagSchema(key);
+  const answers = materialAnswers(key);
+  if (!schema) return '';
+  return schema.questions
+    .filter(q => answers[q.id])
+    .map(q => `<div class="qa-line"><b>${escapeHtml(q.text)}</b>：${escapeHtml(answers[q.id])}</div>`)
+    .join('');
+}
+
 function openCertMaterialTagModal(key) {
-  const selected = new Set(materialTags(key));
+  const schema = getCertTagSchema(key);
+  if (!schema) {
+    toast('风险中台未下发该材料的标签问卷');
+    return;
+  }
+  const answers = materialAnswers(key);
   document.getElementById('cert-mat-tag-modal')?.remove();
-  const checks = CERT_MATERIAL_TAGS.map(tag => {
-    const id = `cmt-${key}-${tag.replace(/[^a-zA-Z0-9]/g, '_')}`;
-    const safe = tag.replace(/"/g, '&quot;');
-    return `<label for="${id}"><input type="checkbox" id="${id}" data-tag="${safe}" ${selected.has(tag) ? 'checked' : ''} /> ${tag}</label>`;
+  const qaHtml = schema.questions.map((q, qi) => {
+    const opts = q.options.map((opt, oi) => {
+      const id = `cmt-${key}-${q.id}-${oi}`;
+      const checked = answers[q.id] === opt ? 'checked' : '';
+      return `<label for="${id}"><input type="radio" name="cmt-${key}-${q.id}" id="${id}" data-qid="${escapeAttr(q.id)}" value="${escapeAttr(opt)}" ${checked} /> ${escapeHtml(opt)}</label>`;
+    }).join('');
+    return `<div class="cert-qa-item" data-qid="${escapeAttr(q.id)}">
+      <div class="cert-qa-q">${qi + 1}. ${escapeHtml(q.text)}</div>
+      <div class="cert-qa-opts">${opts}</div>
+    </div>`;
   }).join('');
   const wrap = document.createElement('div');
   wrap.id = 'cert-mat-tag-modal';
   wrap.innerHTML = `
-    <div class="modal-mask reject-modal" onclick="if(event.target===this)closeCertMaterialTagModal()">
+    <div class="modal-mask reject-modal cert-tag-modal" onclick="if(event.target===this)closeCertMaterialTagModal()">
       <div class="modal">
         <div class="modal-hd">
-          增加增信项标签
+          增信项标签 · ${escapeHtml(schema.label)}
           <button type="button" class="x" onclick="closeCertMaterialTagModal()">×</button>
         </div>
         <div class="modal-bd">
-          <div class="tag-grid">${checks}</div>
+          ${qaHtml}
         </div>
         <div class="modal-ft">
           <button type="button" class="btn" onclick="closeCertMaterialTagModal()">取消</button>
@@ -2118,13 +2228,20 @@ function closeCertMaterialTagModal() {
 
 function confirmCertMaterialTags(key) {
   const modal = document.getElementById('cert-mat-tag-modal');
-  if (!modal) return;
-  const tags = [...modal.querySelectorAll('input[type=checkbox][data-tag]:checked')].map(el => el.dataset.tag);
-  if (!tags.length) {
-    toast('请至少选择 1 个标签');
+  const schema = getCertTagSchema(key);
+  if (!modal || !schema) return;
+  const answers = {};
+  const missing = [];
+  schema.questions.forEach(q => {
+    const picked = modal.querySelector(`input[type=radio][data-qid="${CSS.escape(q.id)}"]:checked`);
+    if (picked) answers[q.id] = picked.value;
+    else missing.push(q.text);
+  });
+  if (missing.length) {
+    toast(`还有 ${missing.length} 题未选择`);
     return;
   }
-  state.certVerdicts[key] = { tags };
+  state.certVerdicts[key] = { answers, source: 'risk_mid' };
   closeCertMaterialTagModal();
   toast('已打标签');
   renderPage();
@@ -2187,8 +2304,7 @@ function renderCertDetail() {
   const payslipInc = getPayslipIncome();
   setTitle('增信项审核详情', u.id + ' · ' + fullName(u));
   const materialHtml = materials.length ? materials.map(m => {
-    const tags = materialTags(m.key);
-    const tagged = tags.length > 0;
+    const tagged = materialHasTags(m.key);
     const focusCls = focus && m.key === focus ? ' focus' : '';
     const verdCls = tagged ? ' verdict-pass' : '';
     const fields = (m.fields || []).map(f => `
@@ -2210,8 +2326,9 @@ function renderCertDetail() {
           <div class="kv"><dt>月均收入</dt><dd><input id="payslip-avg-income" class="form-like" type="text" placeholder="Average monthly income" value="${(payslipInc.avg || '').replace(/"/g, '&quot;')}" onchange="syncPayslipIncomeFromDom()" /></dd></div>
         </div>`
       : '';
-    const tagEcho = tagged
-      ? `<div class="kv" style="margin-top:12px"><dt>增信项标签</dt><dd><div class="risk-label-row">${tags.map(t => `<span class="tag info">${t}</span>`).join('')}</div></dd></div>`
+    const echoHtml = formatCertAnswersEcho(m.key);
+    const tagEcho = tagged && echoHtml
+      ? `<div class="kv" style="margin-top:12px"><dt>增信项标签<span class="tag info" style="margin-left:6px;font-weight:400">风险中台</span></dt><dd><div class="cert-qa-echo">${echoHtml}</div></dd></div>`
       : '';
     return `
       <div class="material-card${focusCls}${verdCls}">
