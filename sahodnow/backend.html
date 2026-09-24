@@ -2065,7 +2065,7 @@ function toggleCertSort() {
 }
 
 /**
- * 增信项审核打标问卷（由风险中台按材料类型下发；原型示意固定配置）
+ * 增信项审核打标问卷（风险维护于 phl_sahod_kidlatpeso_user/tb_data_dict；Backend 前台读取；原型示意固定配置）
  * key 对齐 enhanceMaterials.key；展示名对齐风险口径（CC / Bank statement / …）
  */
 const RISK_CERT_TAG_SCHEMA = {
@@ -2365,6 +2365,9 @@ function renderCertDetail() {
           <div class="kv"><dt>姓名</dt><dd>${fullName(u)}</dd></div>
           <div class="kv"><dt>手机号</dt><dd>${u.maskPhone}</dd></div>
           <div class="kv"><dt>公司名称</dt><dd>${u.basic.companyName || '—'}</dd></div>
+          <div class="kv"><dt>学历</dt><dd>${u.basic.education || '—'}</dd></div>
+          <div class="kv"><dt>收入</dt><dd>${u.basic.income || '—'}</dd></div>
+          <div class="kv"><dt>职业</dt><dd>${u.basic.profession || '—'}</dd></div>
           <div class="kv"><dt>证件类型</dt><dd>${u.idInfo.type}</dd></div>
           <div class="kv"><dt>证件号码</dt><dd>${u.idInfo.number}</dd></div>
         </div>
