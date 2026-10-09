@@ -365,6 +365,32 @@ body.menu-open .site-header {
 .panel.center .panel-copy h2,
 .panel.center .story-copy h2 { max-width: none; }
 .panel.center .panel-copy > p { max-width: 36rem; margin-left: auto; margin-right: auto; }
+.facts {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 28px 32px;
+  width: 100%;
+  margin: 72px 0 0;
+  padding-top: 36px;
+  border-top: 1px solid var(--line);
+  text-align: left;
+}
+.facts div { display: grid; gap: 8px; }
+.facts dt {
+  margin: 0;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #018b8d;
+}
+.facts dd {
+  margin: 0;
+  font-size: clamp(1.15rem, 2vw, 1.45rem);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  color: var(--ink);
+}
 .panel.center .hero-dots { justify-content: center; }
 .panel.band {
   display: flex;
@@ -1312,6 +1338,7 @@ footer p { color: rgba(251,252,252,.55); }
   .duo, .duo img { min-height: 360px; }
   .page-top { padding: 120px 0 56px; }
   .specs { margin-top: 40px; gap: 20px; grid-template-columns: 1fr 1fr; }
+  .facts { grid-template-columns: 1fr 1fr; margin-top: 40px; gap: 24px; }
   .how { gap: 36px; }
   .phone { width: 250px; height: 500px; }
   .privacy-band { margin-top: 48px; padding: 48px 0; }
