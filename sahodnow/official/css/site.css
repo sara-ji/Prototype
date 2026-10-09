@@ -288,6 +288,13 @@ body.menu-open .site-header {
   color: rgba(251, 252, 252, 0.68);
   margin: 28px 0 36px;
 }
+.hero-reg {
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(251, 252, 252, 0.55);
+}
 .hero-photo {
   position: relative;
 }
