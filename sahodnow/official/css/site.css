@@ -453,18 +453,23 @@ body.menu-open .site-header {
   width: min(272px, 26vw);
   height: min(560px, 68vh);
   margin: 0;
+  overflow: hidden;
   transform: translateY(16%);
   animation: phone-float 5.6s ease-in-out infinite;
   box-shadow: 0 28px 70px rgba(0, 17, 17, 0.32);
 }
-.hero-phone img {
+.hero-screen {
   position: absolute;
-  inset: 12px 12px auto;
-  width: calc(100% - 24px);
-  height: 118%;
+  inset: 12px;
+  overflow: hidden;
+  border-radius: 30px;
+  background: #f4f6f6;
+}
+.hero-phone img {
+  width: 100%;
+  height: 100%;
   object-fit: cover;
   object-position: 50% 0;
-  border-radius: 30px;
   mix-blend-mode: normal;
   opacity: 1;
   transform: none;
