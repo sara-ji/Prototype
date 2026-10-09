@@ -135,10 +135,107 @@ body.menu-open .site-header {
   border-bottom: 0 !important;
 }
 
+/* Full-viewport panels */
+.panel {
+  min-height: 100dvh;
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  align-items: stretch;
+}
+.panel-copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 108px 7vw 64px;
+}
+.panel-copy h2 { max-width: 14ch; }
+.story-copy {
+  position: relative;
+  min-height: 220px;
+}
+.story-copy .hero-slide {
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  isolation: auto;
+  pointer-events: none;
+}
+.story-copy .hero-slide.is-on { position: relative; }
+.story-copy h2 {
+  max-width: 18ch;
+  font-size: clamp(1.6rem, 3.4vw, 2.7rem);
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+  font-style: italic;
+  font-weight: 400;
+}
+.story-copy p {
+  margin-top: 16px;
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.panel-copy .hero-dots {
+  position: static;
+  flex-direction: row;
+  margin-top: 32px;
+}
+.panel-copy .hero-dots button { background: rgba(16,22,22,.28); }
+.panel-copy .hero-dots button.is-on { background: #018b8d; }
+.panel-copy .lede,
+.panel-copy > p { max-width: 34rem; margin: 28px 0 0; }
+.panel-copy .links { margin-top: 36px; }
+.panel-visual {
+  position: relative;
+  overflow: hidden;
+  background: #018b8d;
+  min-height: 42vh;
+}
+.panel-visual img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  mix-blend-mode: luminosity;
+  opacity: 0.92;
+}
+.panel.reverse { grid-template-columns: 0.95fr 1.05fr; }
+.panel.reverse .panel-copy { order: 2; }
+.panel.band {
+  display: flex;
+  align-items: center;
+  grid-template-columns: none;
+}
+.panel.band .wrap { width: min(var(--max), calc(100% - 48px)); padding: 108px 0 64px; }
+.figure-type {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 8vw;
+  background: #018b8d;
+  color: #fbfcfc;
+}
+.figure-type small {
+  font-size: 12px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(251,252,252,.7);
+  margin-bottom: 16px;
+}
+.figure-type strong {
+  font-size: clamp(4.2rem, 10vw, 8.4rem);
+  font-weight: 500;
+  letter-spacing: -0.07em;
+  line-height: 0.85;
+  color: #fbfcfc;
+}
+.how-panel .how { margin-top: 36px; }
+.how-panel .how-step { padding: 16px 0; }
+.how-panel .h-lead { margin-bottom: 0; }
+
 /* Hero */
 .hero {
-  min-height: 0;
-  height: min(62vh, 620px);
+  min-height: 100dvh;
+  height: 100dvh;
   display: grid;
   grid-template-columns: 1.05fr 0.95fr;
   background: #071111;
@@ -391,8 +488,8 @@ body.menu-open .site-header {
   background: #071111;
   color: #fbfcfc;
 }
-.dark p, .dark .lede, .dark .term dd { color: rgba(251,252,252,.64); }
-.dark h2 { color: #fbfcfc; }
+.dark p, .dark .lede, .dark .term dd, .panel.dark .panel-copy > p { color: rgba(251,252,252,.64); }
+.dark h2, .panel.dark h2 { color: #fbfcfc; }
 .dark .term { border-top-color: rgba(255,255,255,.1); }
 .dark .term:last-child { border-bottom-color: rgba(255,255,255,.1); }
 
@@ -887,7 +984,7 @@ footer p { color: rgba(251,252,252,.55); }
   }
   .nav-links.open a { font-size: 1.7rem; letter-spacing: 0; text-transform: none; font-family: Rubik, sans-serif; font-weight: 500; opacity: 1; }
   .menu-btn { display: block; z-index: 60; }
-  .hero, .split, .split.reverse, .row, .term, .foot, .ca, .how, .specs {
+  .hero, .panel, .panel.reverse, .split, .split.reverse, .row, .term, .foot, .ca, .how, .specs {
     grid-template-columns: 1fr;
   }
   .regs { grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -896,8 +993,11 @@ footer p { color: rgba(251,252,252,.55); }
   .logo-set img { height: 32px; }
   .reg { min-height: 128px; padding: 22px 16px; }
   .split.reverse .copy { order: 0; }
-  .hero { height: auto; min-height: 0; }
-  .hero-copy { padding: 96px 24px 36px; }
+  .hero, .panel { height: auto; min-height: 0; }
+  .hero-copy, .panel-copy { padding: 96px 24px 36px; }
+  .panel.reverse .panel-copy { order: 0; }
+  .panel.band .wrap { padding: 80px 0 56px; }
+  .figure-type { min-height: 42vh; padding: 48px 24px; }
   .v-label { display: none; }
   .hero-photo { min-height: 42vh; max-height: 420px; }
   .hero-cap { left: 24px; right: 56px; bottom: 24px; }

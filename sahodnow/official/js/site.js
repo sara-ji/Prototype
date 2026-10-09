@@ -57,15 +57,19 @@
   onScroll();
   window.addEventListener("scroll", onScroll, { passive: true });
 
-  const heroSlides = document.querySelector("[data-hero-slides]");
-  if (heroSlides) {
-    const slides = [...heroSlides.querySelectorAll(".hero-slide")];
-    const dots = [...heroSlides.querySelectorAll("[data-hero-dot]")];
+  document.querySelectorAll("[data-hero-slides]").forEach((root) => {
+    const groups = [...root.querySelectorAll("[data-slide-group]")];
+    const sets = groups.length
+      ? groups.map((g) => [...g.querySelectorAll(".hero-slide")])
+      : [[...root.querySelectorAll(".hero-slide")]];
+    const dots = [...root.querySelectorAll("[data-hero-dot]")];
+    const len = sets[0] ? sets[0].length : 0;
+    if (!len) return;
     let index = 0;
     let timer;
     const show = (n) => {
-      index = (n + slides.length) % slides.length;
-      slides.forEach((slide, i) => slide.classList.toggle("is-on", i === index));
+      index = (n + len) % len;
+      sets.forEach((slides) => slides.forEach((slide, i) => slide.classList.toggle("is-on", i === index)));
       dots.forEach((dot, i) => {
         dot.classList.toggle("is-on", i === index);
         dot.setAttribute("aria-selected", i === index ? "true" : "false");
@@ -84,10 +88,10 @@
         play();
       });
     });
-    heroSlides.addEventListener("mouseenter", stop);
-    heroSlides.addEventListener("mouseleave", play);
+    root.addEventListener("mouseenter", stop);
+    root.addEventListener("mouseleave", play);
     play();
-  }
+  });
 
   const marquee = document.querySelector("[data-marquee]");
   if (marquee) {
@@ -124,6 +128,8 @@
 
     document.querySelectorAll([
       ".hero-copy",
+      ".panel-copy",
+      ".panel.band .wrap",
       ".page-top .wrap",
       ".chapter > .wrap",
       "main > .wrap",
