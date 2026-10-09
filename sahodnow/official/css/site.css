@@ -222,12 +222,27 @@ body.menu-open .site-header {
   mix-blend-mode: luminosity;
   opacity: 0.9;
 }
+.panel.center .frame {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 36rem;
+}
+.panel.center .panel-copy { align-items: center; }
+.panel.center .panel-copy h2,
+.panel.center .story-copy h2 { max-width: 18ch; }
+.panel.center .panel-copy > p { margin-left: auto; margin-right: auto; }
+.panel.center .hero-dots { justify-content: center; }
 .panel.band {
   display: flex;
   align-items: center;
   grid-template-columns: none;
 }
 .panel.band .wrap { width: min(1040px, calc(100% - 96px)); padding: 0; }
+#download .wrap { text-align: center; max-width: 36rem; margin: 0 auto; }
+#download .stores { justify-content: center; }
+#download .dl, #download .note { margin-left: auto; margin-right: auto; }
 .figure-type {
   display: flex;
   flex-direction: column;
