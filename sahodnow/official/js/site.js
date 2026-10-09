@@ -26,7 +26,7 @@
       <div class="foot">
         <div>
           <a class="logo" href="index.html"><span class="mark"></span>SahodNow</a>
-          <p>Less waiting, more living. Your sahod, sooner.</p>
+          <p>Less waiting, more living.</p>
         </div>
         <div>
           <a href="product.html">Product</a>
@@ -40,7 +40,7 @@
           <a href="https://www.sahodnow.ph/privacy">Privacy policy</a>
         </div>
       </div>
-      <p class="legal">SahodNow is the online lending platform of Lendwise Financing Corp., an SEC-registered financing company — so salaried Filipinos can use funds before payday and repay when salary arrives. Final terms appear in the app before you confirm. We never ask for OTP, PIN, or processing fees outside the official app. © ${new Date().getFullYear()} Lendwise Financing Corp.</p>
+      <p class="legal">SahodNow is the online lending platform of Lendwise Financing Corp., an SEC-registered financing company. Final terms appear in the app before you confirm. We never ask for OTP, PIN, or fees outside the official app. © ${new Date().getFullYear()} Lendwise Financing Corp.</p>
     </div>
   `;
 
