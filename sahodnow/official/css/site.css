@@ -160,7 +160,7 @@ body.menu-open .site-header {
   justify-content: center;
   padding: 0;
 }
-.panel-copy h2 { max-width: 14ch; }
+.panel-copy h2 { max-width: none; }
 .story-copy {
   position: relative;
   min-height: 220px;
@@ -174,7 +174,7 @@ body.menu-open .site-header {
 }
 .story-copy .hero-slide.is-on { position: relative; }
 .story-copy h2 {
-  max-width: 18ch;
+  max-width: none;
   font-size: clamp(1.6rem, 3.4vw, 2.7rem);
   line-height: 1.2;
   letter-spacing: -0.03em;
@@ -227,12 +227,12 @@ body.menu-open .site-header {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  max-width: 36rem;
+  max-width: min(920px, 100%);
 }
-.panel.center .panel-copy { align-items: center; }
+.panel.center .panel-copy { align-items: center; width: 100%; }
 .panel.center .panel-copy h2,
-.panel.center .story-copy h2 { max-width: 18ch; }
-.panel.center .panel-copy > p { margin-left: auto; margin-right: auto; }
+.panel.center .story-copy h2 { max-width: none; }
+.panel.center .panel-copy > p { max-width: 36rem; margin-left: auto; margin-right: auto; }
 .panel.center .hero-dots { justify-content: center; }
 .panel.band {
   display: flex;
@@ -536,8 +536,8 @@ body.menu-open .site-header {
   color: #fff;
 }
 .page-top p { color: rgba(251,252,252,.64); max-width: 40rem; }
-.page-top h1 { max-width: 14ch; }
-.page-top h1.wide { max-width: 18ch; }
+.page-top h1 { max-width: min(920px, 100%); }
+.page-top h1.wide { max-width: min(920px, 100%); }
 .page-top h1 em { font-style: italic; color: #018b8d; }
 .amt {
   font-size: clamp(4.4rem, 12vw, 8.4rem);
