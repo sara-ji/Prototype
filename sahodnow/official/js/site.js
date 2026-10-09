@@ -8,14 +8,12 @@
     <div class="wrap nav">
       <a class="logo" href="index.html"><span class="mark" aria-hidden="true"></span>SahodNow</a>
       <ul class="nav-links">
-        <li><a data-nav="home" href="index.html">Home</a></li>
-        <li><a data-nav="product" href="product.html">Product</a></li>
-        <li><a data-nav="about" href="about.html">About us</a></li>
+        <li><a data-nav="borrow" href="index.html">Borrow</a></li>
         <li><a data-nav="trust" href="trust.html">Trust</a></li>
         <li><a data-nav="contact" href="contact.html">Contact</a></li>
       </ul>
       <div class="nav-right">
-        <a class="nav-cta" href="product.html#download">Get the app</a>
+        <a class="nav-cta" href="index.html#download">Get the app</a>
         <button class="menu-btn" type="button" aria-label="Menu"><i></i></button>
       </div>
     </div>
@@ -29,8 +27,7 @@
           <p>Less waiting, more living.</p>
         </div>
         <div>
-          <a href="product.html">Product</a>
-          <a href="about.html">About us</a>
+          <a href="index.html">Borrow</a>
           <a href="trust.html">Trust</a>
           <a href="contact.html">Contact</a>
         </div>
