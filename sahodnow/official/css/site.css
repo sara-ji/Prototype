@@ -1,6 +1,10 @@
 :root {
   --brand: #018b8d;
   --brand-deep: #01393a;
+  --night: #174443;
+  --night-wash: radial-gradient(ellipse 70% 60% at 78% 40%, rgba(1, 139, 141, 0.34), transparent 58%),
+    radial-gradient(ellipse 50% 45% at 10% 90%, rgba(1, 139, 141, 0.16), transparent 52%),
+    #174443;
   --ink: #101616;
   --mute: #5a6565;
   --line: rgba(16, 22, 22, 0.1);
@@ -184,7 +188,8 @@ body.menu-open .site-header {
 }
 .panel.dark::after,
 .hero::after {
-  background-image: radial-gradient(rgba(251, 252, 252, 0.14) 1px, transparent 1.2px);
+  opacity: 0.55;
+  background-image: radial-gradient(rgba(251, 252, 252, 0.2) 1.1px, transparent 1.3px);
   -webkit-mask-image: radial-gradient(ellipse at 70% 40%, #000 20%, transparent 72%);
 }
 .panel.reverse::before {
@@ -357,6 +362,28 @@ body.menu-open .site-header {
   display: flex;
   align-items: center;
   grid-template-columns: none;
+  min-height: 0;
+  padding-top: 12vh;
+  padding-bottom: 12vh;
+}
+.dark.how-panel {
+  background:
+    radial-gradient(ellipse 75% 70% at 88% 48%, rgba(1, 139, 141, 0.42), transparent 56%),
+    var(--brand-deep);
+}
+#download {
+  background:
+    radial-gradient(ellipse 80% 90% at 100% 0%, rgba(255, 255, 255, 0.14), transparent 46%),
+    #018b8d;
+  padding-top: 10vh;
+  padding-bottom: 10vh;
+}
+#download .kicker { color: rgba(251, 252, 252, 0.8); }
+#download .note { color: rgba(251, 252, 252, 0.72); }
+#download .store:hover {
+  background: #fbfcfc;
+  color: #018b8d;
+  border-color: #fbfcfc;
 }
 .panel.band .wrap { width: min(1040px, calc(100% - 96px)); padding: 0; }
 .figure-type {
@@ -394,7 +421,7 @@ body.menu-open .site-header {
   justify-content: center;
   padding: 14vh 8vw;
   box-sizing: border-box;
-  background: #071111;
+  background: var(--night-wash);
   color: #fbfcfc;
   position: relative;
   overflow: hidden;
@@ -647,7 +674,7 @@ body.menu-open .site-header {
 .term-gap { margin-top: 48px; }
 
 .dark {
-  background: #071111;
+  background: var(--night-wash);
   color: #fbfcfc;
 }
 .dark p, .dark .lede, .dark .term dd, .panel.dark .panel-copy > p { color: rgba(251,252,252,.64); }
@@ -657,7 +684,7 @@ body.menu-open .site-header {
 
 .page-top {
   padding: 160px 0 80px;
-  background: #071111;
+  background: var(--night-wash);
   color: #fff;
 }
 .page-top p { color: rgba(251,252,252,.64); max-width: 40rem; }
@@ -1006,7 +1033,7 @@ body.menu-open .site-header {
   font-weight: 500;
 }
 .band-btn { transition: background .3s var(--ease), color .3s var(--ease); }
-.band-btn:hover { background: #071111; color: #fbfcfc; }
+.band-btn:hover { background: var(--night); color: #fbfcfc; }
 .dark .note { color: rgba(251,252,252,.45); max-width: 42rem; }
 
 .faq { max-width: 860px; }
@@ -1069,7 +1096,7 @@ input:focus, textarea:focus, select:focus { outline: none; border-bottom-color: 
 }
 
 footer {
-  background: #071111;
+  background: var(--night);
   color: rgba(251,252,252,.7);
   padding: 72px 0 40px;
 }
@@ -1137,7 +1164,7 @@ footer p { color: rgba(251,252,252,.55); }
     flex-direction: column;
     position: fixed;
     inset: 0;
-    background: #071111;
+    background: var(--night);
     color: #fff;
     justify-content: center;
     align-items: flex-start;
