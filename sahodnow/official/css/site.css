@@ -428,7 +428,7 @@ body.menu-open .site-header {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 16vh 8vw 38vh;
+  padding: 14vh 8vw 26vh;
   box-sizing: border-box;
   background: #018b8d;
   color: #fbfcfc;
@@ -436,9 +436,43 @@ body.menu-open .site-header {
   overflow: hidden;
 }
 .hero .frame {
-  grid-template-columns: 1fr;
-  max-width: 920px;
-  margin-right: auto;
+  grid-template-columns: 1.05fr 0.95fr;
+  max-width: 1120px;
+  width: 100%;
+  margin: 0 auto;
+  z-index: 2;
+}
+.hero-device {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  position: relative;
+  z-index: 2;
+}
+.hero-phone {
+  width: min(272px, 26vw);
+  height: min(560px, 68vh);
+  margin: 0;
+  transform: translateY(16%);
+  animation: phone-float 5.6s ease-in-out infinite;
+  box-shadow: 0 28px 70px rgba(0, 17, 17, 0.32);
+}
+.hero-phone img {
+  position: absolute;
+  inset: 12px 12px auto;
+  width: calc(100% - 24px);
+  height: 118%;
+  object-fit: cover;
+  object-position: 50% 0;
+  border-radius: 30px;
+  mix-blend-mode: normal;
+  opacity: 1;
+  transform: none;
+}
+@keyframes phone-float {
+  from { transform: translateY(16%); }
+  50% { transform: translateY(11%); }
+  to { transform: translateY(16%); }
 }
 .hero .kicker { color: rgba(251, 252, 252, 0.82); }
 .hero-copy {
@@ -454,6 +488,7 @@ body.menu-open .site-header {
   left: 0;
   right: 0;
   bottom: 0;
+  z-index: 0;
   height: min(42vh, 420px);
   overflow: hidden;
   pointer-events: none;
@@ -1000,6 +1035,7 @@ body.menu-open .site-header {
   .hero-slide.is-on img { animation: none; }
   .deco-ring.alt { animation: none; }
   .hero-city img { animation: none; }
+  .hero-phone { animation: none; }
   .js .reveal {
     opacity: 1;
     transform: none;
@@ -1231,8 +1267,9 @@ footer p { color: rgba(251,252,252,.55); }
   .reg { min-height: 128px; padding: 22px 16px; }
   .split.reverse .copy { order: 0; }
   .hero, .panel { height: auto; min-height: 0; padding: 88px 24px 56px; }
-  .hero { min-height: 100dvh; padding: 88px 24px 34vh; }
+  .hero { min-height: 100dvh; padding: 88px 24px 28vh; }
   .hero-city { height: 32vh; }
+  .hero-phone { width: 210px; height: 430px; transform: translateY(18%); }
   .hero-copy, .panel-copy { padding: 0; }
   .frame { gap: 36px; }
   .panel.reverse .panel-copy { order: 0; }
