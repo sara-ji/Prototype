@@ -463,6 +463,9 @@ body.menu-open .site-header {
   to { transform: scale(1.12); }
 }
 .hero-slide:nth-child(1) img { object-position: 70% 40%; }
+.hero-slide:nth-child(2) img { object-position: 50% 28%; }
+.hero-slide:nth-child(3) img { object-position: 50% 26%; }
+.hero-slide:nth-child(4) img { object-position: 50% 30%; }
 .hero-cap {
   position: absolute;
   left: 32px;
