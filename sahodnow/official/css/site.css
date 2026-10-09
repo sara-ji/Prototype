@@ -603,8 +603,8 @@ body.menu-open .site-header {
   text-transform: uppercase;
 }
 
-.dl { max-width: 40rem; }
-.dl h2 { margin-bottom: 18px; }
+#download h2 { margin-bottom: 18px; }
+.dl, #download .note { max-width: 40rem; }
 .stores { display: flex; flex-wrap: wrap; gap: 16px; margin: 32px 0 20px; }
 .store {
   display: inline-flex;
