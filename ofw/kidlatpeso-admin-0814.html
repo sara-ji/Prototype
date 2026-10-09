@@ -104,6 +104,20 @@
     <button type="button" class="lightbox-close" onclick="closeLightbox()">×</button>
   </div>
 
+  <div id="ocr-modal" class="modal" onclick="if(event.target===this)closePassportOcrModal()">
+    <div class="modal-card ocr-card" onclick="event.stopPropagation()">
+      <div class="modal-head">
+        <h3 id="ocr-modal-title">OCR 回显确认</h3>
+        <button type="button" class="modal-x" onclick="closePassportOcrModal()">×</button>
+      </div>
+      <div class="modal-body" id="ocr-modal-body"></div>
+      <div class="modal-foot">
+        <button type="button" class="btn-sm" id="ocr-modal-cancel" onclick="closePassportOcrModal()">取消</button>
+        <button type="button" class="btn-sm primary" id="ocr-modal-ok" onclick="confirmPassportOcrModal()">确认并保存</button>
+      </div>
+    </div>
+  </div>
+
   <div id="edit-modal" class="modal" onclick="if(event.target===this)closeEditModal()">
     <div class="modal-card" onclick="event.stopPropagation()">
       <div class="modal-head">
@@ -273,6 +287,11 @@
       background: #fff; width: min(440px, 100%); border-radius: 4px;
       box-shadow: 0 8px 32px rgba(0,0,0,.18); overflow: hidden;
     }
+    .modal-card.ocr-card { width: min(520px, 100%); }
+    .ocr-hint { font-size: 12px; color: var(--text-muted); margin: 0 0 12px; line-height: 1.5; }
+    .ocr-row { margin-bottom: 10px; }
+    .ocr-row label { margin-bottom: 4px; }
+    .ocr-dev-hint { margin: 12px 0 0; font-size: 11px; line-height: 1.4; color: #b0b0b0; }
     .modal-head {
       display: flex; align-items: center; justify-content: space-between;
       padding: 14px 16px; border-bottom: 1px solid var(--border);
@@ -1032,6 +1051,12 @@
         upload: '上传',
         reupload: '重新上传',
         file_ok: '已上传',
+        ocr_title: '护照 OCR 回显',
+        ocr_hint: '识别完成。确认后用识别结果替换这些字段的已填内容。取消则不写入。',
+        ocr_dev_hint: '销售无权限编辑 Passport Number（仅供开发查看）',
+        ocr_saved: '已保存护照照片及可编辑的 OCR 字段',
+        ocr_photo_only: '已保存护照照片（无可回显字段）',
+        ocr_confirm: '确认并保存',
         click_zoom: '点击放大',
         not_filled: '未填写',
         please_select: '— 请选择 —',
@@ -1436,6 +1461,12 @@
         upload: 'Upload',
         reupload: 'Re-upload',
         file_ok: 'Uploaded',
+        ocr_title: 'Passport OCR',
+        ocr_hint: 'OCR done. Confirm replaces the current values of these fields with the OCR result. Cancel writes nothing.',
+        ocr_dev_hint: 'No permission to edit Passport Number (for developers only)',
+        ocr_saved: 'Passport photo and editable OCR fields saved',
+        ocr_photo_only: 'Passport photo saved (no editable OCR fields)',
+        ocr_confirm: 'Confirm and save',
         click_zoom: 'Click to enlarge',
         not_filled: 'Not filled',
         please_select: '— Select —',
@@ -1658,6 +1689,7 @@
       'Passport': '护照',
       'SSS ID': 'SSS ID',
       'PhilHealth ID': 'PhilHealth ID',
+      'National ID（Philsys ID)': 'National ID（Philsys ID）',
       'Saudi Arabia': '沙特阿拉伯',
       'UAE': '阿联酋',
       'Hong Kong': '香港',
@@ -2037,6 +2069,12 @@
       const code = userStatus(user);
       return isBeforeFinalSubmit(user) || code === 'MANUAL_RETURNED' || code === 'MANUAL_PENDING';
     }
+    /** 护照照片可点上传以触发 OCR 演示；文本字段仍走 canEditThisField。 */
+    function canStartPassportOcr(user) {
+      if (!user || !isSalesAssistMenu() || !ROLES[role].canEdit) return false;
+      if (isSalesMgmtMenu() && (isBeforeFinalSubmit(user) || canMgmtEditRestrictedField(user))) return true;
+      return canTeamBEditBorrower(user);
+    }
     function canEditThisField(key, user) {
       if (key === 'mobile' || key === 'cm_phone') return false;
       if (READONLY_FIELD_KEYS.has(key)) return false;
@@ -2172,7 +2210,7 @@
       { key: 'cm_full_rel', label: 'Relationship with Co-maker', type: 'select', options: ['Spouse', 'Parent', 'Child', 'Sibling', 'Relative'] },
       { key: 'cm_dob', label: "Co-maker's Date Of Birth", type: 'date' },
       { key: 'cm_gender', label: "Co-maker's Gender", type: 'select', options: ['Male', 'Female'] },
-      { key: 'cm_id_type', label: "Co-maker's ID Type", type: 'select', options: ['UMID', 'Driver License', 'Passport', 'SSS ID', 'PhilHealth ID'] },
+      { key: 'cm_id_type', label: "Co-maker's ID Type", type: 'select', options: ['UMID', 'Driver License', 'Passport', 'SSS ID', 'PhilHealth ID', 'National ID（Philsys ID)'] },
       { key: 'cm_id_number', label: "Co-maker's ID Number", type: 'text' },
       { key: 'cm_id_photo', label: "Co-maker's ID photo", type: 'file_front_back', backKey: 'cm_id_photo_back', tip: 'rename' },
       { key: 'cm_residential', label: "Co-maker's Residential Address", type: 'text', tip: 'new' },
@@ -2858,6 +2896,16 @@
     let reviewAssignTarget = '';
     let reviewClaimCount = 1;
     let editCtx = null;
+    let ocrCtx = null;
+    /** Demo OCR result for Philippine Passport. Keys match sales-fill fields. */
+    const PASSPORT_OCR_DEMO = [
+      { key: 'passport_number', label: 'Passport Number', type: 'text', value: 'P8841209A' },
+      { key: 'last_name', label: 'Last Name', type: 'text', value: 'DELA CRUZ' },
+      { key: 'first_name', label: 'First Name', type: 'text', value: 'JUAN' },
+      { key: 'middle_name', label: 'Middle Name', type: 'text', value: 'SANTOS' },
+      { key: 'dob', label: 'Date of Birth', type: 'date', value: '1992-06-15' },
+      { key: 'gender', label: 'Gender', type: 'select', options: ['Male', 'Female'], value: 'Male' },
+    ];
     let rebindUserId = null;
 
     let reviewAuditState = {};
@@ -4741,11 +4789,12 @@
         return;
       }
       if (READONLY_FIELD_KEYS.has(field.key) || field.readonly) return;
-      if (field.key !== 'cm_phone' && !canEditThisField(field.key, user)) return;
+      const passportOcrUpload = !cmId && field.key === 'passport_photo' && canStartPassportOcr(user);
+      if (field.key !== 'cm_phone' && !passportOcrUpload && !canEditThisField(field.key, user)) return;
       if (cmId) {
         const cm = user.comakers?.find(c => c.id === cmId);
         if (!cm || !isComakerEditable(user, cm)) return;
-      } else if (!isFieldKeyEditable(user, field.key, dataObjForGate)) {
+      } else if (!passportOcrUpload && !isFieldKeyEditable(user, field.key, dataObjForGate)) {
         return;
       }
       editCtx = { userId, cmId: cmId || null, field, writeKey };
@@ -4796,12 +4845,64 @@
       document.body.style.overflow = '';
     }
 
+    function openPassportOcrModal(userId, photoUrl) {
+      const user = getUser(userId);
+      if (!user) return;
+      /* 演示：6 个识别字段里，销售不能编辑 Passport Number，弹窗只展示其余 5 个。 */
+      const editable = PASSPORT_OCR_DEMO.filter(f => f.key !== 'passport_number');
+      ocrCtx = { userId, photoUrl, editable };
+      document.getElementById('ocr-modal-title').textContent = t('ocr_title');
+      document.getElementById('ocr-modal-cancel').textContent = t('cancel');
+      document.getElementById('ocr-modal-ok').textContent = t('ocr_confirm');
+      const rows = editable.map(f => {
+        const control = f.type === 'select'
+          ? `<select id="ocr-${f.key}" class="kv-input">${(f.options || []).map(o => `<option value="${esc(o)}"${o === f.value ? ' selected' : ''}>${esc(locLabel(o))}</option>`).join('')}</select>`
+          : `<input id="ocr-${f.key}" class="kv-input" type="${f.type}" value="${esc(f.value)}" />`;
+        return `<div class="ocr-row"><label>${esc(locLabel(f.label))}</label>${control}</div>`;
+      }).join('');
+      document.getElementById('ocr-modal-body').innerHTML =
+        `<p class="ocr-hint">${esc(t('ocr_hint'))}</p>${rows}<p class="ocr-dev-hint">${esc(t('ocr_dev_hint'))}</p>`;
+      document.getElementById('ocr-modal').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closePassportOcrModal() {
+      ocrCtx = null;
+      document.getElementById('ocr-modal').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    function confirmPassportOcrModal() {
+      if (!ocrCtx) return;
+      const { userId, photoUrl, editable } = ocrCtx;
+      const values = editable.map(f => {
+        const el = document.getElementById('ocr-' + f.key);
+        return { key: f.key, value: el ? el.value : f.value };
+      });
+      closePassportOcrModal();
+      const u = getUser(userId);
+      updateField(userId, 'passport_photo', photoUrl);
+      if (u) {
+        values.forEach(item => { u.fields[item.key] = item.value; });
+        if (u.fields.first_name || u.fields.last_name) {
+          u.name = `${u.fields.first_name || ''} ${u.fields.last_name || ''}`.trim() || u.name;
+        }
+      }
+      showToast(values.length ? t('ocr_saved') : t('ocr_photo_only'));
+      render();
+    }
+
     function confirmEditModal() {
       if (!editCtx) return;
       const input = document.getElementById('edit-modal-input');
       const value = input ? input.value : '';
       const { userId, cmId, field, writeKey } = editCtx;
       const key = writeKey || field.key;
+      if (!cmId && key === 'passport_photo' && value) {
+        closeEditModal();
+        openPassportOcrModal(userId, value);
+        return;
+      }
       closeEditModal();
       if (cmId) {
         updateComakerField(userId, cmId, key, value);
@@ -4843,7 +4944,7 @@
 
     function renderKvValue(dataObj, field, editable, changeFn, uploadFn, editMeta) {
       const user = editMeta?.userId ? getUser(editMeta.userId) : null;
-      const canEdit = editable && editMeta && (!user || canEditThisField(field.key, user))
+      const canEdit = editable && editMeta && (!user || canEditThisField(field.key, user) || (field.key === 'passport_photo' && canStartPassportOcr(user)))
         && !READONLY_FIELD_KEYS.has(field.key) && !field.readonly;
       const editIcon = canEdit ? renderEditBtn(editMeta.userId, field, editMeta.cmId) : '';
 
@@ -4901,7 +5002,9 @@
         html += '</tr>';
       }
       fileFields.forEach(f => {
-        const fieldEdit = user ? isFieldKeyEditable(user, f.key, dataObj, editMeta?.cmId) : editable;
+        const fieldEdit = user
+          ? (f.key === 'passport_photo' && !editMeta?.cmId ? canStartPassportOcr(user) : isFieldKeyEditable(user, f.key, dataObj, editMeta?.cmId))
+          : editable;
         const flagged = flags.includes(f.key);
         const flagTag = flagged
           ? `<span class="tag tag-warning" style="margin-left:6px;font-size:10px">${esc(userStatus(user) === 'MANUAL_PENDING' ? t('flag_pending') : t('flag_return'))}</span>`
@@ -5064,7 +5167,8 @@
 
     function updateField(userId, key, value) {
       const u = getUser(userId);
-      if (!u || !isFieldKeyEditable(u, key, u.fields)) return;
+      const allowPassportPhoto = key === 'passport_photo' && u && canStartPassportOcr(u);
+      if (!u || (!allowPassportPhoto && !isFieldKeyEditable(u, key, u.fields))) return;
       if (key === 'ph_residential' || key === 'c1_residential' || key === 'c2_residential') {
         setMergedResidential(u.fields, key, value);
       } else u.fields[key] = value;
