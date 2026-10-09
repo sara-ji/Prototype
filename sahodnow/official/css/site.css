@@ -375,8 +375,28 @@ body.menu-open .site-header {
   padding-bottom: 12vh;
 }
 .how-panel {
-  background: var(--paper);
+  background: #018b8d;
+  color: #fbfcfc;
 }
+.how-panel h2,
+.how-panel .h-lead { color: #fbfcfc; }
+.how-panel .kicker { color: rgba(251, 252, 252, 0.82); }
+.how-panel::before { border-color: rgba(251, 252, 252, 0.22); }
+.how-panel::after {
+  background-image: radial-gradient(rgba(251, 252, 252, 0.28) 1.1px, transparent 1.3px);
+}
+.how-panel .deco-ring { border-color: rgba(251, 252, 252, 0.4); }
+.how-panel .deco-dot {
+  background: #fbfcfc;
+  box-shadow: 0 0 0 6px rgba(251, 252, 252, 0.16);
+}
+.how-panel .how-step {
+  border-top-color: rgba(251, 252, 252, 0.2);
+  color: #fbfcfc;
+}
+.how-panel .how-step:last-child { border-bottom-color: rgba(251, 252, 252, 0.2); }
+.how-panel .how-step span { color: #fbfcfc; }
+.how-panel .how-step em { color: rgba(251, 252, 252, 0.72); }
 #download {
   background:
     radial-gradient(ellipse 80% 90% at 100% 0%, rgba(255, 255, 255, 0.14), transparent 46%),
