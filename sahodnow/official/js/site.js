@@ -27,13 +27,14 @@
           <p>Less waiting, more living.</p>
         </div>
         <div>
+          <p class="foot-label">Quick links</p>
           <a href="index.html">Borrow</a>
           <a href="trust.html">Trust</a>
           <a href="contact.html">Contact</a>
         </div>
         <div>
-          <a href="mailto:support@sahodnow.ph">support@sahodnow.ph</a>
-          <a href="mailto:privacy@sahodnow.ph">privacy@sahodnow.ph</a>
+          <p class="foot-label">Terms</p>
+          <a href="https://www.sahodnow.ph/terms">User policy</a>
           <a href="https://www.sahodnow.ph/privacy">Privacy policy</a>
         </div>
       </div>

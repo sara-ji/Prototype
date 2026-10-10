@@ -1481,6 +1481,13 @@ footer p { color: rgba(251,252,252,.55); }
   padding-bottom: 48px;
   border-bottom: 1px solid rgba(255,255,255,.08);
 }
+.foot-label {
+  margin: 0 0 16px;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(251, 252, 252, 0.45);
+}
 .foot a {
   text-decoration: none;
   display: block;
