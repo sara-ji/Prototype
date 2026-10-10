@@ -375,7 +375,8 @@ body.menu-open .site-header {
   border-top: 1px solid var(--line);
   text-align: left;
 }
-.facts div { display: grid; gap: 8px; }
+.facts div { display: grid; gap: 8px; justify-items: start; }
+.facts .spec-ico { margin-bottom: 8px; }
 .facts dt {
   margin: 0;
   font-size: 11px;
