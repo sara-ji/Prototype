@@ -1043,6 +1043,95 @@ body.menu-open .site-header {
   max-width: 38rem;
   margin: 18px 0 0;
 }
+.reg-strip {
+  display: flex;
+  align-items: center;
+  width: min(920px, calc(100% - 48px));
+  margin: 56px auto 0;
+  min-height: 122px;
+  background: var(--paper);
+  border-radius: 0 80px 80px 0;
+}
+.reg-cap {
+  width: 122px;
+  height: 122px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  background: #018b8d;
+  border-radius: 0 61px 61px 0;
+}
+.reg-seal {
+  width: 72px;
+  height: 72px;
+  animation: seal-spin 16s linear infinite;
+}
+@keyframes seal-spin { to { transform: rotate(360deg); } }
+.reg-row {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  list-style: none;
+  margin: 0;
+  padding: 0 36px;
+}
+.reg-row li { position: relative; }
+.reg-mark {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: #fff;
+  border: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: default;
+}
+.reg-mark svg {
+  width: 22px;
+  height: 22px;
+  stroke: #018b8d;
+  fill: none;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.reg-mark b {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  color: var(--ink);
+}
+.reg-tip {
+  display: none;
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 12px);
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 220px;
+  padding: 8px 12px;
+  background: #101616;
+  color: #fbfcfc;
+  font-size: 12px;
+  line-height: 1.35;
+  text-align: center;
+  border-radius: 8px;
+  z-index: 2;
+}
+.reg-tip::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: #101616;
+}
+.reg-row li:hover .reg-tip,
+.reg-row li:focus-within .reg-tip { display: block; }
 .logo-marquee {
   position: relative;
   overflow: hidden;
@@ -1085,6 +1174,7 @@ body.menu-open .site-header {
   .deco-ring.alt { animation: none; }
   .hero-city img { animation: none; }
   .hero-phone { animation: none; }
+  .reg-seal { animation: none; }
   .js .reveal {
     opacity: 1;
     transform: none;
@@ -1343,6 +1433,12 @@ footer p { color: rgba(251,252,252,.55); }
   }
   .regs { grid-template-columns: 1fr 1fr; gap: 12px; }
   .logo-marquee { margin: 40px 0 64px; }
+  .reg-strip { width: calc(100% - 32px); min-height: 88px; margin-top: 36px; overflow-x: auto; }
+  .reg-cap { width: 72px; height: 88px; border-radius: 0 44px 44px 0; }
+  .reg-seal { width: 48px; height: 48px; }
+  .reg-row { gap: 14px; padding: 0 16px; }
+  .reg-mark { width: 68px; height: 68px; }
+  .reg-row li:hover .reg-tip { display: none; }
   .logo-set { gap: 48px; padding: 0 24px; }
   .logo-set img { height: 32px; }
   .reg { min-height: 128px; padding: 22px 16px; }
