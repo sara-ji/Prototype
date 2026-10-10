@@ -1253,14 +1253,32 @@ body.menu-open .site-header {
   gap: 64px;
   align-items: center;
 }
-.trust-id .ca-reg { margin: 0; position: relative; z-index: 1; width: min(100%, 380px); padding: 40px 32px; }
-.trust-id .note { margin-top: 28px; }
+.trust-id .link { margin: 8px 0 4px; color: #018b8d; }
+.trust-id .note { margin-top: 22px; }
+.sec-no { margin: 28px 0 0; }
+.sec-no small {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--mute);
+}
+.sec-no strong {
+  display: block;
+  margin-top: 8px;
+  font-size: clamp(1.7rem, 3vw, 2.4rem);
+  font-weight: 500;
+  letter-spacing: -0.045em;
+  line-height: 1;
+  color: var(--ink);
+}
 .reg-stage {
   position: relative;
   min-height: 320px;
   display: grid;
   place-items: center;
 }
+.reg-stage .gfx { width: 62%; }
 .reg-stage .deco-ring {
   inset: 4%;
   border-color: rgba(1, 139, 141, 0.28);
