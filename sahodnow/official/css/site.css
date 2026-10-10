@@ -1557,9 +1557,15 @@ footer p { color: rgba(251,252,252,.55); }
   }
   .nav-links.open a { font-size: 1.7rem; letter-spacing: 0; text-transform: none; font-family: Rubik, sans-serif; font-weight: 500; opacity: 1; }
   .menu-btn { display: block; z-index: 60; }
-  .hero, .panel, .panel.reverse, .frame, .split, .split.reverse, .row, .term, .foot, .ca, .how, .specs, .trust-id, .trust-split, .safe, .pair {
+  .hero, .panel, .panel.reverse, .frame, .split, .split.reverse, .row, .term, .foot, .ca, .how, .specs, .trust-id, .trust-split, .safe, .pair,
+  .hero .frame,
+  .trust-hero .frame,
+  .contact-hero .frame,
+  .panel.reverse .frame {
     grid-template-columns: 1fr;
   }
+  .hero-device { width: 100%; justify-content: center; }
+  .hero-phone { max-width: 70%; }
   .regs { grid-template-columns: 1fr 1fr; gap: 12px; }
   .logo-marquee { margin: 40px 0 64px; }
   .oversight { grid-template-columns: 1fr 1fr; gap: 12px; }
