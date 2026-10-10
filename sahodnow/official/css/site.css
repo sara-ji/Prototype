@@ -468,7 +468,7 @@ body.menu-open .site-header {
 .how-panel .how { margin-top: 40px; }
 .how-panel .how-step { padding: 14px 0; }
 .how-panel .h-lead { margin-bottom: 0; }
-.how-panel .phone { width: 240px; height: 480px; }
+.how-panel .phone { width: 240px; height: 480px; overflow: hidden; }
 
 /* Hero */
 .hero {
