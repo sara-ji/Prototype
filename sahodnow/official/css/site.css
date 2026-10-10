@@ -1066,7 +1066,8 @@ body.menu-open .site-header {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 168px;
+  gap: 10px;
+  min-width: 188px;
   padding: 14px 22px;
   border: 1px solid rgba(255,255,255,.28);
   border-radius: 999px;
@@ -1076,6 +1077,7 @@ body.menu-open .site-header {
   text-transform: uppercase;
   color: #fbfcfc;
 }
+.store svg { width: 18px; height: 18px; flex-shrink: 0; }
 .store { transition: border-color .25s var(--ease), color .25s var(--ease); }
 .store:hover { border-color: #018b8d; color: #018b8d; }
 
