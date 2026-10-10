@@ -123,9 +123,11 @@ p { margin: 0 0 1em; color: var(--mute); }
 .menu-btn i::before { top: -6px; }
 .menu-btn i::after { top: 6px; }
 
-body[data-page="borrow"] .site-header { color: #fbfcfc; }
+body[data-page="borrow"] .site-header,
+body[data-page="trust"] .site-header { color: #fbfcfc; }
 body[data-page="borrow"] .site-header.scrolled,
-body:not([data-page="borrow"]) .site-header {
+body[data-page="trust"] .site-header.scrolled,
+body:not([data-page="borrow"]):not([data-page="trust"]) .site-header {
   color: var(--ink);
   background: rgba(251, 252, 252, 0.9);
   backdrop-filter: blur(16px);
@@ -567,6 +569,20 @@ body.menu-open .site-header {
   display: none;
 }
 .hero h1 { color: #fbfcfc; max-width: 11ch; }
+.trust-hero {
+  padding: 14vh 8vw;
+  align-items: center;
+}
+.trust-hero .frame { grid-template-columns: 1.1fr 0.9fr; }
+.trust-hero h1 { max-width: none; }
+.trust-hero .lede { margin-bottom: 0; }
+.trust-hero .deco-ring { border-color: rgba(251, 252, 252, 0.42); }
+.trust-hero .deco-dot {
+  background: #fbfcfc;
+  box-shadow: 0 0 0 6px rgba(251, 252, 252, 0.16);
+}
+.trust-hero .gfx { color: #fbfcfc; }
+.trust-hero .gfx::before { background: rgba(251, 252, 252, 0.08); }
 .hero h1 em {
   font-style: italic;
   color: #fbfcfc;
@@ -1378,6 +1394,7 @@ footer p { color: rgba(251,252,252,.55); }
   .split.reverse .copy { order: 0; }
   .hero, .panel { height: auto; min-height: 0; padding: 88px 24px 56px; }
   .hero { min-height: 100dvh; padding: 88px 24px 28vh; }
+  .trust-hero { padding: 108px 24px 72px; }
   .hero-city { height: 32vh; }
   .hero-phone { width: 210px; height: 430px; transform: translateY(18%); }
   .hero-copy, .panel-copy { padding: 0; }
