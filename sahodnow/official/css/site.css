@@ -1562,27 +1562,62 @@ footer p { color: rgba(251,252,252,.55); }
   .regs { grid-template-columns: 1fr 1fr; gap: 12px; }
   .logo-marquee { margin: 40px 0 64px; }
   .oversight { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .oversight article { min-height: 0; padding: 22px 16px 24px; }
   .reg-stage { min-height: 240px; }
   .guard article { grid-template-columns: 48px 1fr; }
   .logo-set { gap: 48px; padding: 0 24px; }
   .logo-set img { height: 32px; }
   .reg { min-height: 128px; padding: 22px 16px; }
   .split.reverse .copy { order: 0; }
-  .hero, .panel { height: auto; min-height: 0; padding: 88px 24px 56px; }
-  .hero { min-height: 100dvh; padding: 88px 24px 28vh; }
+  .hero, .panel { height: auto; min-height: 0; padding: 88px 20px 56px; }
+  .hero {
+    min-height: 100dvh;
+    height: auto;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 96px 20px 22vh;
+  }
   .trust-hero,
-  .contact-hero { padding: 108px 24px 72px; }
+  .contact-hero {
+    justify-content: center;
+    padding: 108px 20px 56px;
+  }
   .reach article { grid-template-columns: 52px 1fr; gap: 16px; }
-  .hero-city { height: 32vh; }
-  .hero-phone { width: 210px; height: 430px; transform: translateY(18%); }
+  .hero-city { height: 26vh; }
+  .hero-phone {
+    width: 180px;
+    height: 368px;
+    margin: 28px auto 0;
+    animation: none;
+    transform: none;
+  }
+  .hero h1 { max-width: 9ch; font-size: clamp(2.5rem, 12vw, 3.6rem); }
+  .lede { margin: 18px 0 0; }
+  .how { justify-items: stretch; }
+  .how-steps { width: 100%; min-width: 0; }
+  .how-step,
+  .how-step b,
+  .how-step em { min-width: 0; }
+  .how-stage {
+    width: min(100%, 260px);
+    height: auto;
+    margin: 8px auto 0;
+    aspect-ratio: auto;
+  }
+  .how-panel .phone {
+    width: min(230px, 68vw);
+    height: auto;
+    aspect-ratio: 9 / 18.6;
+    margin: 0 auto;
+  }
   .hero-copy, .panel-copy { padding: 0; }
   .frame { gap: 36px; }
   .panel.reverse .panel-copy { order: 0; }
-  .panel.band .wrap { width: min(1040px, calc(100% - 48px)); padding: 0; }
+  .panel.band .wrap { width: 100%; padding: 0; }
   .figure-type { padding: 28px 24px; }
   .frame-photo { max-width: 280px; max-height: 46vh; margin: 0 auto; }
-  .gfx-stage { width: min(100%, 280px); }
-  .how-stage { width: min(100%, 300px); height: 520px; }
+  .gfx-stage { width: min(100%, 240px); margin-inline: auto; }
   .v-label { display: none; }
   .hero-photo { min-height: 0; max-height: none; }
   .hero-cap { left: 24px; right: 56px; bottom: 24px; }
@@ -1603,4 +1638,19 @@ footer p { color: rgba(251,252,252,.55); }
   .pair article, .pair article:nth-child(even) { padding: 24px 0; border-left: 0; }
   .privacy-band h2 { max-width: none; }
   .quotes { grid-template-columns: 1fr; gap: 32px; margin-top: 36px; }
+  .mail { max-width: 100%; overflow-wrap: anywhere; font-size: clamp(1.15rem, 4.6vw, 1.7rem); }
+  .store { min-width: 0; flex: 1 1 160px; }
+  .sec-no strong,
+  h1, h2, h3, p { overflow-wrap: break-word; }
+}
+
+@media (max-width: 560px) {
+  .oversight,
+  .facts,
+  .specs { grid-template-columns: 1fr; }
+  .facts { gap: 28px; }
+  .guard article { grid-template-columns: 40px 1fr; }
+  .reach article { grid-template-columns: 44px 1fr; }
+  .reach-hours { font-size: 1.2rem; }
+  .band-btn { width: 100%; min-width: 0; }
 }
