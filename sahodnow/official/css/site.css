@@ -814,11 +814,25 @@ body.menu-open .site-header {
 
 .page-top {
   padding: 160px 0 80px;
-  background: var(--night-wash);
-  color: #fff;
+  background: var(--paper);
+  color: var(--ink);
+  position: relative;
+  overflow: hidden;
 }
-.page-top p { color: rgba(251,252,252,.64); max-width: 40rem; }
-.page-top h1 { max-width: min(920px, 100%); }
+.page-top::before {
+  content: "";
+  position: absolute;
+  width: min(52vw, 520px);
+  height: min(52vw, 520px);
+  border: 1px solid rgba(1, 139, 141, 0.16);
+  border-radius: 50%;
+  right: -8%;
+  top: 16%;
+  pointer-events: none;
+}
+.page-top .wrap { position: relative; }
+.page-top p { color: var(--mute); max-width: 34rem; }
+.page-top h1 { max-width: min(920px, 100%); color: var(--ink); }
 .page-top h1.wide { max-width: min(920px, 100%); }
 .page-top h1 em { font-style: italic; color: #018b8d; }
 .amt {
