@@ -74,6 +74,7 @@
   .path.on { border-color: #1c1917; box-shadow: inset 0 0 0 1px #1c1917; }
   .path .when { font-size: 12px; color: var(--muted); }
   .path strong { display: block; margin: 4px 0; font-size: 16px; }
+  .path .tag { white-space: normal; line-height: 1.45; border-radius: 10px; }
   .detail { margin-top: 14px; border-top: 1px solid var(--line); padding-top: 14px; }
   .detail h3 { margin: 0 0 4px; font-size: 16px; }
   .meta { margin: 0 0 10px; color: var(--muted); font-size: 14px; }
@@ -283,12 +284,13 @@ function badge(progress) {
 }
 
 function pathButton(p) {
-  const progress = p.topics.length === 1 ? p.topics[0].progress : `${p.topics.length} 个专题`;
+  const label = p.phase === "done" ? p.topics[0].progress : p.aim;
+  const done = p.phase === "done" && !String(label).includes("未上线");
   return `
     <button class="path ${p.id === current ? "on" : ""}" data-id="${p.id}">
       <span class="when">${p.month}</span>
       <strong>${p.name}</strong>
-      <span class="tag ${p.phase === "done" && !String(progress).includes("未上线") ? "done" : ""}">${progress}</span>
+      <span class="tag ${done ? "done" : ""}">${label}</span>
     </button>
   `;
 }
@@ -301,8 +303,6 @@ function renderPaths() {
 function renderDetail() {
   const path = paths.find(p => p.id === current);
   detailEl.innerHTML = `
-    <h3>${path.month} · ${path.name}</h3>
-    <p class="meta">${path.aim}</p>
     <div class="topics">
       ${path.topics.map(t => `
         <article class="topic">
