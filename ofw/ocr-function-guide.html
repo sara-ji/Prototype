@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>OCR 填资 · 功能说明</title>
+<style>
+  :root {
+    --ink: #1c1917;
+    --muted: #57534e;
+    --line: #e6dfd4;
+    --paper: #f6f3ee;
+    --card: #fffdfb;
+    --accent: #9a4d12;
+    --accent-bg: #fff3e8;
+    --done: #1f7a4d;
+    --done-bg: #e7f5ee;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    color: var(--ink);
+    background: var(--paper);
+    font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    line-height: 1.55;
+  }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 40px 24px 80px; }
+  .eyebrow { font-size: 12px; letter-spacing: 0.08em; color: var(--accent); font-weight: 650; }
+  h1 { margin: 6px 0 8px; font-size: 30px; letter-spacing: -0.03em; }
+  .lead { margin: 0 0 8px; color: var(--muted); }
+  .prd {
+    display: inline-block;
+    margin-top: 8px;
+    color: var(--accent);
+    font-weight: 650;
+  }
+  h2 { margin: 36px 0 12px; font-size: 18px; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 16px;
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 650; font-size: 12px; }
+  tr:last-child td { border-bottom: 0; }
+  .note {
+    margin-top: 12px;
+    background: var(--accent-bg);
+    color: var(--ink);
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 14px;
+  }
+  .note b { color: var(--accent); }
+  .ends { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .end h3 { margin: 0 0 6px; font-size: 16px; }
+  .end p { margin: 0 0 12px; color: var(--muted); font-size: 14px; }
+  .end video {
+    width: 100%;
+    max-height: 520px;
+    object-fit: contain;
+    background: #1c1917;
+    border-radius: 12px;
+    display: block;
+  }
+  .fields { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
+  .fields th, .fields td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+  .fields th { color: var(--muted); font-size: 12px; }
+  .points { display: grid; gap: 10px; }
+  .point {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 14px 16px;
+  }
+  .point b { display: block; margin-bottom: 4px; }
+  .point p { margin: 0; color: var(--muted); font-size: 14px; }
+  @media (max-width: 720px) {
+    .ends { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Kidlat Peso · OFW</div>
+  <h1>OCR 填资功能说明</h1>
+  <p class="lead">上传证件或材料后自动识别，核对无误再提交。识别不到时可以手填，不挡住后面的流程。</p>
+  <a class="prd" href="https://doc.weixin.qq.com/doc/w3_AHIAzXj8ABACNeIJOUeCOS92ID1t1_a?scode=AGMA_AdxAAsJU8f2d0AcIAigYNALU">字段对照见需求文档第 4 章</a>
+
+  <h2>1. 支持识别的材料</h2>
+  <div class="card">
+    <table>
+      <thead>
+        <tr>
+          <th>材料</th>
+          <th>用在</th>
+          <th>识别渠道</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>护照 Passport</td>
+          <td>借款人</td>
+          <td>Advance AI</td>
+        </tr>
+        <tr>
+          <td>OEC</td>
+          <td>借款人</td>
+          <td>自研 KIE</td>
+        </tr>
+        <tr>
+          <td>签证 Valid Visa</td>
+          <td>借款人</td>
+          <td>自研 KIE</td>
+        </tr>
+        <tr>
+          <td>机票行程单 Flight Itinerary</td>
+          <td>借款人</td>
+          <td>自研 KIE</td>
+        </tr>
+        <tr>
+          <td>护照 Passport<br>National ID（Philsys）<br>驾照 Driver's License<br>UMID<br>PhilHealth<br>SSS<br>TIN<br>PRC<br>Postal ID<br>Pag-IBIG<br>Voter ID</td>
+          <td>担保人</td>
+          <td>Advance AI</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="note">
+      <b>自研 KIE 特别说明。</b>
+      OEC、签证、机票走自研识别，等待上限 1 秒。超过 1 秒就跳过这次识别，文件仍保留，用户直接手填，提交不会被卡住。
+      身份证件走 Advance AI；识别失败同样可以手填。不在支持范围内的材料不调用识别。
+    </div>
+  </div>
+
+  <h2>2. APP 和 Backend 都能用</h2>
+  <div class="ends">
+    <article class="end card">
+      <h3>APP</h3>
+      <p>用户上传后，回显开关打开且识别成功，结果直接填进表单，用户核对后继续。</p>
+      <video controls playsinline preload="metadata" src="app-ocr-demo.mp4"></video>
+    </article>
+    <article class="end card">
+      <h3>Backend</h3>
+      <p>销售代填时，回显开关打开且识别成功，先弹出确认，核对后再写入表单。</p>
+      <video controls playsinline preload="metadata" src="backend-ocr-demo.mp4"></video>
+    </article>
+  </div>
+
+  <h2>3. 回显开关与识别记录</h2>
+  <div class="points">
+    <article class="point">
+      <b>回显开关可以分别配置</b>
+      <p>APP 和 Backend 各自决定要不要把识别结果写进表单。关掉之后，仍然会识别，也仍然会留下记录，只是不写表单。Backend 关闭时也不弹出确认。</p>
+    </article>
+    <article class="point">
+      <b>每次识别成功都留下完整结果，用来做交叉验证</b>
+      <p>表单上只回填填资要用的字段。证面上多识别出来的内容会单独留下。同一信息出现在不同证件上时可以对一下，比如护照号、姓名、生日在护照、OEC、签证上是否一致。也可以把当时的识别结果和用户最终提交的版本对一下，改过或对不上的地方用来做风险验证。用户最终提交的内容，仍以他确认后的表单为准。</p>
+      <p style="margin-top:10px">以一份 OEC 为例，记录里会留下这些字段。其中只有合同期限回填到表单，其余供核对：</p>
+      <table class="fields">
+        <thead>
+          <tr><th>落库字段</th><th>含义</th><th>本例</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>oec_ofw_full_name</td><td>姓名</td><td>ALVIN EMPAY MUJAR</td></tr>
+          <tr><td>sex</td><td>性别</td><td>Male</td></tr>
+          <tr><td>date_of_birth</td><td>生日</td><td>1985-05-09</td></tr>
+          <tr><td>passport_number</td><td>护照号</td><td>P0946271B</td></tr>
+          <tr><td>occupation</td><td>职业</td><td>ASSISTANT HOTEL HOUSEKEEPER</td></tr>
+          <tr><td>ofw_agency</td><td>中介</td><td>JOBSGLOBAL.COM EMPLOYMENT SERVICES INC</td></tr>
+          <tr><td>employer_name</td><td>雇主</td><td>FLEXIDEAS S.A.</td></tr>
+          <tr><td>destination</td><td>目的地</td><td>GREECE</td></tr>
+          <tr><td>oec_certificate_number</td><td>证书号</td><td>2026042910146</td></tr>
+          <tr><td>contract_duration_months</td><td>合同期限，回填表单</td><td>12 Months And 0 Days</td></tr>
+          <tr><td>oec_valid_exit_until</td><td>出境有效期</td><td>6/24/2026</td></tr>
+        </tbody>
+      </table>
+    </article>
+  </div>
+</div>
+</body>
+</html>
