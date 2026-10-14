@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>10月月会 · 产品路径</title>
+<style>
+  :root {
+    --ink: #1c1917;
+    --muted: #57534e;
+    --line: #e6dfd4;
+    --paper: #f6f3ee;
+    --card: #fffdfb;
+    --done: #1f7a4d;
+    --done-bg: #e7f5ee;
+    --next: #9a4d12;
+    --next-bg: #fff3e8;
+    --wait: #78716c;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    color: var(--ink);
+    background: var(--paper);
+    font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    line-height: 1.5;
+  }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 36px 24px 72px; }
+  .eyebrow { font-size: 12px; letter-spacing: 0.08em; color: var(--next); font-weight: 650; }
+  h1 { margin: 6px 0 8px; font-size: 30px; letter-spacing: -0.03em; }
+  .lead { margin: 0; color: var(--muted); }
+  h2 { margin: 36px 0 12px; font-size: 18px; }
+  .pains { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .pain {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 18px 16px;
+  }
+  .pain svg { display: block; margin-bottom: 12px; }
+  .pain b { display: block; font-size: 16px; font-weight: 650; }
+  .tag {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 12px;
+    font-weight: 650;
+    border-radius: 999px;
+    padding: 2px 8px;
+    background: var(--next-bg);
+    color: var(--next);
+  }
+  .tag.done { background: var(--done-bg); color: var(--done); }
+  .board {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 16px;
+  }
+  .groups { display: grid; grid-template-columns: 180px 1fr; gap: 12px; }
+  .group-label { font-size: 13px; color: var(--muted); padding-top: 8px; }
+  .paths { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .paths.one { grid-template-columns: 1fr; }
+  .path {
+    text-align: left;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 12px;
+    cursor: pointer;
+    font: inherit;
+    color: inherit;
+    min-height: 92px;
+  }
+  .path.on { border-color: #1c1917; box-shadow: inset 0 0 0 1px #1c1917; }
+  .path .when { font-size: 12px; color: var(--muted); }
+  .path strong { display: block; margin: 4px 0; font-size: 16px; }
+  .detail { margin-top: 14px; border-top: 1px solid var(--line); padding-top: 14px; }
+  .detail h3 { margin: 0 0 4px; font-size: 16px; }
+  .meta { margin: 0 0 10px; color: var(--muted); font-size: 14px; }
+  .topics { display: grid; gap: 10px; }
+  .topic {
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 12px 14px;
+    background: #fff;
+  }
+  .topic-top { display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+  .topic h4 { margin: 0; font-size: 15px; }
+  .topic .problem { margin: 6px 0 8px; font-size: 14px; }
+  .topic ul { margin: 0; padding-left: 18px; }
+  .topic li { margin: 4px 0; font-size: 14px; }
+  .empty { color: var(--muted); font-size: 14px; margin: 8px 0 0; }
+  @media (max-width: 900px) {
+    .pains, .groups, .paths { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Kidlat Peso · 2026-10-14</div>
+  <h1>产品路径</h1>
+  <h2>1. 当前业务痛点</h2>
+  <div class="pains">
+    <article class="pain">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+        <rect x="4" y="5" width="8" height="8" rx="2" stroke="#1c1917" stroke-width="1.6"/>
+        <rect x="16" y="5" width="8" height="8" rx="2" stroke="#1c1917" stroke-width="1.6"/>
+        <rect x="10" y="15" width="8" height="8" rx="2" stroke="#1c1917" stroke-width="1.6"/>
+        <path d="M8 13v2M20 13v2M14 13v2" stroke="#9a4d12" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+      <b>进件跟单流程复杂，协作困难，用户成交周期长</b>
+    </article>
+    <article class="pain">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+        <path d="M6 20l5-6 4 3 7-9" stroke="#1c1917" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M17 8h5v5" stroke="#9a4d12" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <b>降低逾期率</b>
+    </article>
+    <article class="pain">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+        <path d="M6 18c3-1 4-6 8-6s5 5 8 4" stroke="#1c1917" stroke-width="1.6" stroke-linecap="round"/>
+        <path d="M6 12c3-1 4-6 8-6s5 5 8 4" stroke="#9a4d12" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+      <b>收益与规模的双向增长诉求</b>
+    </article>
+  </div>
+
+  <h2>2. 进度规划</h2>
+  <div class="board">
+    <div class="groups">
+      <div>
+        <div class="group-label">9月 · 已处理</div>
+        <div class="paths one" id="done-paths"></div>
+      </div>
+      <div>
+        <div class="group-label">10月 · 接下来</div>
+        <div class="paths" id="next-paths"></div>
+      </div>
+    </div>
+    <div class="detail" id="detail">
+      <p class="empty">点上面的路径名称，查看专题、要解决的问题、需求列表和进度。</p>
+    </div>
+  </div>
+</div>
+<script>
+const paths = [
+  {
+    id: "intake",
+    month: "9月",
+    phase: "done",
+    name: "进件跟单",
+    aim: "进件和跟单更顺，协作更清楚，缩短用户成交周期",
+    topics: [
+      {
+        name: "进件与展业效率提升",
+        problem: "缩短成交周期，填资、销售跟单和人审结论接得上",
+        progress: "核心主路径已上线",
+        items: [
+          { text: "填资流程改造：本土+海外流程统一，预审戳额→销售跟进→终审戳额；含文件说明、多文件、OEC/Visa 体验", progress: "已上线" },
+          { text: "Backend 销售办单优化：用户状态可视、发标后资料仍可看、海外销管可跟、BK 可维护担保人", progress: "已上线" },
+          { text: "人审结论优化：拒绝可退回用户或 Team B 补件；Pending 由销售改资料、App 无感知", progress: "已上线" },
+          { text: "OCR 填资：证件、材料自动核对，填得更准", progress: "未上线" }
+        ]
+      }
+    ]
+  },
+  {
+    id: "overdue",
+    month: "10月",
+    phase: "next",
+    name: "降低逾期率",
+    aim: "降低逾期率：找得到人，还款更从容，后续跟进更顺",
+    topics: [
+      {
+        name: "催收能力支持 · 地址证明",
+        problem: "贷后找得到人，联系更稳",
+        progress: "方案中，未上线",
+        items: ["地址证明：外卖或电商地址、水电账单、门牌、门口视频；收集定位"]
+      },
+      {
+        name: "延长用户 Due Day",
+        problem: "还款时间更从容",
+        progress: "未开始",
+        items: ["把到期日往后延"]
+      },
+      {
+        name: "Co-maker 放款",
+        problem: "收款和后续跟进落在同一个人身上",
+        progress: "未开始，待资产/法务拍板",
+        items: ["款放到担保人账户"]
+      }
+    ]
+  },
+  {
+    id: "audit",
+    month: "10月",
+    phase: "next",
+    name: "人审质检",
+    aim: "拒绝和退回原因清楚，过程可回看，办单更高效",
+    topics: [
+      {
+        name: "人审销售工作流质检",
+        problem: "原因清楚，过程可回看，办单更高效",
+        progress: "未开始",
+        items: ["拒绝/退回原因展示", "认领人、停留时长、退回次数"]
+      }
+    ]
+  },
+  {
+    id: "revenue",
+    month: "10月",
+    phase: "next",
+    name: "业务收益",
+    aim: "提费之后，借款意愿和收益仍然稳住",
+    topics: [
+      {
+        name: "提费与费率展示",
+        problem: "费用更好理解，提费后用户仍愿意借",
+        progress: "未开始",
+        items: ["还款页拆开本金和费用", "砍头费以权益包呈现"]
+      }
+    ]
+  },
+  {
+    id: "scale",
+    month: "10月",
+    phase: "next",
+    name: "扩大业务规模",
+    aim: "用户能带来新用户，佣金能支撑规模一起增长",
+    topics: [
+      {
+        name: "用户分享裂变",
+        problem: "老用户带来新用户",
+        progress: "未开始",
+        items: ["用户邀请好友"]
+      },
+      {
+        name: "佣金体系改造",
+        problem: "佣金能配置、能加、能补，支撑用户裂变",
+        progress: "未开始",
+        items: ["佣金规则和发放节点可配置", "活动加佣", "少发漏发可补"]
+      }
+    ]
+  }
+];
+
+const doneEl = document.getElementById("done-paths");
+const nextEl = document.getElementById("next-paths");
+const detailEl = document.getElementById("detail");
+let current = "intake";
+
+function badge(progress) {
+  const done = progress.includes("已上线") && !progress.includes("未上线");
+  return `<span class="tag ${done ? "done" : ""}">${progress}</span>`;
+}
+
+function pathButton(p) {
+  const progress = p.topics.length === 1 ? p.topics[0].progress : `${p.topics.length} 个专题`;
+  return `
+    <button class="path ${p.id === current ? "on" : ""}" data-id="${p.id}">
+      <span class="when">${p.month}</span>
+      <strong>${p.name}</strong>
+      <span class="tag ${p.phase === "done" && !String(progress).includes("未上线") ? "done" : ""}">${progress}</span>
+    </button>
+  `;
+}
+
+function renderPaths() {
+  doneEl.innerHTML = paths.filter(p => p.phase === "done").map(pathButton).join("");
+  nextEl.innerHTML = paths.filter(p => p.phase === "next").map(pathButton).join("");
+}
+
+function renderDetail() {
+  const path = paths.find(p => p.id === current);
+  detailEl.innerHTML = `
+    <h3>${path.month} · ${path.name}</h3>
+    <p class="meta">${path.aim}</p>
+    <div class="topics">
+      ${path.topics.map(t => `
+        <article class="topic">
+          <div class="topic-top">
+            <h4>${t.name}</h4>
+            ${badge(t.progress)}
+          </div>
+          <p class="problem">期望效果：${t.problem}</p>
+          <ul>${t.items.map(item => {
+            const text = typeof item === "string" ? item : item.text;
+            const mark = typeof item === "string" ? "" : ` <span class="tag ${item.progress === "已上线" ? "done" : ""}">${item.progress}</span>`;
+            return `<li>${text}${mark}</li>`;
+          }).join("")}</ul>
+        </article>
+      `).join("")}
+    </div>
+  `;
+}
+
+function select(id) {
+  current = id;
+  renderPaths();
+  renderDetail();
+}
+
+document.body.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-id]");
+  if (!button) return;
+  select(button.dataset.id);
+});
+
+select("overdue");
+</script>
+</body>
+</html>

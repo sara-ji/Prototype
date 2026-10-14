@@ -18,6 +18,7 @@ https://sara-ji.github.io/Prototype/
 | OFW Admin | https://sara-ji.github.io/Prototype/ofw/kidlatpeso-admin-0814.html |
 | OFW OCR 字段抽取对照报告 | https://sara-ji.github.io/Prototype/ofw/ocr-field-accuracy-report.html |
 | OFW 人审审核记录分析 | https://sara-ji.github.io/Prototype/ofw/manual-review-analysis.html |
+| OFW 10月月会 · 产品路径 | https://sara-ji.github.io/Prototype/ofw/product-path-2026-10.html |
 
 ## 注意
 
