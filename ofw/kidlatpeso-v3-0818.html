@@ -1040,6 +1040,18 @@
             <button type="button" class="btn-primary" style="margin-top:16px" onclick="closeSampleModal()">Got it</button>
           </div>
         </div>
+        <div class="modal-overlay" id="privacy-modal" hidden onclick="if(event.target===this)closePrivacyNotice()">
+          <div class="modal-card" onclick="event.stopPropagation()">
+            <h4>Privacy Notice</h4>
+            <div class="modal-body" style="font-size:13px;line-height:1.5;color:var(--text)">
+              <p>We collect approximate location (GPS) and IP address.</p>
+              <p style="margin-top:8px"><strong>Borrower:</strong> to check whether you are in the Philippines or overseas. This is not the address for a home visit.</p>
+              <p style="margin-top:8px"><strong>Co-maker:</strong> collected when the co-maker opens the confirmation page, and may be used for a home visit in the Philippines.</p>
+              <p style="margin-top:8px">If GPS is unavailable, we use the IP address parsed by our device-risk provider. You can deny location; IP may still be recorded when you use the service.</p>
+            </div>
+            <button type="button" class="btn-primary" style="margin-top:16px" onclick="closePrivacyNotice()">Got it</button>
+          </div>
+        </div>
         <div class="modal-overlay" id="guided-upload-modal" hidden onclick="if(event.target===this)closeGuidedUploadModal()">
           <div class="modal-card guided-upload-card" onclick="event.stopPropagation()">
             <h4 id="guided-upload-title">Upload</h4>
@@ -1214,7 +1226,7 @@
       expectedPayday: Array.from({ length: 31 }, (_, i) => String(i + 1)),
       weekday: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
       comakerOccupation: ['Self-employed / Business Owner / Freelancer', 'BPO worker', 'Government Employee', 'Corporate Employee', 'Contract Employee', 'Factory Worker', 'Construction Worker', 'Education / Teaching'],
-      idType: ['UMID', 'Driver License', 'Passport', 'SSS ID', 'PhilID'],
+      idType: ['UMID', 'Driver License', 'Passport', 'SSS ID', 'PhilID', 'National ID（Philsys ID)', 'PhilHealth ID'],
       certTypeByRel: {
         Spouse: ['Marriage Certificate'],
         Parent: ['Birth Certificate', 'Affidavit of Relationship'],
@@ -1227,6 +1239,7 @@
         'Utility Bills',
         'Barangay Clearance',
       ],
+      ecomAddressType: ['Grab', 'Shopee', 'Lazada', 'Foodpanda'],
       loanTerm: ['6 Month', '9 Months', '12 Months'],
       bank: ['BDO', 'BPI', 'GCash', 'Maya'],
       loanAmount: ['PHP 5,000', 'PHP 8,000', 'PHP 10,000'],
@@ -1315,6 +1328,24 @@
         intro: 'Upload a document that shows the co-maker’s address.',
         images: [{ src: 'https://picsum.photos/seed/ofw-utility/640/400' }],
         must: [],
+      },
+      cm_ecom_proof: {
+        title: 'E-commerce Address Proof',
+        intro: 'Upload a Grab, Shopee, Lazada, or Foodpanda screenshot that shows the delivery address.',
+        images: [{ src: 'https://picsum.photos/seed/ofw-grab/640/400' }],
+        must: [
+          'Must show the co-maker’s name or account',
+          'Must clearly show the delivery address in the Philippines',
+        ],
+      },
+      cm_door_video: {
+        title: 'Doorway Video',
+        intro: 'Optional. A short video at the co-maker’s door.',
+        images: [],
+        must: [
+          'House number must be clearly visible',
+          'The co-maker must appear in the video',
+        ],
       },
     };
 
@@ -1432,7 +1463,7 @@
       const common = [
         ['oec', 'oec_duration'],
         ['payroll', 'expected_payday'],
-        ['cm_province', 'cm_city', 'cm_barangay', 'cm_complete', 'cm_validation_type', 'cm_validation'],
+        ['cm_province', 'cm_city', 'cm_barangay', 'cm_complete', 'cm_validation_type', 'cm_validation', 'cm_ecom_type', 'cm_ecom_proof', 'cm_door_video'],
         ['cm_full_rel', 'cm_rel_cert_type', 'cm_rel_cert'],
       ];
       if (isOvw()) {
@@ -1504,6 +1535,9 @@
         cm_complete: "Co-maker's Complete Address",
         cm_validation_type: "Co-maker's Proof of Address Type",
         cm_validation: "Co-maker's Proof of Address",
+        cm_ecom_type: 'E-commerce Address Proof Type',
+        cm_ecom_proof: 'E-commerce Address Proof',
+        cm_door_video: 'Doorway Video',
         cm_full_rel: 'Relationship with Co-maker',
         cm_rel_cert_type: 'Relationship Certificate Type',
         cm_rel_cert: 'Relationship Certificate',
@@ -1513,15 +1547,17 @@
 
     function renderReturnedControl(key) {
       const label = returnedFieldLabel(key) + ' (returned)';
-      if (key === 'flight' || key === 'valid_visa' || key === 'oec' || key === 'proof_income' || key === 'cm_validation' || key === 'cm_rel_cert') {
-        return uploadField(key, label, key === 'proof_income' || key === 'cm_validation' ? { multiple: true, max: 6 } : {});
+      if (key === 'flight' || key === 'valid_visa' || key === 'oec' || key === 'proof_income' || key === 'cm_validation' || key === 'cm_ecom_proof' || key === 'cm_rel_cert') {
+        return uploadField(key, label, key === 'proof_income' || key === 'cm_validation' || key === 'cm_ecom_proof' ? { multiple: true, max: 6 } : {});
       }
+      if (key === 'cm_door_video') return uploadField(key, label, { required: false, accept: 'video/*', formatHint: 'Video' });
       if (key === 'departure_date' || key === 'visa_expiry' || key === 'visa_issue') return dateField(key, label);
       if (key === 'oec_duration') return textField(key, label, oecDurationFieldOpts());
       if (key === 'payroll') return selectField(key, label, O.payrollPeriod);
       if (key === 'expected_payday') return expectedPaydayFieldsHtml();
       if (key === 'residence_doc_type') return selectField(key, label, O.residenceDocType || O.visaType);
       if (key === 'cm_validation_type') return selectField(key, label, O.validationType);
+      if (key === 'cm_ecom_type') return selectField(key, label, O.ecomAddressType);
       if (key === 'cm_full_rel') return selectField(key, label, isOvw() ? O.comakerRelationship : O.relationship);
       if (key === 'cm_rel_cert_type') {
         const rel = val('cm_full_rel');
@@ -1811,12 +1847,14 @@
         ['cm_social', 'Social Media'],
         ['cm_social_acc', 'Social Media Account'],
         ['cm_validation_type', "Co-maker's Proof of Address Type"],
+        ['cm_ecom_type', 'E-commerce Address Proof Type'],
       ];
       req.forEach(([k, label]) => { if (!filled(k)) miss.push({ key: k, label }); });
       if (!dateFilled('cm_dob')) miss.push({ key: 'cm_dob', label: "Co-maker's Date Of Birth" });
       if (!addrFilled('cm')) miss.push({ key: 'cm_addr', label: "Co-maker's Residential Address" });
       if (!uploaded('cm_id_photo')) miss.push({ key: 'cm_id_photo', label: "Co-maker's ID photo" });
       if (!uploaded('cm_validation')) miss.push({ key: 'cm_validation', label: "Co-maker's Proof of Address" });
+      if (!uploaded('cm_ecom_proof')) miss.push({ key: 'cm_ecom_proof', label: 'E-commerce Address Proof' });
       if (!uploaded('cm_rel_cert')) miss.push({ key: 'cm_rel_cert', label: 'Relationship Certificate' });
       if (!filled('cm_rel_cert_type')) miss.push({ key: 'cm_rel_cert_type', label: 'Relationship Certificate Type' });
       return miss;
@@ -2010,6 +2048,7 @@
         const camSub = opts.reqHint
           ? `<span class="cam-sub">${esc(opts.reqHint)}</span>`
           : '';
+        const accept = opts.accept || 'image/*,.pdf';
         const addSlot = count < max ? (
           guided
             ? `<div class="photo-capture photo-capture--sm" data-guided-upload="${esc(key)}" data-upload-multi="1" data-upload-max="${max}" role="button" tabindex="0">
@@ -2021,13 +2060,13 @@
                 ${camIconHtml()}
                 <span class="cam-text">Upload</span>
                 ${camSub}
-                <input type="file" accept="image/*,.pdf" multiple />
+                <input type="file" accept="${esc(accept)}" multiple />
               </div>`
         ) : '';
         const countHint = count
           ? `<p class="photo-multi-hint">${count} file${count > 1 ? 's' : ''} uploaded</p>`
           : '';
-        const formatHint = `<p class="photo-multi-hint">Photos or PDF</p>`;
+        const formatHint = `<p class="photo-multi-hint">${esc(opts.formatHint || 'Photos or PDF')}</p>`;
       return `<div class="field" data-field="${key}">
           <div class="photo-field-head">
             <span class="photo-field-label">${fieldLabel(label, required)}</span>
@@ -2060,8 +2099,9 @@
         <div class="photo-capture${has ? ' has-file' : ''}" data-upload="${key}">
           ${camIconHtml()}
           <span class="cam-text">${has ? 'Uploaded · tap to replace' : 'Upload'}</span>
-          <input type="file" accept="image/*,.pdf" />
+          <input type="file" accept="${esc(opts.accept || 'image/*,.pdf')}" />
         </div>
+        ${opts.formatHint ? `<p class="photo-multi-hint">${esc(opts.formatHint)}</p>` : ''}
         <div class="err-msg">Please upload a file</div>
       </div>`;
     }
@@ -2207,6 +2247,23 @@
       if (!modal) return;
       modal.classList.remove('open');
       modal.hidden = true;
+    }
+    function openPrivacyNotice() {
+      const el = document.getElementById('privacy-modal');
+      if (!el) return;
+      el.hidden = false;
+      el.classList.add('open');
+    }
+    function closePrivacyNotice() {
+      const el = document.getElementById('privacy-modal');
+      if (!el) return;
+      el.classList.remove('open');
+      el.hidden = true;
+    }
+    function grantLocation(who) {
+      setVal(who === 'cm' ? '_cmLocGranted' : '_locGranted', '1');
+      toast(who === 'cm' ? 'Co-maker location allowed (demo)' : 'Location allowed (demo)');
+      render();
     }
 
     function openGuidedUploadModal(key, opts = {}) {
@@ -2708,6 +2765,7 @@
           cm_occupation: 'Corporate Employee', cm_income: 'P20,000 - P25,000',
           cm_id_type: 'UMID', cm_id_number: '1111-2222-3333',
           cm_id_photo: '1', cm_validation: '2', cm_validation_type: 'Utility Bills',
+          cm_ecom_type: 'Grab', cm_ecom_proof: '1',
           cm_rel_cert: '1', cm_rel_cert_type: 'Birth Certificate',
           cm_social: 'Facebook', cm_social_acc: 'juan.demo',
         },
@@ -2722,6 +2780,7 @@
           cm_occupation: 'BPO worker', cm_income: 'P20,000 - P25,000',
           cm_id_type: 'UMID', cm_id_number: '1234-5678-9012',
           cm_id_photo: '1', cm_validation: '2', cm_validation_type: 'Utility Bills',
+          cm_ecom_type: 'Shopee', cm_ecom_proof: '1', cm_door_video: '1',
           cm_rel_cert: '1', cm_rel_cert_type: 'Marriage Certificate',
           cm_social: 'Facebook', cm_social_acc: 'maria.santos',
         },
@@ -3269,6 +3328,14 @@
             ).join('')}
           </div>
           <button type="button" class="btn-primary" onclick="continueFlowStatus()">Continue</button>
+          <div class="card" style="margin-top:16px">
+            <div class="label">Location</div>
+            <p class="hint-muted">We use GPS and IP to check whether you are in the Philippines or overseas. This location is not a home-visit address.</p>
+            ${val('_locGranted') === '1'
+              ? '<p class="hint-muted">Location allowed (demo).</p>'
+              : '<button type="button" class="btn-ghost" onclick="grantLocation(\'borrower\')">Allow location</button>'}
+            <p class="hint-muted" style="margin-top:8px">Updated <a href="#" onclick="event.preventDefault();openPrivacyNotice()">Privacy Notice</a> covers location and IP.</p>
+          </div>
         </div>
       `;
     }
@@ -3296,6 +3363,8 @@
       sdu('cm_id_photo', force);
       sdu('cm_validation', force, 2);
       sd('cm_validation_type', 'Utility Bills', force);
+      sd('cm_ecom_type', 'Grab', force);
+      sdu('cm_ecom_proof', force, 1);
       sdu('cm_rel_cert', force);
       sd('cm_rel_cert_type', 'Marriage Certificate', force);
       sd('cm_social', 'Facebook', force);
@@ -3480,6 +3549,11 @@
         ${textField('cm_complete', "Co-maker's Complete Address")}
         ${selectField('cm_validation_type', "Co-maker's Proof of Address Type", O.validationType)}
         ${uploadField('cm_validation', "Co-maker's Proof of Address", { multiple: true, max: 6 })}
+        ${selectField('cm_ecom_type', 'E-commerce Address Proof Type', O.ecomAddressType)}
+        ${uploadField('cm_ecom_proof', 'E-commerce Address Proof', { multiple: true, max: 6, reqHint: 'Grab / Shopee / Lazada / Foodpanda' })}
+        <p class="hint-muted">Required. Screenshot must show the co-maker’s delivery address.</p>
+        ${uploadField('cm_door_video', 'Doorway Video', { required: false, accept: 'video/*', formatHint: 'Video · optional' })}
+        <p class="hint-muted">Optional. The video must clearly show the house number, and the co-maker must appear in it.</p>
         <div class="section-title">Proof of relationship</div>
         ${selectField('cm_full_rel', 'Relationship with Co-maker', isOvw() ? O.comakerRelationship : O.relationship)}
         ${rel ? selectField('cm_rel_cert_type', 'Relationship Certificate Type', certOpts) : '<p class="hint-muted">Select a relationship first.</p>'}
@@ -3658,7 +3732,7 @@
 
           <label class="loan-agree field" data-field="loan_agree">
             <input type="checkbox" data-loan-agree ${agreed ? 'checked' : ''} />
-            <span>I have read and accepted the <a href="#" onclick="event.preventDefault()">loan agreement</a> and <a href="#" onclick="event.preventDefault()">privacy agreement</a>.</span>
+            <span>I have read and accepted the <a href="#" onclick="event.preventDefault()">loan agreement</a> and <a href="#" onclick="event.preventDefault();openPrivacyNotice()">privacy agreement</a>.</span>
           </label>
 
           <button type="button" class="btn-primary${canSubmit?'':' btn-disabled'}" onclick="tryConfirmLoan()">Submit</button>
@@ -3786,6 +3860,13 @@
         'cm-h5-register': `
           <span class="h5-badge">Co-maker H5</span>
           ${textField('cm_h5_phone', 'Mobile number', { type: 'tel' })}
+          <div class="card">
+            <div class="label">Location</div>
+            <p class="hint-muted">Used for field collection of the co-maker’s address. Collected only after the co-maker opens this page.</p>
+            ${val('_cmLocGranted') === '1'
+              ? '<p class="hint-muted">Location allowed (demo).</p>'
+              : '<button type="button" class="btn-ghost" onclick="grantLocation(\'cm\')">Allow location</button>'}
+          </div>
           <button type="button" class="btn-primary" onclick="if(!filled('cm_h5_phone')){markErrors(['cm_h5_phone']);return;}goTo('cm-h5-confirm')">Next</button>
         `,
         'cm-h5-confirm': `
@@ -3916,6 +3997,7 @@
       closePassportCamera();
       closeGuidedUploadModal();
       closeSampleModal();
+      closePrivacyNotice();
       renderNav();
       const body = document.getElementById('screen-body');
       body.innerHTML = renderScreen();

@@ -846,6 +846,16 @@
         rv_contact_comaker: '联系担保人',
         rv_contact_dial: '联系人外呼',
         rv_comaker_material: '担保人材料',
+        rv_ecom_proof: '电商地址证明',
+        rv_door_video: '门口视频',
+        rv_reviewer_addr: '人审录入地址',
+        rv_addr_pack: '地址信息',
+        rv_addr_optional: '非必填。省市区 + 详细地址。借款人地址不能作为上门地址。',
+        rv_ecom_proof: '电商地址证明',
+        rv_door_video: '门口视频',
+        rv_reviewer_addr: '人审录入地址',
+        rv_addr_pack: '地址信息',
+        rv_addr_optional: '选填。省市区 + 详细地址。借款人地址不能作为上门地址。',
         rv_rel_proof: '关系证明',
         rv_id_proof: '身份证明',
         rv_liveness_photo: '活体照',
@@ -1261,6 +1271,16 @@
         rv_contact_comaker: 'Contact Co-maker',
         rv_contact_dial: 'Contact dial',
         rv_comaker_material: 'Co-maker Materials',
+        rv_ecom_proof: 'E-commerce Address Proof',
+        rv_door_video: 'Doorway Video',
+        rv_reviewer_addr: 'Reviewer-entered address',
+        rv_addr_pack: 'Address',
+        rv_addr_optional: 'Optional. Region + street address. Borrower address is not a visit address.',
+        rv_ecom_proof: 'E-commerce Address Proof',
+        rv_door_video: 'Doorway Video',
+        rv_reviewer_addr: 'Reviewer-entered address',
+        rv_addr_pack: 'Address',
+        rv_addr_optional: 'Optional. Region + street address. Borrower address is not a visit address.',
         rv_rel_proof: 'Relationship Proof',
         rv_id_proof: 'ID Proof',
         rv_liveness_cm: 'Liveness Photo',
@@ -1636,6 +1656,15 @@
       'Relationship Certificate': '关系证明',
       "Co-maker's Proof of Address Type": '担保人地址证明类型',
       "Co-maker's Proof of Address": '担保人地址证明',
+      'E-commerce Address Proof Type': '电商地址证明类型',
+      'E-commerce Address Proof': '电商地址证明',
+      'Doorway Video': '门口视频',
+      "Co-maker's ID photo · Front": '担保人证件照 · 正面',
+      'E-commerce Address Proof Type': '电商地址证明类型',
+      'E-commerce Address Proof': '电商地址证明',
+      'Doorway Video': '门口视频',
+      "Co-maker's ID photo · Front": '担保人证件照 · 正面',
+      "Co-maker's ID photo · Back": '担保人证件照 · 反面',
       'Male': '男',
       'Female': '女',
       'Single': '单身',
@@ -2224,6 +2253,9 @@
       { key: 'cm_rel_cert', label: 'Relationship Certificate', type: 'file' },
       { key: 'cm_validation_type', label: "Co-maker's Proof of Address Type", type: 'select', options: ['Bank Account Summary (past 3 months)', 'Utility Bills', 'Barangay Clearance'], tip: 'rename' },
       { key: 'cm_validation', label: "Co-maker's Proof of Address", type: 'file', tip: 'rename' },
+      { key: 'cm_ecom_type', label: 'E-commerce Address Proof Type', type: 'select', options: ['Grab', 'Shopee', 'Lazada', 'Foodpanda'], tip: 'new' },
+      { key: 'cm_ecom_proof', label: 'E-commerce Address Proof', type: 'file', tip: 'new' },
+      { key: 'cm_door_video', label: 'Doorway Video', type: 'file', tip: 'new' },
     ];
 
     function newComakerId() { return 'cm_' + Math.random().toString(36).slice(2, 9); }
@@ -2268,7 +2300,7 @@
       const common = [
         ['oec', 'oec_duration'],
         ['payroll', 'expected_payday'],
-        ['cm_residential', 'cm_province', 'cm_city', 'cm_barangay', 'cm_complete', 'cm_validation_type', 'cm_validation'],
+        ['cm_residential', 'cm_province', 'cm_city', 'cm_barangay', 'cm_complete', 'cm_validation_type', 'cm_validation', 'cm_ecom_type', 'cm_ecom_proof', 'cm_door_video'],
         ['cm_full_rel', 'cm_rel_cert_type', 'cm_rel_cert'],
       ];
       if (flow === 'oversea') {
@@ -2427,6 +2459,8 @@
       cm_id_photo: 'https://picsum.photos/seed/cmid1/480/320',
       cm_rel_cert: 'https://picsum.photos/seed/cert1/480/320',
       cm_validation: 'https://picsum.photos/seed/validate1/480/320',
+      cm_ecom_proof: 'https://picsum.photos/seed/grabaddr/480/320',
+      cm_door_video: 'https://picsum.photos/seed/doorvideo/480/320',
       gov_id: 'https://picsum.photos/seed/govid1/480/320',
     };
 
@@ -2515,6 +2549,7 @@
           cm_complete: '1 Demo Ave', cm_email: 'cm@email.com',
           cm_rel_cert_type: 'Marriage Certificate', cm_rel_cert: MOCK_IMG.cm_rel_cert,
           cm_validation_type: 'Utility Bills', cm_validation: MOCK_IMG.cm_validation,
+          cm_ecom_type: 'Grab', cm_ecom_proof: MOCK_IMG.cm_ecom_proof, cm_door_video: MOCK_IMG.cm_door_video,
           cm_social: 'Facebook', cm_social_acc: first.toLowerCase(),
           ...opts.fields,
         },
@@ -2939,7 +2974,7 @@
       b_id: 'passport_photo', b_live: 'liveness_photo', b_oec: 'oec', b_visa: 'valid_visa',
       b_flight: 'flight', b_contract: 'employer_contract', b_income: 'proof_income',
       b_gov: 'gov_id', b_emp: 'proof_emp',
-      c_id: 'cm_id_photo', c_id_back: 'cm_id_photo_back', c_rel: 'cm_rel_cert', c_val: 'cm_validation', c_live: 'cm_liveness',
+      c_id: 'cm_id_photo', c_id_back: 'cm_id_photo_back', c_rel: 'cm_rel_cert', c_val: 'cm_validation', c_ecom: 'cm_ecom_proof', c_door: 'cm_door_video', c_live: 'cm_liveness',
     };
 
     const BIZ_TAG_KEYS = ['biz_not_first', 'biz_seaman', 'biz_fraud', 'biz_id', 'biz_comaker', 'biz_calling', 'biz_other'];
@@ -3026,7 +3061,7 @@
     }
 
     function getImageFieldKeys(user) {
-      return [...new Set(getReviewMaterials(user).map(m => m.fieldKey).filter(Boolean))];
+      return [...new Set(getReviewMaterials(user).filter(m => !m.skipMust).map(m => m.fieldKey).filter(Boolean))];
     }
 
     /** Image materials only — used for Pass gate and “N left to review”. */
@@ -3264,6 +3299,8 @@
         { key: 'c_id_back', label: `${t('rv_id_photo')} · ${t('photo_back')}`, url: cmf.cm_id_photo_back || MOCK_IMG.cm_id_photo },
         { key: 'c_rel', label: t('rv_rel_proof'), url: cmf.cm_rel_cert || MOCK_IMG.cm_rel_cert },
         { key: 'c_val', label: t('rv_id_proof'), url: cmf.cm_validation || MOCK_IMG.cm_validation },
+        { key: 'c_ecom', label: t('rv_ecom_proof'), url: cmf.cm_ecom_proof || MOCK_IMG.cm_ecom_proof },
+        { key: 'c_door', label: t('rv_door_video'), url: cmf.cm_door_video || '', skipMust: !cmf.cm_door_video, placeholder: lang === 'zh' ? '未上传（选填）' : 'Not uploaded (optional)' },
         { key: 'c_live', label: t('rv_liveness_cm'), url: cmf.cm_liveness || MOCK_IMG.cm_id_photo, matchMode: true },
       ].map(it => ({
         ...it,
@@ -3574,6 +3611,7 @@
         decisionTextItem('t_c_occupation', 'cm_occupation', t('rv_occupation'), cp, cmf.cm_occupation, 'comaker'),
         decisionTextItem('t_c_income', 'cm_income', t('rv_income'), cp, cmf.cm_income, 'comaker'),
         decisionTextItem('t_c_val_type', 'cm_validation_type', t('rv_id_proof_type'), cp, cmf.cm_validation_type, 'comaker'),
+        decisionTextItem('t_c_ecom_type', 'cm_ecom_type', 'E-commerce Address Proof Type', cp, cmf.cm_ecom_type, 'comaker'),
         decisionTextItem('t_c_rel_type', 'cm_rel_cert_type', t('rv_rel_proof_type'), cp, cmf.cm_rel_cert_type, 'comaker'),
         decisionTextItem('t_c_social', 'cm_social', t('rv_social_media'), cp, cmf.cm_social, 'comaker'),
         decisionTextItem('t_c_social_acc', 'cm_social_acc', t('rv_social_account'), cp, cmf.cm_social_acc, 'comaker'),
@@ -3629,12 +3667,16 @@
         decisionTextItem('p_cm_occupation', 'cm_occupation', "Co-maker's Occupation", cp, cmf.cm_occupation, 'comaker'),
         img('p_cm_val', 'cm_validation', "Co-maker's Proof of Address", 'comaker', cp, cmf.cm_validation || MOCK_IMG.cm_validation),
         decisionTextItem('p_cm_val_type', 'cm_validation_type', "Co-maker's Proof of Address Type", cp, cmf.cm_validation_type, 'comaker'),
+        img('p_cm_ecom', 'cm_ecom_proof', 'E-commerce Address Proof', 'comaker', cp, cmf.cm_ecom_proof || MOCK_IMG.cm_ecom_proof),
+        decisionTextItem('p_cm_ecom_type', 'cm_ecom_type', 'E-commerce Address Proof Type', cp, cmf.cm_ecom_type, 'comaker'),
+        img('p_cm_door', 'cm_door_video', 'Doorway Video', 'comaker', cp, cmf.cm_door_video || ''),
         img('p_cm_rel', 'cm_rel_cert', 'Relationship Certificate', 'comaker', cp, cmf.cm_rel_cert || MOCK_IMG.cm_rel_cert),
         decisionTextItem('p_cm_rel_type', 'cm_rel_cert_type', 'Relationship Certificate Type', cp, cmf.cm_rel_cert_type, 'comaker'),
       ] : [];
 
       if (isDomestic) {
         return [
+          decisionTextItem('p_mother', 'mother_maiden', "Mother's Maiden Name", bp, f.mother_maiden, 'borrower'),
           img('p_passport', 'passport_photo', 'Philippine Passport Photo', 'borrower', bp, f.passport_photo || MOCK_IMG.passport_photo),
           decisionTextItem('p_marital', 'marital_status', 'Marital Status', bp, f.marital_status, 'borrower'),
           decisionTextItem('p_email', 'email', 'Email', bp, f.email, 'borrower'),
@@ -3654,6 +3696,7 @@
       const visaDocLabel = (f.residence_doc_type === 'Employment / Work Visa' || f.residence_doc_type === 'Work Visa' || !f.residence_doc_type)
         ? 'Valid Visa' : 'Valid Document';
       return [
+        decisionTextItem('p_mother', 'mother_maiden', "Mother's Maiden Name", bp, f.mother_maiden, 'borrower'),
         img('p_passport', 'passport_photo', 'Philippine Passport Photo', 'borrower', bp, f.passport_photo || MOCK_IMG.passport_photo),
         decisionTextItem('p_marital', 'marital_status', 'Marital Status', bp, f.marital_status, 'borrower'),
         decisionTextItem('p_email', 'email', 'Email', bp, f.email, 'borrower'),
@@ -3906,6 +3949,38 @@
       ];
     }
 
+    const reviewerAddrDraft = {};
+    function reviewerAddrOf(userId) {
+      if (!reviewerAddrDraft[userId]) {
+        reviewerAddrDraft[userId] = { bRegion: '', bDetail: '', cRegion: '', cDetail: '' };
+      }
+      return reviewerAddrDraft[userId];
+    }
+    function renderAddrInputs(userId, prefix, title) {
+      const a = reviewerAddrOf(userId);
+      const regionKey = prefix + 'Region';
+      const detailKey = prefix + 'Detail';
+      const regionLabel = lang === 'zh' ? '省 / 市 / 区' : 'Province / City / District';
+      const detailLabel = lang === 'zh' ? '详细地址' : 'Street address';
+      return `<div style="flex:1;min-width:240px">
+        <div style="font-weight:600;margin-bottom:8px">${esc(title)}</div>
+        <label style="display:block;font-size:12px;color:#909399;margin-bottom:4px">${esc(regionLabel)}</label>
+        <input style="width:100%;margin-bottom:8px;padding:6px 8px;border:1px solid #dcdfe6;border-radius:2px" value="${esc(a[regionKey])}" oninput="reviewerAddrOf('${userId}').${regionKey}=this.value" />
+        <label style="display:block;font-size:12px;color:#909399;margin-bottom:4px">${esc(detailLabel)}</label>
+        <input style="width:100%;padding:6px 8px;border:1px solid #dcdfe6;border-radius:2px" value="${esc(a[detailKey])}" oninput="reviewerAddrOf('${userId}').${detailKey}=this.value" />
+      </div>`;
+    }
+    function renderAddressPack(user) {
+      const zh = lang === 'zh';
+      return `
+        <p style="color:#909399;margin:0 0 10px">${esc(t('rv_addr_optional'))}</p>
+        <div style="display:flex;gap:16px;flex-wrap:wrap">
+          ${renderAddrInputs(user.id, 'b', zh ? '借款人地址（辅助，非上门）' : 'Borrower address (not a visit address)')}
+          ${renderAddrInputs(user.id, 'c', zh ? '担保人地址' : 'Co-maker address')}
+        </div>
+      `;
+    }
+
     function renderReviewDetailPage(user) {
       const f = user.fields || {};
       const loan = user.loan || {};
@@ -3957,6 +4032,8 @@
         { key: 'c_id_back', label: "Co-maker's ID photo · Back", url: cmf.cm_id_photo_back || MOCK_IMG.cm_id_photo, fieldKey: 'cm_id_photo_back', tip: 'rename' },
         { key: 'c_rel', label: 'Relationship Certificate', url: cmf.cm_rel_cert || MOCK_IMG.cm_rel_cert, fieldKey: 'cm_rel_cert', tip: 'rename' },
         { key: 'c_val', label: "Co-maker's Proof of Address", url: cmf.cm_validation || MOCK_IMG.cm_validation, fieldKey: 'cm_validation', tip: 'rename' },
+        { key: 'c_ecom', label: 'E-commerce Address Proof', url: cmf.cm_ecom_proof || MOCK_IMG.cm_ecom_proof, fieldKey: 'cm_ecom_proof', tip: 'new' },
+        { key: 'c_door', label: 'Doorway Video', url: cmf.cm_door_video || '', fieldKey: 'cm_door_video', tip: 'new', placeholder: lang === 'zh' ? '未上传（选填）' : 'Not uploaded (optional)' },
         { key: 'c_live', label: t('rv_liveness_cm'), url: cmf.cm_liveness || MOCK_IMG.cm_id_photo, fieldKey: 'cm_liveness', tip: null },
       ];
       if (cm) {
@@ -3979,6 +4056,7 @@
           rf("Co-maker's Occupation", cmf.cm_occupation, 'cm_occupation', null),
           rf('Relationship Certificate Type', cmf.cm_rel_cert_type, 'cm_rel_cert_type', tipR),
           rf("Co-maker's Proof of Address Type", cmf.cm_validation_type, 'cm_validation_type', tipR),
+          rf('E-commerce Address Proof Type', cmf.cm_ecom_type, 'cm_ecom_type', tipN),
           rf("Co-maker's Monthly Income", cmf.cm_income, 'cm_income', null),
           rf('Social Media', cmf.cm_social, 'cm_social', null),
           rf('Social Media Account', cmf.cm_social_acc, 'cm_social_acc', null),
@@ -3996,6 +4074,8 @@
         );
       }
 
+      const addrPack = renderReviewModule(t('rv_addr_pack'), renderAddressPack(user));
+
       const marks = countFieldMarks(user.id);
 
       return `
@@ -4009,6 +4089,7 @@
         ${borrowerModule}
         ${contactsModule}
         ${comakerModule}
+        ${addrPack}
         <div class="info-block rv-section">
           <div class="info-block-title">${t('rv_related_records')}</div>
           <div class="rv-footer-body">
