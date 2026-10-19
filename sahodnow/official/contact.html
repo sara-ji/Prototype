@@ -17,7 +17,8 @@
       <div class="frame">
         <div class="hero-copy">
           <h1>Reach us<br>here.</h1>
-          <p class="lede">Email, hotline, and hours. Only what is listed on this page.</p>
+          <p class="lede">Submit a ticket, email, or call. Only the channels listed on this page are ours.</p>
+          <a class="link hero-link" href="#ticket">Submit a ticket</a>
         </div>
         <div class="panel-visual" aria-hidden="true">
           <div class="gfx-stage">
@@ -64,6 +65,38 @@
             </div>
           </article>
         </div>
+      </div>
+    </section>
+
+    <section class="chapter sheet" id="ticket">
+      <div class="wrap ticket">
+        <div>
+          <p class="kicker">Submit a ticket</p>
+          <h2>Tell us what you need.</h2>
+          <p>Questions, loan status, eligibility, payments, disbursements, or any concern. We reply by email.</p>
+          <p class="note">Never include your OTP, PIN, or password. We will never ask for them.</p>
+        </div>
+        <form class="ticket-form" data-ticket>
+          <label>Topic
+            <select name="topic" required>
+              <option value="" disabled selected>Choose a topic</option>
+              <option>Question about SahodNow</option>
+              <option>Loan status</option>
+              <option>Eligibility</option>
+              <option>Payment update</option>
+              <option>Disbursement</option>
+              <option>Issue or concern</option>
+            </select>
+          </label>
+          <div class="ticket-row">
+            <label>Full name<input name="name" autocomplete="name" required /></label>
+            <label>Mobile number<input name="mobile" type="tel" inputmode="tel" autocomplete="tel" placeholder="09XX XXX XXXX" required /></label>
+          </div>
+          <label>Email<input name="email" type="email" autocomplete="email" required /></label>
+          <label>Message<textarea name="message" rows="5" required></textarea></label>
+          <button class="band-btn ticket-send" type="submit">Submit ticket</button>
+          <p class="ticket-done" role="status" hidden>Your email app opens with the ticket filled in. Send it to submit.</p>
+        </form>
       </div>
     </section>
   </main>

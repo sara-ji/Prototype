@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="NPC DPO/DPS Seal of Registration (sample)">
+  <defs>
+    <path id="ring" d="M100 100 m-74 0 a74 74 0 1 1 148 0 a74 74 0 1 1 -148 0"/>
+  </defs>
+  <circle cx="100" cy="100" r="96" fill="#ffffff"/>
+  <circle cx="100" cy="100" r="92" fill="none" stroke="#1d3a8a" stroke-width="4"/>
+  <circle cx="100" cy="100" r="60" fill="none" stroke="#1d3a8a" stroke-width="1.5"/>
+  <text font-family="Rubik, Arial, sans-serif" font-size="13" font-weight="600" letter-spacing="2.2" fill="#1d3a8a">
+    <textPath href="#ring" startOffset="50%" text-anchor="middle">NATIONAL PRIVACY COMMISSION &#183; SEAL OF REGISTRATION &#183;</textPath>
+  </text>
+  <text x="100" y="94" text-anchor="middle" font-family="Rubik, Arial, sans-serif" font-size="30" font-weight="700" fill="#1d3a8a">NPC</text>
+  <text x="100" y="116" text-anchor="middle" font-family="Rubik, Arial, sans-serif" font-size="14" font-weight="600" letter-spacing="1" fill="#c9a227">DPO / DPS</text>
+  <text x="100" y="136" text-anchor="middle" font-family="Rubik, Arial, sans-serif" font-size="9" letter-spacing="2" fill="#8a94a6">SAMPLE</text>
+</svg>
