@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SahodNow · Google 账号注册与 Play 开发者认证全流程</title>
+<style>
+  :root { --teal:#018b8d; --teal-d:#016a6c; --ink:#14201f; --muted:#5d6b6a; --line:#e3eceb; --bg:#f6f9f9; --red:#c0392b; --red-bg:#fdecea; --amber:#9a6700; --amber-bg:#fff6dd; --green:#1e7b4f; --green-bg:#e6f5ec; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:"PingFang SC","Microsoft YaHei","Segoe UI",sans-serif; color:var(--ink); background:var(--bg); line-height:1.7; font-size:15px; }
+  header.top { background:var(--teal); color:#fff; padding:36px 0 30px; }
+  .wrap { max-width:1080px; margin:0 auto; padding:0 28px; }
+  header.top h1 { margin:0 0 8px; font-size:28px; }
+  header.top p { margin:4px 0; opacity:.92; }
+  nav.toc { position:sticky; top:0; z-index:5; background:#fff; border-bottom:1px solid var(--line); }
+  nav.toc .wrap { display:flex; flex-wrap:wrap; gap:4px 18px; padding-top:10px; padding-bottom:10px; font-size:13.5px; }
+  nav.toc a { color:var(--teal-d); text-decoration:none; }
+  main { padding:28px 0 60px; }
+  section { background:#fff; border:1px solid var(--line); border-radius:14px; padding:26px 30px; margin:0 0 22px; }
+  h2 { margin:0 0 14px; font-size:21px; color:var(--teal-d); }
+  h3 { margin:22px 0 8px; font-size:17px; }
+  h4 { margin:16px 0 6px; font-size:15px; }
+  table { width:100%; border-collapse:collapse; margin:10px 0 14px; font-size:14px; }
+  th, td { border:1px solid var(--line); padding:8px 10px; vertical-align:top; text-align:left; }
+  th { background:#eef6f6; font-weight:600; }
+  td.k { white-space:nowrap; font-weight:600; }
+  code { background:#eef3f3; padding:1px 5px; border-radius:4px; font-size:13px; }
+  .tag { display:inline-block; font-size:12px; padding:1px 8px; border-radius:10px; margin-right:4px; white-space:nowrap; }
+  .tag.off { background:var(--green-bg); color:var(--green); }
+  .tag.adv { background:var(--amber-bg); color:var(--amber); }
+  .tag.risk { background:var(--red-bg); color:var(--red); }
+  .box { border-radius:10px; padding:12px 16px; margin:12px 0; }
+  .box.risk { background:var(--red-bg); border-left:4px solid var(--red); }
+  .box.warn { background:var(--amber-bg); border-left:4px solid var(--amber); }
+  .box.ok { background:var(--green-bg); border-left:4px solid var(--green); }
+  .box p { margin:4px 0; }
+  .src { font-size:12.5px; color:var(--muted); margin:6px 0 0; }
+  .src a { color:var(--teal-d); word-break:break-all; }
+  figure { margin:14px 0 18px; }
+  figure img { width:100%; border:1px solid var(--line); border-radius:10px; display:block; }
+  figcaption { font-size:12.5px; color:var(--muted); margin-top:6px; }
+  .step { border-top:1px dashed var(--line); padding-top:6px; margin-top:22px; }
+  .step:first-of-type { border-top:0; margin-top:0; }
+  .step-no { display:inline-block; background:var(--teal); color:#fff; border-radius:6px; padding:0 9px; margin-right:8px; font-size:14px; }
+  ol, ul { padding-left:22px; margin:6px 0; }
+  li { margin:3px 0; }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media (max-width:820px) { .grid2 { grid-template-columns:1fr; } section { padding:20px 18px; } }
+  .legend span { margin-right:14px; }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <h1>Google 账号注册 & Google Play 开发者认证全流程</h1>
+    <p>适用：SahodNow（主体 LendWise Financing Corp.，菲律宾注册，已有 SEC 注册及 OLP 备案），研发团队在国内操作。</p>
+    <p>资料整理日期：2026-10-23｜依据 Google 官方 Help Center、Policy Center、Android Developers 官方文档与官方 PDF 指南（见文末来源清单）。</p>
+  </div>
+</header>
+
+<nav class="toc"><div class="wrap">
+  <a href="#tldr">0 先看结论</a>
+  <a href="#plan">1 账号规划</a>
+  <a href="#timeline">2 时间线</a>
+  <a href="#materials">3 材料清单</a>
+  <a href="#steps">4 分步流程</a>
+  <a href="#cn-risk">5 国内操作风险与规避</a>
+  <a href="#listing">6 上架合规红线</a>
+  <a href="#todo">7 待确认事项</a>
+  <a href="#sources">8 来源清单</a>
+</div></nav>
+
+<main><div class="wrap">
+
+<p class="legend"><span class="tag off">官方</span>Google 官方文档原文要求 <span class="tag adv">建议</span>基于官方规则的内部操作建议（非 Google 原文） <span class="tag risk">风险</span>需要重点规避的点</p>
+
+<!-- 0 -->
+<section id="tldr">
+  <h2>0. 先看结论</h2>
+  <ol>
+    <li><b>必须注册「组织（Organization）」账号。</b>Play Console Requirements 政策明确：提供贷款等金融服务的开发者必须以组织身份注册。<span class="tag off">官方</span></li>
+    <li><b>组织账号的核心是「信息一致」。</b>SEC 文件、D-U-N-S（邓白氏）档案、Google 付款资料（payments profile）、官网，这四处的<b>法定名称和地址必须逐字一致</b>。不一致是验证失败的首要原因，事后发现不一致会被要求 28 天内整改，否则账号和 App 下架。<span class="tag off">官方</span></li>
+    <li><b>最大的时间风险是 D-U-N-S 编码。</b>官方说明免费申请最长约 30 个工作日（付费加急约 8 个工作日）；没有 D-U-N-S 无法创建组织账号。距 11-10 上线只剩约 13 个工作日，<b>今天就要查主体是否已有 D-U-N-S</b>。<span class="tag risk">风险</span></li>
+    <li><b>Google 并不禁止中国团队注册</b>（中国本身就在支持注册的地区列表里）。国内操作的真正风险不是「在国内」，而是：①资料与主体不一致、②与被封账号产生关联（同设备 / 网络 / 付款卡 / 手机号）、③登录环境频繁切换触发安全验证。跳板机的正确用途是<b>提供固定、一致的登录环境</b>，不是伪装身份。<span class="tag adv">建议</span></li>
+    <li><b>Owner 账号必须是公司可控的账号</b>：用公司域名邮箱建 Google 账号，开两步验证，研发用各自账号被邀请、按最小权限分配，不共享 Owner 密码。<span class="tag adv">建议</span></li>
+    <li><b>账号通过后，上架还有两条硬红线和当前 PRD 冲突</b>（详见第 6 节）：<br>
+      ①贷款类 App 禁止申请 <code>QUERY_ALL_PACKAGES</code>、<code>READ_PHONE_NUMBERS</code>、<code>ACCESS_FINE_LOCATION</code>、<code>READ_MEDIA_IMAGES</code>/<code>READ_EXTERNAL_STORAGE</code> 等权限；<code>READ_SMS</code> 也不在贷款类允许用途内。当前 PRD 5.12 的 Applist、短信、手机号、GPS、相册上传都受影响。<br>
+      ②禁止「60 天内须全额还清」的短期贷款，官网写的「1–12 个月」里，1 个月、2 个月期限需要确认是否构成违规。<span class="tag risk">风险</span></li>
+  </ol>
+</section>
+
+<!-- 1 -->
+<section id="plan">
+  <h2>1. 账号规划（先定人、定号、定环境）</h2>
+  <table>
+    <tr><th>项目</th><th>建议值 / 要求</th><th>依据</th></tr>
+    <tr><td class="k">开发者账号类型</td><td>Organization（组织）。注册后账号类型不可再改。</td><td><span class="tag off">官方</span> Play Console Requirements §1.1；官方组织验证指南</td></tr>
+    <tr><td class="k">Owner Google 账号</td><td>用公司域名邮箱新建，例如 <code>googleplay@sahodnow.com</code>（公司邮箱系统可控、可交接）。<b>不要用员工个人 Gmail。</b>Owner 是第一个注册的账号，唯一能管理付款资料和身份信息；账号无法直接改 Owner，只能走 App 转移。</td><td><span class="tag off">官方</span> 用户与权限说明（Account owner 定义）；<span class="tag adv">建议</span></td></tr>
+    <tr><td class="k">Owner 实际操作人</td><td>主体的授权代表本人，或由其授权的固定专人。上传的是<b>授权代表（董事 / CEO / 法定代表人）本人的证件</b>，证件可以是任意国家签发。建议选择在 SEC GIS（公司信息表）上列名的董事 / 高管。</td><td><span class="tag off">官方</span> 菲律宾证件要求页：“The government-issued photo ID can be issued in any country”</td></tr>
+    <tr><td class="k">开发者名称（商店展示）</td><td>可与法定名称不同，例如「SahodNow」。但法定名称、地址会在 Google Play 上公开展示。</td><td><span class="tag off">官方</span> 创建开发者账号所需信息</td></tr>
+    <tr><td class="k">联系邮箱（Google 联系你，不公开）</td><td>需 OTP 验证；应与 Google 账号邮箱不同；<b>应与组织官网域名一致</b>；须代表组织；可以是群组邮箱。建议 <code>googleplay-notice@sahodnow.com</code>（群组，产品 + 研发负责人都能收）。</td><td><span class="tag off">官方</span> 管理开发者账号信息</td></tr>
+    <tr><td class="k">开发者邮箱（Play 公开展示）</td><td>需 OTP 验证；不能是通用 / 个人邮箱。建议 <code>CS@sahodnow.com</code>。</td><td><span class="tag off">官方</span></td></tr>
+    <tr><td class="k">联系电话（不公开）</td><td>国际格式，需短信 / 语音 OTP 验证，并在账号存续期间一直可用。建议用菲律宾 +63 手机号，由固定专人长期持有。</td><td><span class="tag off">官方</span>；<span class="tag adv">建议</span> 用 +63</td></tr>
+    <tr><td class="k">开发者电话（Play 公开展示）</td><td>组织账号必填，需 OTP 验证。建议客服热线 <code>+63 2 8841 9886</code>（0288419886）；固话可用语音呼叫收验证码。</td><td><span class="tag off">官方</span></td></tr>
+    <tr><td class="k">组织电话（不公开）</td><td>应是公众在网上或公共登记（如邓白氏）里能查到的组织电话，用于核验组织。建议与 D-U-N-S 档案中的电话一致。</td><td><span class="tag off">官方</span></td></tr>
+    <tr><td class="k">组织官网</td><td><code>https://sahodnow.com</code>（以实际域名为准），必须在 Google Search Console 完成所有权验证。</td><td><span class="tag off">官方</span></td></tr>
+    <tr><td class="k">注册费付款卡</td><td>25 美元一次性；支持 Visa / Mastercard / AmEx / Visa Electron，<b>不接受预付卡</b>。建议用以主体名义（或授权代表本人名义）开立的菲律宾信用卡 / 借记卡。</td><td><span class="tag off">官方</span> 入门指南 Step 3；<span class="tag adv">建议</span> 卡的国家与主体一致</td></tr>
+  </table>
+  <div class="box warn"><p><b>注意邮箱域名统一：</b>《各部门模块与需求跟进》里商店联系邮箱写的是 <code>support@sahodnow.ph</code>，官网和协议用的是 <code>CS@sahodnow.com</code>。Google 要求联系邮箱与已验证官网同域名，建议统一为官网域名。</p></div>
+</section>
+
+<!-- 2 -->
+<section id="timeline">
+  <h2>2. 时间线与依赖</h2>
+  <table>
+    <tr><th>环节</th><th>耗时</th><th>依赖</th><th>依据</th></tr>
+    <tr><td>查询 / 申请 D-U-N-S</td><td>查询即时；免费申请最长约 30 个工作日，付费加急约 8 个工作日；邓白氏可能电话核实</td><td>SEC 文件上的准确名称和地址；可接听的组织电话</td><td><span class="tag off">官方</span> Play Help + 邓白氏官网</td></tr>
+    <tr><td>官网上线 + Search Console 验证</td><td>手动添加的 DNS TXT 记录，可能要 2–3 天才被识别</td><td>域名 DNS 管理权限</td><td><span class="tag off">官方</span> Search Console Help</td></tr>
+    <tr><td>注册 Play Console（填表 + 付费）</td><td>当天</td><td>D-U-N-S、付款卡、邮箱、电话</td><td><span class="tag off">官方</span></td></tr>
+    <tr><td>身份验证（组织文件 + 代表证件）审核</td><td>官方未写时长；第三方经验约 3–5 个工作日</td><td>付款资料与文件逐字一致</td><td>第三方经验</td></tr>
+    <tr><td>网站验证 → 电话验证</td><td>当天</td><td><b>电话验证必须在身份验证、网站验证完成之后</b></td><td><span class="tag off">官方</span></td></tr>
+    <tr><td>App 上架审核</td><td>视审核情况</td><td>财务功能声明 + SEC 牌照文件、隐私政策、数据安全表、审核测试账号</td><td><span class="tag off">官方</span></td></tr>
+  </table>
+  <p>组织账号<b>不受</b>个人账号的「12 名测试者 × 14 天封闭测试」和「真机设备验证」限制，这两项只针对 2023-11-13 之后新建的个人账号。<span class="tag off">官方</span></p>
+</section>
+
+<!-- 3 -->
+<section id="materials">
+  <h2>3. 材料清单（到可直接准备的颗粒度）</h2>
+  <table>
+    <tr><th style="width:18%">材料</th><th>颗粒度要求</th><th style="width:20%">我们的值 / 负责人</th><th style="width:14%">依据</th></tr>
+    <tr><td class="k">法定名称</td><td>与 SEC 注册证书逐字一致，包括标点和缩写（如 “Corp.” 和 “Corporation” 视为不同）。D-U-N-S、付款资料、官网页脚三处统一。</td><td>LendWise Financing Corp.（以 SEC 证书原文为准）｜法务</td><td><span class="tag off">官方</span></td></tr>
+    <tr><td class="k">法定地址</td><td>与 SEC 登记地址一致；不允许 PO Box。楼层、楼栋、Barangay、City、邮编写法统一。</td><td>以 SEC GIS 上的主要办公地址为准；官网页脚目前为 “Eton Cyberpod Corinthian, EDSA corner Ortigas Avenue, Barangay Ugong Norte, Quezon City, Metro Manila, Philippines”，需与 SEC 原文核对｜法务</td><td><span class="tag off">官方</span> 付款资料要求</td></tr>
+    <tr><td class="k">D-U-N-S 编码</td><td>9 位数字；邓白氏档案中的名称和地址必须与付款资料一致；填写次数有限，提前拿到再开始注册。</td><td>待查询｜法务 / 财务</td><td><span class="tag off">官方</span></td></tr>
+    <tr><td class="k">D-U-N-S 申请资料</td><td>法定名称、业务地址、业务电话、负责人（Owner / President / CEO）姓名、法律结构、成立年份、主营行业、员工总数。</td><td>SEC 文件 + GIS｜法务</td><td><span class="tag off">官方</span> 邓白氏官网</td></tr>
+    <tr><td class="k">组织注册文件（菲律宾）</td><td>菲律宾页面接受两类：① Certificate of incorporation or registration；② Extract from commercial register。要求彩色、清晰、非复印件、未修改；名称和地址须与付款资料一致。<br><span class="tag adv">建议</span>SEC 注册证书通常不含地址，同时准备 SEC Certificate of Incorporation 和最新 GIS（含主要办公地址、董事名单），必要时附 Articles of Incorporation。</td><td>SEC 注册号 2026100271772-03｜法务出彩色扫描件</td><td><span class="tag off">官方</span> 菲律宾证件要求页</td></tr>
+    <tr><td class="k">授权代表证件</td><td>护照 / 身份证 / 驾照 / 永久居留卡任选一种；有效期内、彩色、清晰、非复印件；可为任意国家签发。证件姓名须与付款资料里的联系人一致。</td><td>授权代表本人｜行政</td><td><span class="tag off">官方</span></td></tr>
+    <tr><td class="k">授权证明</td><td><span class="tag adv">建议</span>如操作人不是证件上的董事，额外准备 Board Resolution / Secretary's Certificate，指定其代表公司办理 Google Play 账号（以备 Google 追加材料）。</td><td>法务</td><td>官方：可能要求补充材料</td></tr>
+    <tr><td class="k">官网</td><td>可公开访问，展示主体名称、地址、SEC 注册号、CA 号和联系方式；已在 Search Console 验证所有权。</td><td>官网已有 SEC/CA 号｜产品 + 研发</td><td><span class="tag off">官方</span></td></tr>
+    <tr><td class="k">邮箱 × 2</td><td>联系邮箱、开发者邮箱都需要收 6 位 OTP，并长期可用。</td><td>见第 1 节｜IT</td><td><span class="tag off">官方</span></td></tr>
+    <tr><td class="k">电话 × 3</td><td>联系电话、开发者电话：OTP 验证；组织电话：与公开登记一致。国际格式 +63…</td><td>见第 1 节｜行政</td><td><span class="tag off">官方</span></td></tr>
+    <tr><td class="k">付款卡</td><td>25 美元；非预付卡；建议户名与主体或授权代表一致。</td><td>财务</td><td><span class="tag off">官方</span></td></tr>
+    <tr><td class="k">牌照文件（上架用）</td><td>财务功能声明中上传：SEC Registration No.、Certificate of Authority（CA）、OLP 备案 / 批准文件。Google 须能把开发者账号和牌照对应起来，所以账号主体必须就是牌照持有主体。</td><td>CA No. F-26-0147-92｜法务</td><td><span class="tag off">官方</span> Financial Services 政策</td></tr>
+  </table>
+</section>
+
+<!-- 4 -->
+<section id="steps">
+  <h2>4. 分步流程</h2>
+  <div class="box warn"><p><b>关于截图：</b>下列截图来自 Google 官方 PDF《A guide to the Android Developer Console》（2026-03）和《Updates to Play Console for Android developer verification》（2026-03）。Google 说明 Play 新开发者在注册 Play Console 时完成同一套身份验证，页面结构一致，但 Play Console 的界面文字可能略有差别，以实际页面为准。</p></div>
+
+  <div class="step">
+  <h3><span class="step-no">Step 0</span>准备固定操作环境 <span class="tag adv">建议</span></h3>
+  <ol>
+    <li>一个 Owner 账号对应一台固定跳板机，用固定的菲律宾出口 IP（优先公司在菲律宾的办公网络或云主机的固定 IP），以及一个固定的浏览器配置文件。<b>注册、验证、日常登录全部在这个环境里完成</b>，不要在国内直连、个人 VPN、不同代理之间来回切换。</li>
+    <li>这台跳板机和浏览器配置文件只登录本主体相关的 Google 账号，<b>不登录任何曾被封禁、或与其他贷款 App 主体相关的 Google 账号</b>。</li>
+    <li>国内侧访问境外网络应走公司 IT 提供的合规跨境通道，不使用个人翻墙工具。</li>
+  </ol>
+  <p class="src">原因：Google 对账号终止后的「关联账号」会一并永久停用，新开账号也会被终止；关联判断会参考共用的设备、网络、付款信息等（见 Play Help「账号、注册和付款问题」「Enforcement Process」）。Google 也说明在新设备登录时会触发两步验证。</p>
+  </div>
+
+  <div class="step">
+  <h3><span class="step-no">Step 1</span>查询 / 申请 D-U-N-S 编码 <span class="tag off">官方</span></h3>
+  <ol>
+    <li>打开邓白氏为 Google 开发者提供的入口，选择「Philippines」（属于邓白氏的 Worldwide Network Partner 地区）。</li>
+    <li>先用公司名称、地址或电话查询是否已有 D-U-N-S（很多公司做生意时已有编号）。</li>
+    <li>没有就免费申请：提交第 3 节「D-U-N-S 申请资料」。正常最长约 30 个工作日，可付费加急（约 8 个工作日）。邓白氏可能来电核实。</li>
+    <li>拿到编号后，核对邓白氏档案里的名称和地址与 SEC 原文完全一致；不一致先在邓白氏改正，再去注册 Play。</li>
+  </ol>
+  <div class="box risk"><p><b>风险：</b>①Google 提醒 D-U-N-S 申请是免费的，警惕收高额代办费的第三方；②D-U-N-S 输入次数有限，拿到确切编号后再开始注册；③没有 D-U-N-S 无法创建组织账号，Google 也不为没准备 D-U-N-S 的组织延期或豁免。</p></div>
+  <p class="src">来源：<a href="https://support.google.com/googleplay/android-developer/answer/13628312?hl=en">Required information to create a Play Console developer account</a> ｜ <a href="https://www.dnb.com/en-us/smb/duns/google-developers.html">D&amp;B: Get a D-U-N-S Number (Google Developers)</a> ｜ <a href="https://www.dnb.com/en-us/smb/duns/get-a-duns.html">D&amp;B: How to Get a D-U-N-S Number</a></p>
+  </div>
+
+  <div class="step">
+  <h3><span class="step-no">Step 2</span>官网和域名邮箱就绪，并在 Search Console 验证官网 <span class="tag off">官方</span></h3>
+  <ol>
+    <li>官网可公开访问，展示主体名称、地址、SEC 注册号、CA 号、客服邮箱和热线。</li>
+    <li>用<b>Owner 同一个 Google 账号</b>登录 <a href="https://search.google.com/search-console">Google Search Console</a>，添加「网域」资源（Domain property），用 DNS TXT 记录验证所有权。官方说明手动添加的记录可能要 2–3 天才生效，验证失败就隔一两天再试，所以这一步要最早做。</li>
+    <li>同一个账号验证的话，后面 Play Console 发起的网站验证请求可以直接通过；如果 Search Console 的所有者是另一个账号，需要那个账号在 Search Console 里批准请求。</li>
+  </ol>
+  <figure><img src="gplay-guide-img/adc_guide_p20.jpg" alt="官方截图：组织网站验证" /><figcaption>官方截图：组织必须用 Google Search Console 验证官网。先在 Search Console 注册所有权，再在控制台填写官网 URL 并发起验证请求，所有者批准后即完成。（ADC 指南第 20 页）</figcaption></figure>
+  <p class="src">来源：<a href="https://support.google.com/webmasters/answer/9008080?hl=en">Search Console: Verify your site ownership</a> ｜ <a href="https://support.google.com/googleplay/android-developer/answer/10841920?hl=en">Verify your developer identity information（Website 小节）</a></p>
+  </div>
+
+  <div class="step">
+  <h3><span class="step-no">Step 3</span>创建 Owner Google 账号并开启两步验证</h3>
+  <ol>
+    <li>在 Step 0 的固定环境里，用「使用现有邮箱创建」的方式，以公司域名邮箱（例如 <code>googleplay@sahodnow.com</code>）创建 Google 账号。<span class="tag adv">建议</span></li>
+    <li>开启两步验证（2-Step Verification）。Play Console 要求有访问权限的用户使用两步验证，新设备登录时需要验证码。<span class="tag off">官方</span></li>
+    <li>两步验证方式建议「安全密钥或验证器 App + 备用码」，备用码打印后存档，不只依赖一部手机。<span class="tag adv">建议</span></li>
+  </ol>
+  <p class="src">来源：<a href="https://support.google.com/googleplay/android-developer/answer/2543765?hl=en">Protect your developer account</a> ｜ <a href="https://android-developers.googleblog.com/2020/08/android-developers.googplay-console-2-step-verification.html">Android Developers Blog: Play Console 2-Step Verification</a></p>
+  </div>
+
+  <div class="step">
+  <h3><span class="step-no">Step 4</span>注册 Play Console 开发者账号 <span class="tag off">官方</span></h3>
+  <p>入口：<a href="https://play.google.com/console/signup">play.google.com/console/signup</a>，用 Owner 账号登录。</p>
+  <h4>4.1 选择账号类型：Organization</h4>
+  <figure><img src="gplay-guide-img/adc_guide_p10.jpg" alt="官方截图：选择账号类型" /><figcaption>官方截图：选择账号类型。组织或企业选 Organization；账号类型会决定需要完成哪些验证，完成验证后不可更改。（ADC 指南第 10 页）</figcaption></figure>
+  <h4>4.2 关联 / 新建付款资料（payments profile），填写 D-U-N-S</h4>
+  <ul>
+    <li>选择「创建新的付款资料」。国家选 <b>Philippines</b>；类型选组织；名称、地址按 SEC 原文填写。</li>
+    <li>输入 D-U-N-S 后，系统会带出邓白氏档案里的组织信息，确认无误再继续。</li>
+    <li><b>付款资料的国家、账号类型、D-U-N-S 建立后都不能修改</b>，要改只能新建付款资料并重新验证。</li>
+  </ul>
+  <figure><img src="gplay-guide-img/adc_guide_p11.jpg" alt="官方截图：关联付款资料" /><figcaption>官方截图：关联 Google 付款资料以验证身份，页面展示 D-U-N-S、组织名称、组织地址。（ADC 指南第 11 页）</figcaption></figure>
+  <h4>4.3 联系信息与开发者公开资料</h4>
+  <ul>
+    <li>联系人姓名、联系邮箱（OTP 验证）、联系电话：Google 内部联系用，不公开。</li>
+    <li>开发者名称、开发者邮箱、开发者电话：在 Google Play 公开展示。</li>
+    <li>邮箱在注册流程中当场验证；电话在账号创建后、身份和网站验证完成后才能验证。</li>
+  </ul>
+  <figure><img src="gplay-guide-img/adc_guide_p12.jpg" alt="官方截图：联系信息" /><figcaption>官方截图：填写联系信息并验证邮箱。（ADC 指南第 12 页）</figcaption></figure>
+  <h4>4.4 组织补充信息，接受条款，支付 25 美元</h4>
+  <ul>
+    <li>组织类型（Company/business）、组织规模、组织电话、组织官网；以及过往 Android 开发和发布经验、计划发布的 App 数量和类别等问卷，如实填写。</li>
+    <li>接受《开发者分发协议》，用付款卡支付 25 美元。</li>
+  </ul>
+  <figure><img src="gplay-guide-img/adc_guide_p13.jpg" alt="官方截图：组织补充信息" /><figcaption>官方截图：填写组织规模、组织官网等补充信息，之后接受条款并支付 25 美元。（ADC 指南第 13 页）</figcaption></figure>
+  <div class="box risk"><p><b>风险：</b>①官方提示：如果提交的身份或付款卡信息被判定无效，25 美元注册费不退；②问卷里的 App 类别要如实选择金融类，与后续上架的 App 一致。</p></div>
+  <p class="src">来源：<a href="https://support.google.com/googleplay/android-developer/answer/6112435?hl=en">Get started with Play Console</a> ｜ <a href="https://support.google.com/googleplay/android-developer/answer/13628312?hl=en">Required information to create a Play Console developer account</a> ｜ <a href="https://support.google.com/googleplay/android-developer/answer/16260648?hl=en">Update developer identity details managed by a Google payments profile</a></p>
+  </div>
+
+  <div class="step">
+  <h3><span class="step-no">Step 5</span>身份验证：上传组织文件和授权代表证件 <span class="tag off">官方</span></h3>
+  <p>账号创建后，Play Console 首页会列出待完成的验证。组织账号需要完成：①上传组织官方文件；②上传政府签发的证件；③在 Search Console 验证官网；④用 OTP 验证联系电话。</p>
+  <div class="grid2">
+    <figure><img src="gplay-guide-img/adc_guide_p15.jpg" alt="官方截图：需要完成的验证项" /><figcaption>官方截图：个人与组织账号分别需要完成的验证项。（ADC 指南第 15 页）</figcaption></figure>
+    <figure><img src="gplay-guide-img/adc_guide_p16.jpg" alt="官方截图：首页验证任务" /><figcaption>官方截图：首页「Finish setting up your account」列出各项验证。（ADC 指南第 16 页）</figcaption></figure>
+  </div>
+  <figure><img src="gplay-guide-img/adc_guide_p17.jpg" alt="官方截图：上传组织注册文件" /><figcaption>官方截图：上传组织注册文件，第一步先确认组织名称，文件上的名称必须与页面显示一致。（ADC 指南第 17 页）</figcaption></figure>
+  <figure><img src="gplay-guide-img/adc_guide_p18.jpg" alt="官方截图：上传代表证件" /><figcaption>官方截图：授权代表上传个人证件，并确认姓名和地址。（ADC 指南第 18 页）</figcaption></figure>
+  <div class="box risk">
+    <p><b>验证失败最常见的原因</b>（官方原文）：提交不受支持的文件。<b>提交修改过或伪造的文件会导致账号和 App 被立即移除。</b></p>
+    <p>证件要求：在有效期内、彩色、清晰、光线充足、不是复印件；所有文件信息要和付款资料完全一致（个人信息、组织名称、地址）。发现不一致可以在验证任务中更新付款资料。</p>
+  </div>
+  <p class="src">来源：<a href="https://support.google.com/googleplay/android-developer/answer/15633622?hl=en&amp;co=GENIE.CountryCode%3DPH">Google Play Developer Verification: Required documents by country and region - Philippines</a> ｜ <a href="https://support.google.com/googleplay/android-developer/answer/10841920?hl=en">Verify your developer identity information</a></p>
+  </div>
+
+  <div class="step">
+  <h3><span class="step-no">Step 6</span>网站验证 <span class="tag off">官方</span></h3>
+  <p>在 Play Console「开发者账号 → 关于您」填写官网 URL，点击「Send verification request」。如果 Step 2 已用同一账号在 Search Console 验证，会直接通过；否则由 Search Console 的所有者批准请求。</p>
+  <p class="src">来源：<a href="https://support.google.com/googleplay/android-developer/answer/10841920?hl=en">Verify your developer identity information（Website）</a> ｜ ADC 指南第 20 页（见 Step 2 截图）</p>
+  </div>
+
+  <div class="step">
+  <h3><span class="step-no">Step 7</span>电话验证（联系电话 + 开发者电话） <span class="tag off">官方</span></h3>
+  <ol>
+    <li><b>前置条件：</b>身份验证和网站验证都已完成，否则无法验证电话。</li>
+    <li>按国际格式填写（例如 <code>+639171234567</code>、<code>+63288419886</code>），选择短信或语音呼叫接收 6 位验证码。</li>
+    <li>以后每次修改电话都要重新验证。收不到短信可改用语音呼叫或换个时间再试。</li>
+  </ol>
+  <figure><img src="gplay-guide-img/adc_guide_p19.jpg" alt="官方截图：联系电话验证" /><figcaption>官方截图：用一次性验证码验证联系电话，该号码仅供 Google 联系使用，不对外展示。（ADC 指南第 19 页）</figcaption></figure>
+  <p class="src">来源：<a href="https://support.google.com/googleplay/android-developer/answer/10841920?hl=en">Verify your developer identity information（Developer phone number / Contact phone number）</a></p>
+  </div>
+
+  <div class="step">
+  <h3><span class="step-no">Step 8</span>给研发开权限（不共享 Owner） <span class="tag off">官方</span></h3>
+  <ul>
+    <li>Owner 或 Admin 在「用户和权限」页面按邮箱邀请用户，可设置访问到期日；被邀请人必须用被邀请的同一邮箱登录，30 天内未接受邀请则失效。</li>
+    <li>按最小权限分配：研发一般给「发布到测试轨道」「查看应用信息」；只有指定负责人拥有「发布到正式版」。付款资料只有 Owner 能看和改。</li>
+  </ul>
+  <p class="src">来源：<a href="https://support.google.com/googleplay/android-developer/answer/9844686?hl=en">Add developer account users and manage permissions</a></p>
+  </div>
+
+  <div class="step">
+  <h3><span class="step-no">Step 9</span>创建 App 与包名注册（Android 开发者验证） <span class="tag off">官方</span></h3>
+  <ul>
+    <li>2026-09-30 起，所有 Play 应用的包名都必须注册到已验证身份的开发者名下；该规则先在巴西、印尼、新加坡、泰国执行，2027 年扩展到全球。</li>
+    <li>新开发者在注册 Play Console 时完成的身份信息会自动用于 Android 开发者身份。新建 App 时，如果包名从未在 Android 上出现过，会随「创建应用」自动注册。</li>
+    <li>如果包名在 Play 建应用之前已经在认证设备上安装过，例如测试包在外部分发过，就要用签名私钥证明所有权：上传带有指定代码片段的签名 APK。</li>
+  </ul>
+  <div class="box warn"><p><b>建议：</b>正式包名确定后，尽快在 Play Console 创建应用占位，再大范围外发测试包；测试包与正式包使用同一套签名，避免包名归属问题。</p></div>
+  <figure><img src="gplay-guide-img/pdc_guide_p26.jpg" alt="官方截图：创建应用时自动注册包名" /><figcaption>官方截图：Play Console「创建应用」会收集并检查包名状态，并为新应用自动注册包名。（PDC 指南第 26 页）</figcaption></figure>
+  <p class="src">来源：<a href="https://support.google.com/googleplay/android-developer/answer/16984799?hl=en">Registering Play package names</a> ｜ <a href="https://developer.android.com/developer-verification">Android developer verification</a> ｜ <a href="https://developer.android.com/static/developer-verification/guides/pdf-guides/pdc-guide.pdf">PDC 指南 PDF</a></p>
+  </div>
+</section>
+
+<!-- 5 -->
+<section id="cn-risk">
+  <h2>5. 国内团队操作的风险与规避</h2>
+  <div class="box ok">
+    <p><b>先厘清：</b>Google Play 支持中国大陆开发者注册（「支持开发者注册的地区」表中 China 为 ✔），授权代表的证件也可以是任意国家签发。所以「研发在国内」本身不违规，也不需要隐瞒。</p>
+    <p>Google 真正审查的是：<b>账号主体是谁、信息是否真实一致、是否与违规账号关联</b>。本主体是菲律宾公司、面向菲律宾用户，按真实信息注册即可与政策一致。</p>
+  </div>
+  <table>
+    <tr><th style="width:17%">风险</th><th>触发场景</th><th>后果</th><th>规避做法</th></tr>
+    <tr><td class="k">信息不一致</td><td>SEC 文件、D-U-N-S、付款资料、官网的名称或地址写法不同；证件姓名与付款资料联系人不同</td><td>验证失败；事后发现不一致须 28 天内整改，否则账号受限、App 下架 <span class="tag off">官方</span></td><td>以 SEC 原文为唯一来源，先改 D-U-N-S 档案和官网页脚，再建付款资料；注册前由法务逐字比对</td></tr>
+    <tr><td class="k">关联封号</td><td>与被终止账号共用设备、网络、付款卡、手机号、邮箱，或团队里有人此前有被封开发者账号</td><td>账号被终止时，关联账号会被永久停用；新开账号也会被终止且不退费 <span class="tag off">官方</span></td><td>本主体使用专用的设备、跳板机、付款卡、手机号和邮箱；不在同一环境登录其他贷款 App 主体或被封的账号；不购买、租用、代注册账号 <span class="tag adv">建议</span></td></tr>
+    <tr><td class="k">登录环境异常</td><td>Owner 在国内直连、不同代理、多台电脑之间切换；多人共用 Owner 密码</td><td>频繁触发安全验证，严重时账号被锁、需要走账号恢复 <span class="tag adv">建议</span></td><td>Owner 只在 Step 0 的固定跳板机加固定浏览器配置文件中登录；研发用各自账号被邀请；两步验证使用安全密钥或验证器</td></tr>
+    <tr><td class="k">虚假陈述</td><td>为了「像菲律宾」而填写不真实的信息，例如虚构菲律宾联系人、使用与主体无关的地址或证件</td><td>违反 Misrepresentation（虚假陈述）政策和 Play Console Requirements；提交修改或伪造文件会导致账号被立即移除 <span class="tag off">官方</span></td><td>所有信息按主体真实情况填写；跳板机只用来稳定环境，不用于伪造身份；如果 Google 追问（包括申诉时），如实说明团队分布</td></tr>
+    <tr><td class="k">联系方式失效</td><td>用临时号、虚拟号、员工个人号；人员离职导致收不到 OTP</td><td>Google 会抽查账号是否活跃；电话或邮箱无法联系可能导致 App 被移除 <span class="tag off">官方</span></td><td>用公司名下长期持有的 +63 号码和公司群组邮箱，并写入交接清单</td></tr>
+    <tr><td class="k">付款卡问题</td><td>使用预付卡，或户名、国家与主体不符的卡</td><td>付款失败；信息被判定无效时注册费不退 <span class="tag off">官方</span></td><td>用主体或授权代表名下的菲律宾信用卡或借记卡 <span class="tag adv">建议</span></td></tr>
+    <tr><td class="k">审核员无法访问</td><td>App 仅限菲律宾 IP 访问、强制短信 OTP、审核账号过期</td><td>无法审核即拒审 <span class="tag off">官方</span></td><td>在 Play Console 提供可重复使用的英文测试账号，能绕过 OTP 和地域限制，并长期有效</td></tr>
+    <tr><td class="k">国内侧合规</td><td>员工用个人翻墙工具访问 Google</td><td>国内网络合规风险 <span class="tag adv">建议</span></td><td>由公司 IT 提供合规的跨境访问方式（如合规专线或境外云桌面）</td></tr>
+  </table>
+  <p class="src">来源：<a href="https://support.google.com/googleplay/android-developer/answer/9306917?hl=en">Supported locations for developer and merchant registration</a> ｜ <a href="https://support.google.com/googleplay/android-developer/answer/10788890?hl=en">Play Console Requirements</a> ｜ <a href="https://support.google.com/googleplay/android-developer/answer/9888689?hl=en">Misrepresentation</a> ｜ <a href="https://support.google.com/googleplay/android-developer/answer/9023898?hl=en">Account, registration, and payment issues</a> ｜ <a href="https://support.google.com/googleplay/android-developer/answer/9899234?hl=en">Enforcement Process</a> ｜ <a href="https://support.google.com/googleplay/android-developer/answer/15748846?hl=en">Requirements for providing sign in details for review</a></p>
+</section>
+
+<!-- 6 -->
+<section id="listing">
+  <h2>6. 上架合规红线（与当前 PRD 的冲突项）</h2>
+  <p>账号认证通过只是第一步。贷款类 App 上架还要遵守 Financial Services 政策和 SMS / Call Log 权限政策。下表对照了当前 PRD 5.12《权限与数据采集》和官网文案：</p>
+  <table>
+    <tr><th style="width:17%">项</th><th>Google 规定 <span class="tag off">官方</span></th><th style="width:24%">当前产品 / PRD</th><th style="width:24%">建议</th></tr>
+    <tr><td class="k">已装应用列表</td><td>个人贷款类 App 禁止申请 <code>QUERY_ALL_PACKAGES</code></td><td>PRD 5.12：Applist 使用 <code>QUERY_ALL_PACKAGES</code>，在首页和发标页采集 <span class="tag risk">冲突</span></td><td>Google Play 包移除该权限；与风险团队确认替代数据，或者只用 <code>&lt;queries&gt;</code> 声明查询少量指定包名</td></tr>
+    <tr><td class="k">短信</td><td><code>READ_SMS</code> 只允许默认短信、电话、助理应用或少数例外场景使用；贷款类不在其中，政策还特别指出贷款 App 不得外传非金融或个人短信</td><td>PRD 5.12：<code>READ_SMS</code> 首页采集金融类短信 <span class="tag risk">冲突</span></td><td>Google Play 包移除；OTP 改用 SMS Retriever API</td></tr>
+    <tr><td class="k">手机号</td><td>禁止 <code>READ_PHONE_NUMBERS</code></td><td>设备数据含手机号（Android 11 及以下） <span class="tag risk">冲突</span></td><td>移除；手机号以注册时 OTP 验证过的为准</td></tr>
+    <tr><td class="k">精确定位</td><td>禁止 <code>ACCESS_FINE_LOCATION</code></td><td>设备数据含 GPS <span class="tag risk">需确认</span></td><td>只申请 <code>ACCESS_COARSE_LOCATION</code>（模糊定位）</td></tr>
+    <tr><td class="k">相册 / 存储</td><td>禁止 <code>READ_MEDIA_IMAGES</code>、<code>READ_MEDIA_VIDEO</code>、<code>READ_EXTERNAL_STORAGE</code>、<code>WRITE_EXTERNAL_STORAGE</code></td><td>ID 卡支持从相册上传 <span class="tag risk">需确认</span></td><td>改用系统照片选择器（Photo Picker），不需要申请权限；或者只允许拍照</td></tr>
+    <tr><td class="k">通讯录</td><td>禁止 <code>READ_CONTACTS</code></td><td>联系人为用户手填 <span class="tag off">合规</span></td><td>保持手填，不读取通讯录</td></tr>
+    <tr><td class="k">短期贷款</td><td>禁止推广「放款后 60 天内须全额还清」的个人贷款</td><td>官网写期限 1–12 个月；第 3 步截图有 3 / 6 / 12 期 <span class="tag risk">需确认</span></td><td>如果存在 1 个月、2 个月一次性还清的产品，Google Play 渠道需下线；商店和官网的最短还款期写成大于 60 天</td></tr>
+    <tr><td class="k">商店描述披露</td><td>分类设为 Finance；披露最短和最长还款期、最高 APR、总成本示例、隐私政策；菲律宾还需披露公司名、商号、SEC 注册号、CA 号</td><td>官网已有 APR 30%、SEC / CA 号</td><td>商店描述按此模板写，与官网和协议一致</td></tr>
+    <tr><td class="k">财务功能声明</td><td>App content → Financial features，勾选「Personal loan direct lender」，上传菲律宾牌照；Google 须能把开发者账号与牌照对应起来</td><td>—</td><td>上传 SEC 注册证书、CA 和 OLP 备案文件；账号主体与牌照持有主体相同</td></tr>
+    <tr><td class="k">使用情况访问</td><td>不在禁止清单内，但属于敏感能力，适用权限政策和显著披露要求</td><td>PRD 5.12：<code>PACKAGE_USAGE_STATS</code></td><td>评估必要性；保留的话，需要做应用内显著披露和用户同意，并在 Data safety 表中申报</td></tr>
+  </table>
+  <div class="box warn"><p>以上冲突项影响的是 Google Play 包的权限清单。建议向 JuanHand Android 团队确认现网 Google Play 包的实际权限和做法，同步给研发和风险团队，作为 PRD 5.12 的修订依据。</p></div>
+  <p class="src">来源：<a href="https://support.google.com/googleplay/android-developer/answer/9876821?hl=en">Financial Services</a> ｜ <a href="https://support.google.com/googleplay/android-developer/answer/13849271?hl=en">Financial features declaration</a> ｜ <a href="https://support.google.com/googleplay/android-developer/answer/10208820?hl=en">Use of SMS or Call Log permission groups</a></p>
+</section>
+
+<!-- 7 -->
+<section id="todo">
+  <h2>7. 待确认事项（建议本周内拉齐）</h2>
+  <table>
+    <tr><th>事项</th><th>负责人</th><th>为什么急</th></tr>
+    <tr><td>主体是否已有 D-U-N-S？没有的话今天提交申请，评估是否付费加急</td><td>法务 / 财务</td><td>最长约 30 个工作日，直接影响 11-10 上线</td></tr>
+    <tr><td>SEC 登记的法定名称、地址原文（以 GIS 为准），并与官网页脚、协议地址统一</td><td>法务</td><td>四处一致是验证通过的前提</td></tr>
+    <tr><td>Owner 由谁持有、授权代表是谁、证件类型；是否需要 Board Resolution</td><td>法务 + 管理层</td><td>Owner 无法直接更换</td></tr>
+    <tr><td>+63 联系电话、开发者电话（热线）能否接收 OTP，由谁长期持有</td><td>行政 / 客服</td><td>电话验证是最后一步，也需要长期可用</td></tr>
+    <tr><td>付款卡（菲律宾、非预付、户名一致）</td><td>财务</td><td>付款失败会卡住注册</td></tr>
+    <tr><td>官网域名和邮箱域名统一（sahodnow.com 或 sahodnow.ph）</td><td>产品 + IT</td><td>联系邮箱应与已验证官网同域名</td></tr>
+    <tr><td>跳板机的固定 IP、浏览器配置文件、使用人登记，以及国内侧的合规访问方式</td><td>IT</td><td>防止关联和安全验证问题</td></tr>
+    <tr><td>第 6 节的权限和期限冲突项，在 PRD 5.12 里修订</td><td>产品 + 风险 + 研发</td><td>影响提包和审核</td></tr>
+  </table>
+</section>
+
+<!-- 8 -->
+<section id="sources">
+  <h2>8. 来源清单（均为 2026-10-23 访问）</h2>
+  <h4>Google Play Console Help / Policy</h4>
+  <ol>
+    <li><a href="https://support.google.com/googleplay/android-developer/answer/10841920?hl=en">Verify your developer identity information</a>（你提供的链接）</li>
+    <li><a href="https://support.google.com/googleplay/android-developer/answer/13628312?hl=en">Required information to create a Play Console developer account</a></li>
+    <li><a href="https://support.google.com/googleplay/android-developer/answer/6112435?hl=en">Get started with Play Console</a></li>
+    <li><a href="https://support.google.com/googleplay/android-developer/answer/15633622?hl=en&amp;co=GENIE.CountryCode%3DPH">Required documents by country and region - Philippines</a></li>
+    <li><a href="https://support.google.com/googleplay/android-developer/answer/13634081?hl=en">View and manage your developer account information</a></li>
+    <li><a href="https://support.google.com/googleplay/android-developer/answer/16260648?hl=en">Update developer identity details managed by a Google payments profile</a></li>
+    <li><a href="https://support.google.com/googleplay/android-developer/answer/9306917?hl=en">Supported locations for developer and merchant registration</a></li>
+    <li><a href="https://support.google.com/googleplay/android-developer/answer/9844686?hl=en">Add developer account users and manage permissions</a></li>
+    <li><a href="https://support.google.com/googleplay/android-developer/answer/2543765?hl=en">Protect your developer account</a></li>
+    <li><a href="https://support.google.com/googleplay/android-developer/answer/16984799?hl=en">Registering Play package names</a></li>
+    <li><a href="https://support.google.com/googleplay/android-developer/answer/10788890?hl=en">Play Console Requirements（Policy）</a></li>
+    <li><a href="https://support.google.com/googleplay/android-developer/answer/9888689?hl=en">Misrepresentation（Policy）</a></li>
+    <li><a href="https://support.google.com/googleplay/android-developer/answer/9023898?hl=en">Account, registration, and payment issues</a></li>
+    <li><a href="https://support.google.com/googleplay/android-developer/answer/9899234?hl=en">Enforcement Process</a></li>
+    <li><a href="https://support.google.com/googleplay/android-developer/answer/15748846?hl=en">Requirements for providing sign in details for review</a></li>
+    <li><a href="https://support.google.com/googleplay/android-developer/answer/9876821?hl=en">Financial Services（Policy）</a></li>
+    <li><a href="https://support.google.com/googleplay/android-developer/answer/13849271?hl=en">Provide information for the Financial features declaration</a></li>
+    <li><a href="https://support.google.com/googleplay/android-developer/answer/10208820?hl=en">Use of SMS or Call Log permission groups</a></li>
+  </ol>
+  <h4>Android Developers / 官方 PDF</h4>
+  <ol>
+    <li><a href="https://developer.android.com/developer-verification">Android developer verification</a></li>
+    <li><a href="https://developer.android.com/static/developer-verification/guides/pdf-guides/adc-guide.pdf">A guide to the Android Developer Console（PDF，截图来源）</a></li>
+    <li><a href="https://developer.android.com/static/developer-verification/guides/pdf-guides/pdc-guide.pdf">Updates to Play Console for Android developer verification（PDF，截图来源）</a></li>
+    <li><a href="https://android-developers.googleblog.com/2020/08/android-developers.googplay-console-2-step-verification.html">Android Developers Blog: Play Console 2-Step Verification</a></li>
+  </ol>
+  <h4>其他官方</h4>
+  <ol>
+    <li><a href="https://support.google.com/webmasters/answer/9008080?hl=en">Search Console: Verify your site ownership</a></li>
+    <li><a href="https://www.dnb.com/en-us/smb/duns/google-developers.html">Dun &amp; Bradstreet: Get a D-U-N-S Number（Google Developers 入口）</a></li>
+    <li><a href="https://www.dnb.com/en-us/smb/duns/get-a-duns.html">Dun &amp; Bradstreet: How to Get a D-U-N-S Number</a></li>
+  </ol>
+  <p class="src">说明：「建议」标签内容是基于上述官方规则推导的内部操作建议，不是 Google 原文。审核时长中的「3–5 个工作日」来自第三方经验，Google 官方未给出。Google 政策会更新，提交前以 Play Console 实际页面和最新 Help Center 为准。</p>
+</section>
+
+</div></main>
+</body>
+</html>

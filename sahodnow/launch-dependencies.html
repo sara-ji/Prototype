@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SahodNow上线-资源依赖同步</title>
+<style>
+  :root { --teal:#018b8d; --ink:#14201f; --muted:#66706f; --line:#e4ebea; --done:#2e9e6b; --plan:#018b8d; --est:#d79a1e; --risk:#d0473a; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:"PingFang SC","Microsoft YaHei","Segoe UI",sans-serif; color:var(--ink); background:#f5f8f8; line-height:1.6; font-size:14px; }
+  .wrap { max-width:1240px; margin:0 auto; padding:28px 24px 48px; }
+  h1 { margin:0 0 4px; font-size:24px; }
+  .sub { color:var(--muted); margin:0 0 18px; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:12px; padding:20px 22px; margin-bottom:18px; }
+  h2 { margin:0 0 12px; font-size:17px; color:var(--teal); }
+  .summary { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+  .sum { border-radius:10px; padding:12px 14px; }
+  .sum b { display:block; font-size:15px; margin-bottom:4px; }
+  .sum ul { list-style:none; margin:0; padding:0; }
+  .sum li { position:relative; padding-left:14px; margin:2px 0; }
+  .sum li::before { content:"·"; position:absolute; left:2px; top:-1px; font-weight:700; font-size:16px; }
+  .sum.ok { background:#e8f6ef; } .sum.warn { background:#fff4dc; } .sum.bad { background:#fdeceb; }
+  .legend { display:flex; gap:18px; flex-wrap:wrap; color:var(--muted); font-size:12.5px; margin:0 0 12px; }
+  .legend i { display:inline-block; width:22px; height:10px; border-radius:3px; margin-right:6px; vertical-align:middle; }
+  .legend i.line { height:0; border-top:2px solid #8fa3a2; border-radius:0; }
+  .legend i.dash { height:0; border-top:2px dashed #d0473a; border-radius:0; }
+
+  /* dependency map */
+  .map-wrap { overflow-x:auto; }
+  .map { position:relative; min-width:1100px; height:560px; }
+  .map svg { position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
+  .col-title { position:absolute; top:0; font-size:12px; color:var(--muted); font-weight:600; }
+  .node { position:absolute; width:178px; border-radius:9px; padding:7px 10px; font-size:12.5px; line-height:1.35; border:1.5px solid; background:#fff; z-index:2; }
+  .node b { display:block; font-size:13px; }
+  .node span { color:var(--muted); font-size:11.5px; }
+  .node.done { border-color:var(--done); background:#eef8f2; }
+  .node.plan { border-color:var(--plan); background:#eaf6f6; }
+  .node.est { border-color:var(--est); background:#fff8e8; }
+  .node.risk { border-color:var(--risk); background:#fdeeed; }
+  .node.goal { border-color:var(--risk); background:var(--risk); color:#fff; }
+  .node.goal span { color:#fde3e0; }
+  .node { cursor:pointer; transition:opacity .2s, box-shadow .2s, transform .2s; user-select:none; }
+  .node:hover { box-shadow:0 2px 10px rgba(1,80,80,.15); }
+  .map.focus .node { opacity:.22; }
+  .map.focus .node.up, .map.focus .node.down, .map.focus .node.sel { opacity:1; }
+  .node.sel { box-shadow:0 0 0 3px rgba(1,139,141,.35); transform:translateY(-1px); }
+  .map svg path.edge { transition:opacity .2s, stroke .2s, stroke-width .2s; }
+  .map.focus svg path.edge { opacity:.08; }
+  .map.focus svg path.edge.up { opacity:1; stroke:#018b8d; stroke-width:2.6px; stroke-dasharray:9 5; marker-start:url(#dot2); marker-end:url(#ar2); animation:flow .9s linear infinite; }
+  .map.focus svg path.edge.down { opacity:1; stroke:#e8891c; stroke-width:2.6px; stroke-dasharray:9 5; marker-start:url(#dot3); marker-end:url(#ar3); animation:flow .9s linear infinite; }
+  .map.focus svg path.edge.dash.up, .map.focus svg path.edge.dash.down { stroke-dasharray:4 3; }
+  @keyframes flow { to { stroke-dashoffset:-14; } }
+  .hint { font-size:12.5px; color:var(--muted); margin:-4px 0 10px; }
+  .hint b.u { color:#018b8d; } .hint b.d { color:#e8891c; }
+
+  /* gantt */
+  .gantt { overflow-x:auto; }
+  .grid { display:grid; position:relative; min-width:1150px; }
+  .hd { font-size:11px; color:var(--muted); text-align:center; padding:2px 0 6px; border-bottom:1px solid var(--line); }
+  .hd.we { color:#b5bdbc; }
+  .hd.mon { font-weight:600; color:var(--ink); }
+  .grp { grid-column:1 / -1; font-size:12px; font-weight:700; color:var(--teal); padding:10px 0 2px; border-bottom:1px solid var(--line); }
+  .lane { font-size:13px; padding:6px 10px 6px 0; border-bottom:1px solid var(--line); white-space:nowrap; }
+  .lane small { display:block; color:var(--muted); font-size:11px; }
+  .cell { border-bottom:1px solid var(--line); }
+  .cell.we { background:#f6f8f8; }
+  .bar { height:22px; align-self:center; border-radius:5px; color:#fff; font-size:11.5px; padding:0 7px; line-height:22px; white-space:nowrap; z-index:2; }
+  .bar.done { background:var(--done); }
+  .bar.plan { background:var(--plan); }
+  .bar.est { background:repeating-linear-gradient(45deg,#e9b44c,#e9b44c 6px,#f1c66b 6px,#f1c66b 12px); color:#5a3d00; }
+  .bar.risk { background:repeating-linear-gradient(45deg,#e46a5f,#e46a5f 6px,#ee857b 6px,#ee857b 12px); }
+  .vline { position:absolute; top:0; bottom:0; width:0; z-index:3; }
+  .vline span { position:absolute; top:-2px; left:4px; color:#fff; font-size:11px; padding:0 6px; border-radius:4px; white-space:nowrap; }
+  .vline.today { border-left:2px solid var(--teal); } .vline.today span { background:var(--teal); }
+  .vline.launch { border-left:2px dashed var(--risk); } .vline.launch span { background:var(--risk); }
+
+  table { width:100%; border-collapse:collapse; font-size:13.5px; }
+  th, td { border-bottom:1px solid var(--line); padding:8px 8px; text-align:left; vertical-align:top; }
+  th { color:var(--muted); font-weight:600; font-size:12.5px; }
+  td.k { font-weight:600; white-space:nowrap; }
+  .st { display:inline-block; font-size:11.5px; padding:0 8px; border-radius:10px; white-space:nowrap; }
+  .st.done { background:#e8f6ef; color:var(--done); }
+  .st.plan { background:#e3f3f3; color:var(--plan); }
+  .st.est { background:#fff4dc; color:#9a6700; }
+  .st.risk { background:#fdeceb; color:var(--risk); }
+  .qa { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+  .qa div { background:#f7faf9; border:1px solid var(--line); border-radius:10px; padding:12px 14px; }
+  .qa div > b:first-child { display:block; margin-bottom:4px; }
+  .note { color:var(--muted); font-size:12.5px; margin-top:10px; }
+  @media (max-width:900px) { .summary, .qa { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>SahodNow上线-资源依赖同步</h1>
+  <p class="sub">更新于 2026-10-23｜目标上线 11-10（周二）｜依据：GR 10-22 进度同步、《消息中台服务》§5 Sender ID 材料、Google 账号依赖图、Google Play 认证规则</p>
+
+  <div class="card">
+    <h2>关键结论</h2>
+    <div class="summary">
+      <div class="sum ok"><b>主体已成立</b>
+        <ul>
+          <li>COI 与 CA 已于 10-22 拿到</li>
+          <li>BIR 2303 预计 10-28、Business Permit 预计 10-30 办完</li>
+          <li>之后才能开对公户、签支付</li>
+        </ul>
+      </div>
+      <div class="sum warn"><b>OLP 11-4 获批有前提</b>
+        <ul>
+          <li>OLP 需要提交 Business Plan</li>
+          <li>Business Plan 要用 AMLC / NPC / CIC 的注册号</li>
+          <li>这三项注册还没启动</li>
+        </ul>
+      </div>
+      <div class="sum bad"><b>11-10 提审有风险</b>
+        <ul>
+          <li>OTP：Sender ID 需 OLP 登记，11-4 后才能提交，OTP 预计 11-18 前后可用</li>
+          <li>商店账号：D-U-N-S 10-26 才能申请，Play 认证预计 11-12 完成</li>
+          <li>支付：进件 10-30 后启动，联调预计 11-13 完成</li>
+          <li>需消息中台确认 OTP 临时通道，否则建议顺延</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>依赖关系图</h2>
+    <div class="legend">
+      <span><i style="background:#eef8f2;border:1.5px solid var(--done)"></i>已完成</span>
+      <span><i style="background:#eaf6f6;border:1.5px solid var(--plan)"></i>已排期</span>
+      <span><i style="background:#fff8e8;border:1.5px solid var(--est)"></i>预估 / 未启动</span>
+      <span><i style="background:#fdeeed;border:1.5px solid var(--risk)"></i>风险</span>
+      <span><i class="line"></i>确定依赖</span>
+      <span><i class="dash"></i>待确认的依赖</span>
+    </div>
+    <p class="hint">点击任一方块：<b class="u">青色</b>是它直接依赖的事项，<b class="d">橙色</b>是它直接影响的事项；再点一次或点空白处恢复。</p>
+    <div class="map-wrap"><div class="map" id="map"><svg id="edges"></svg></div></div>
+  </div>
+
+  <div class="card">
+    <h2>甘特图（10-19 ～ 11-20）</h2>
+    <div class="legend">
+      <span><i style="background:var(--done)"></i>已完成</span>
+      <span><i style="background:var(--plan)"></i>已排期（GR 给出的日期）</span>
+      <span><i style="background:#e9b44c"></i>预估 / 建议</span>
+      <span><i style="background:#e46a5f"></i>风险项</span>
+    </div>
+    <div class="gantt"><div class="grid" id="grid"></div></div>
+    <p class="note">灰色列为周末。黄色和红色条的结束时间是按经验预估的，以各负责人实际反馈为准。</p>
+  </div>
+
+  <div class="card">
+    <h2>依赖明细</h2>
+    <table>
+      <tr><th>事项</th><th>前置依赖</th><th>最早可开始</th><th>预计完成</th><th>状态</th></tr>
+      <tr><td class="k">COI + CA</td><td>—</td><td>9-15</td><td>10-22</td><td><span class="st done">已完成</span></td></tr>
+      <tr><td class="k">BIR 2303</td><td>Sec Cert（外部秘书公司 10-23 提供）</td><td>10-23</td><td>10-28</td><td><span class="st plan">已排期</span></td></tr>
+      <tr><td class="k">Business Permit</td><td>海外证照借用 OA 审批</td><td>10-23</td><td>10-30</td><td><span class="st plan">已排期</span></td></tr>
+      <tr><td class="k">AMLC / NPC / CIC 注册</td><td>COI + CA</td><td>现在</td><td>待法务确认</td><td><span class="st risk">未启动</span></td></tr>
+      <tr><td class="k">Business Plan</td><td>AMLC / NPC / CIC 注册号</td><td>草拟中</td><td>注册号到手后定稿</td><td><span class="st risk">卡在注册号</span></td></tr>
+      <tr><td class="k">OLP 登记</td><td>COI + CA；线上披露需<b>官网（正式域名）、客服信息、Logo</b>；Business Plan</td><td>10-23 提交</td><td>11-4</td><td><span class="st est">预计</span></td></tr>
+      <tr><td class="k">域名 + 企业邮箱</td><td>—</td><td>—</td><td>10-23</td><td><span class="st done">已完成</span></td></tr>
+      <tr><td class="k">官网正式上线</td><td>域名；SEC / CA 号</td><td>—</td><td>10-23</td><td><span class="st done">已完成</span></td></tr>
+      <tr><td class="k">Google 账号（Owner）</td><td>企业邮箱（已就绪）+ <b>菲律宾手机号 + 本人在菲律宾本地操作</b></td><td>10-26（周一）</td><td>10-26</td><td><span class="st plan">已排期</span></td></tr>
+      <tr><td class="k">Firebase 项目（FCM Push、归因回传）</td><td>Google 账号 + 包名定稿；<b>不依赖 D-U-N-S</b></td><td>10-26 建号后</td><td>~10-30（研发接入后联调）</td><td><span class="st est">预估</span></td></tr>
+      <tr><td class="k">D-U-N-S</td><td>COI 上的名称、地址、电话；<b>新主体公示期结束后才能申请</b></td><td>10-26（周一）</td><td>~11-5（加急约 8 个工作日）</td><td><span class="st plan">已排期</span></td></tr>
+      <tr><td class="k">Google Play 开发者账号认证</td><td>D-U-N-S + Google 账号 + COI + 代表证件 + 网站验证（Search Console 已完成）+ 付款卡 + 电话</td><td>~11-5</td><td>~11-12</td><td><span class="st est">预估</span></td></tr>
+      <tr><td class="k">Apple 开发者账号</td><td>D-U-N-S + Apple ID（企业邮箱）+ 官网</td><td>~11-5</td><td>~11-12</td><td><span class="st est">预估</span></td></tr>
+      <tr><td class="k">App 提审 & 发布</td><td>Play 认证 + 财务功能声明（CA）+ 隐私政策；OLP 获批后才能正式发布</td><td>~11-12</td><td>11-12 之后</td><td><span class="st risk">风险</span></td></tr>
+      <tr><td class="k">对公银行账户</td><td>COI + BIR 2303 + Business Permit</td><td>10-30</td><td>待财务确认</td><td><span class="st est">预估</span></td></tr>
+      <tr><td class="k">支付渠道签约 / 进件</td><td>COI + CA + GIS + BIR + Permit + 对公账户；<b>OLP 登记证明待确认</b></td><td>10-30</td><td>~11-6</td><td><span class="st est">预估</span></td></tr>
+      <tr><td class="k">支付联调</td><td>签约 / 进件完成，拿到商户号</td><td>~11-6</td><td>~11-13</td><td><span class="st risk">风险</span></td></tr>
+      <tr><td class="k">短信 Sender ID</td><td><b>OLP 登记（已确认需要）</b> + SEC 文件 + GIS + BIR + Permit + 行业牌照（CA）+ 品牌证明（SahodNow ≠ LendWise）+ 官网</td><td>11-4（OLP 获批后）</td><td>~11-18（审批按 1–2 周估）</td><td><span class="st risk">上线阻塞</span></td></tr>
+      <tr><td class="k">OTP 短信可用</td><td>Sender ID + 模板</td><td>Sender ID 下来后</td><td>~11-20</td><td><span class="st risk">上线阻塞项</span></td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>待推进事项</h2>
+    <table>
+      <tr><th>事项</th><th>建议</th><th>负责人</th></tr>
+      <tr><td class="k">D-U-N-S</td><td>10-26（周一）公示期结束后立即用 COI 信息提交，并付费加急；今天先把申请资料（名称、地址、电话、负责人、成立年份、行业、员工数）备好</td><td>产品</td></tr>
+      <tr><td class="k">AMLC / NPC / CIC</td><td>今天启动；确认 Business Plan 能否用受理号先提交</td><td>法务</td></tr>
+                  <tr><td class="k">Google 账号 + Firebase</td><td>10-26（周一）由菲律宾当地同事用菲律宾手机号建 Owner Google 账号并开两步验证；当天建 Firebase 项目，研发随后接入 FCM 和归因，不用等 D-U-N-S。今天先定好操作人、手机号和固定登录设备</td><td>当地同事 + 研发</td></tr>
+      <tr><td class="k">Sender ID</td><td>除 OLP 外的材料在 10-30 前全部备好，OLP 一获批当天就提交；同时确认 OTP 临时通道方案</td><td>消息中台</td></tr>
+      <tr><td class="k">支付进件</td><td>拿到进件材料清单，10-30 Permit 下来就提交；问清楚是否也需要 OLP 证明</td><td>支付</td></tr>
+      <tr><td class="k">OLP 提速</td><td>OLP 同时卡 Sender ID 和 App 发布，AMLC / NPC / CIC 今天必须启动，Business Plan 争取用受理号先提交</td><td>机构</td></tr>
+      <tr><td class="k">11-10 上线口径</td><td>如果商店、Sender ID、支付任一条赶不上，建议上线顺延 1–2 周，11-10 前完成内部联调</td><td>业务负责人</td></tr>
+    </table>
+  </div>
+
+  <div class="card" id="checklist">
+    <h2>开发者账号认证资料清单（Google Play 组织账号）</h2>
+    <p class="note" style="margin:-4px 0 12px">所有资料上的名称和地址，必须与 SEC 文件、D-U-N-S 档案、Google 付款资料、官网<b>逐字一致</b>。证件和文件要彩色、清晰、在有效期内、非复印件。详细说明见《Google Play 开发者账号注册与认证全流程》。</p>
+    <table>
+      <tr><th style="width:4%">#</th><th style="width:20%">资料</th><th>要求</th><th style="width:15%">状态</th><th style="width:12%">负责人</th></tr>
+      <tr><td colspan="5" style="font-weight:700;color:var(--teal);background:#f3f9f9">主体与身份</td></tr>
+      <tr><td>1</td><td class="k">D-U-N-S 编码</td><td>9 位数字；邓白氏档案中的名称、地址与 SEC 原文一致；注册时输入次数有限，拿到后再开始</td><td><span class="st plan">10-26 申请</span></td><td>产品</td></tr>
+      <tr><td>2</td><td class="k">法定名称 + 地址</td><td>以 SEC COI / GIS 原文为准，统一用于 D-U-N-S、付款资料、官网页脚；不能用 PO Box</td><td><span class="st est">待核对</span></td><td>产品</td></tr>
+      <tr><td>3</td><td class="k">组织注册文件</td><td>菲律宾接受：Certificate of Incorporation（COI）或商业登记摘录；COI 通常不含地址，建议同时准备最新 GIS</td><td><span class="st done">COI 已有</span></td><td>产品</td></tr>
+      <tr><td>4</td><td class="k">授权代表证件</td><td>护照 / 身份证 / 驾照 / 永久居留卡任选一种，可为任意国家签发；建议选 GIS 上列名的董事或高管，姓名与付款资料联系人一致</td><td><span class="st est">待定人</span></td><td>产品</td></tr>
+      <tr><td>5</td><td class="k">授权证明（建议备）</td><td>如操作人不是证件上的董事，准备 Board Resolution / Secretary's Certificate，以备 Google 追加材料</td><td><span class="st est">待准备</span></td><td>产品</td></tr>
+      <tr><td colspan="5" style="font-weight:700;color:var(--teal);background:#f3f9f9">账号与联系方式</td></tr>
+      <tr><td>6</td><td class="k">Owner Google 账号</td><td>用企业邮箱注册，开两步验证；需要<b>菲律宾手机号、本人在菲律宾本地</b>操作；之后固定一台设备登录</td><td><span class="st plan">10-26（周一）</span></td><td>产品</td></tr>
+      <tr><td>7</td><td class="k">联系邮箱（不公开）</td><td>Google 联系公司用；与官网同域名、代表组织，可用群组邮箱，需 OTP 验证</td><td><span class="st est">待开群组</span></td><td>产品</td></tr>
+      <tr><td>8</td><td class="k">开发者邮箱（Play 公开）</td><td>与官网同域名，不能是通用或个人邮箱，需 OTP 验证；建议用客服邮箱</td><td><span class="st done">域名已就绪</span></td><td>产品</td></tr>
+      <tr><td>9</td><td class="k">联系电话（不公开）</td><td>+63 国际格式，能收短信或语音验证码，长期由固定专人持有</td><td><span class="st est">待定号码</span></td><td>产品</td></tr>
+      <tr><td>10</td><td class="k">开发者电话（Play 公开）</td><td>+63，需 OTP 验证；建议用客服热线 +63 2 8841 9886（固话可走语音验证码）</td><td><span class="st done">热线已有</span></td><td>产品</td></tr>
+      <tr><td>11</td><td class="k">组织电话（不公开）</td><td>与 D-U-N-S 档案中登记的电话一致，Google 用来核验组织</td><td><span class="st est">随 D-U-N-S</span></td><td>产品</td></tr>
+      <tr><td colspan="5" style="font-weight:700;color:var(--teal);background:#f3f9f9">网站与付款</td></tr>
+      <tr><td>12</td><td class="k">官网</td><td>公开可访问，展示主体名称、地址、SEC 注册号、CA 号、联系方式</td><td><span class="st done">已上线</span></td><td>产品</td></tr>
+      <tr><td>13</td><td class="k">注册费付款卡</td><td>25 美元一次性；Visa / Mastercard / AmEx，不接受预付卡；建议主体或授权代表名下的菲律宾卡</td><td><span class="st est">待确认</span></td><td>产品</td></tr>
+      <tr><td>14</td><td class="k">组织补充信息</td><td>组织类型（Company / business）、员工规模、App 类别（金融）、计划发布的 App 数量</td><td><span class="st est">注册时填</span></td><td>产品</td></tr>
+      <tr><td colspan="5" style="font-weight:700;color:var(--teal);background:#f3f9f9">认证通过后、提审前还需要</td></tr>
+      <tr><td>15</td><td class="k">牌照文件</td><td>财务功能声明中上传 SEC 注册证书、CA；OLP 获批后补传 OLP 登记文件</td><td><span class="st done">CA 已有</span> <span class="st est">OLP ~11-4</span></td><td>产品</td></tr>
+      <tr><td>16</td><td class="k">商店资料</td><td>包名（定稿后不可改）、隐私政策 URL、商店描述（公司名、商号、SEC 号、CA 号、最短 / 最长还款期、最高 APR、总成本示例）</td><td><span class="st est">待准备</span></td><td>产品</td></tr>
+      <tr><td>17</td><td class="k">审核测试账号</td><td>英文、可重复使用、不受 OTP 和地域限制、长期有效</td><td><span class="st est">待准备</span></td><td>产品</td></tr>
+    </table>
+    <p class="note">Apple 开发者组织账号同样需要 D-U-N-S、Apple ID（企业邮箱）、官网，Apple 还会电话核实主体，可与 Google 同步准备。</p>
+  </div>
+</div>
+
+<script>
+/* ---------- dependency map ---------- */
+const COLS = [
+  { x: 0,   title: "主体文件" },
+  { x: 228, title: "前置产物" },
+  { x: 456, title: "账号 / 登记 / 签约" },
+  { x: 684, title: "上线能力" },
+  { x: 912, title: "目标" },
+];
+const N = {
+  coi:    [0, 20,  "done", "COI + CA", "10-22 ✓"],
+  domain: [0, 120, "done", "域名 + 企业邮箱", "10-23 ✓"],
+  bir:    [0, 250, "plan", "BIR 2303", "10-23 → 10-28"],
+  permit: [0, 330, "plan", "Business Permit", "10-23 → 10-30"],
+  aml:    [0, 460, "risk", "AMLC / NPC / CIC", "未启动"],
+  duns:   [1, 20,  "risk", "D-U-N-S", "10-26 申请 · 加急 ~11-5"],
+  site:   [1, 100, "done", "官网正式上线", "10-23 ✓"],
+  gacct:  [1, 180, "plan", "Google 账号（Owner）", "10-26 · 菲律宾本地"],
+  bank:   [1, 300, "est",  "对公银行账户", "10-30 后"],
+  bp:     [1, 460, "risk", "Business Plan", "等注册号"],
+  play:   [2, 20,  "est",  "Play 开发者认证", "~11-5 → 11-12"],
+  apple:  [2, 100, "est",  "Apple 开发者账号", "~11-5 →"],
+  fb:     [2, 180, "est",  "Firebase 项目", "10-26 建号后"],
+  sid:    [2, 280, "risk", "Sender ID", "OLP 后提交 · ~11-18"],
+  pay:    [2, 370, "est",  "支付签约 / 进件", "10-30 →"],
+  olp:    [2, 460, "est",  "OLP 登记", "10-23 → 11-4"],
+  review: [3, 60,  "risk", "App 提审 & 发布", "~11-12 →"],
+  push:   [3, 180, "est",  "Push / 归因回传", "FCM · AF"],
+  otp:    [3, 280, "risk", "OTP 短信", "~11-20"],
+  payint: [3, 370, "risk", "支付联调", "~11-6 → 11-13"],
+  launch: [4, 220, "goal", "上线 11-10", "四条线汇合"],
+};
+const E = [
+  ["coi","duns"],["coi","olp"],["coi","pay"],["coi","sid"],["coi","play"],
+  ["bir","bank"],["bir","pay"],["bir","sid"],
+  ["permit","bank"],["permit","pay"],["permit","sid"],
+  ["aml","bp"],["bp","olp"],
+  ["domain","site"],["domain","gacct"],
+  ["site","olp"],["site","play"],["site","sid"],
+  ["duns","play"],["duns","apple"],
+  ["bank","pay"],
+  ["gacct","play"],["gacct","fb"],
+  ["olp","review"],["olp","pay","dash"],["olp","sid"],
+  ["play","review"],["apple","review"],
+  ["pay","payint"],["sid","otp"],["fb","push"],
+  ["review","launch"],["payint","launch"],["otp","launch"],["push","launch"],
+];
+const map = document.getElementById("map");
+const svg = document.getElementById("edges");
+const NODE_W = 178;
+COLS.forEach(c => {
+  const t = document.createElement("div");
+  t.className = "col-title"; t.style.left = c.x + "px"; t.textContent = c.title;
+  map.appendChild(t);
+});
+const boxes = {};
+Object.entries(N).forEach(([id, [col, y, st, title, sub]]) => {
+  const el = document.createElement("div");
+  el.className = "node " + st;
+  el.style.left = COLS[col].x + "px"; el.style.top = (y + 24) + "px";
+  el.innerHTML = `<b>${title}</b><span>${sub}</span>`;
+  map.appendChild(el);
+  boxes[id] = el;
+});
+requestAnimationFrame(() => {
+  const ns = "http://www.w3.org/2000/svg";
+  const defs = document.createElementNS(ns, "defs");
+  // ar0/ar1: default arrows; ar2/ar3: larger arrows for highlighted lines; dot2/dot3: start dots
+  [["#9fb2b1", 9], ["#d0473a", 9], ["#018b8d", 14], ["#e8891c", 14]].forEach(([c, size], i) => {
+    const m = document.createElementNS(ns, "marker");
+    m.setAttribute("id", "ar" + i); m.setAttribute("viewBox", "0 0 10 10");
+    m.setAttribute("refX", "10"); m.setAttribute("refY", "5");
+    m.setAttribute("markerUnits", "userSpaceOnUse");
+    m.setAttribute("markerWidth", size); m.setAttribute("markerHeight", size); m.setAttribute("orient", "auto");
+    const p = document.createElementNS(ns, "path");
+    p.setAttribute("d", "M0,0 L10,5 L0,10 L2.5,5 z"); p.setAttribute("fill", c);
+    m.appendChild(p); defs.appendChild(m);
+  });
+  [["dot2", "#018b8d"], ["dot3", "#e8891c"]].forEach(([id, c]) => {
+    const m = document.createElementNS(ns, "marker");
+    m.setAttribute("id", id); m.setAttribute("viewBox", "0 0 10 10");
+    m.setAttribute("refX", "5"); m.setAttribute("refY", "5");
+    m.setAttribute("markerUnits", "userSpaceOnUse");
+    m.setAttribute("markerWidth", "8"); m.setAttribute("markerHeight", "8");
+    const dot = document.createElementNS(ns, "circle");
+    dot.setAttribute("cx", "5"); dot.setAttribute("cy", "5"); dot.setAttribute("r", "4"); dot.setAttribute("fill", c);
+    m.appendChild(dot); defs.appendChild(m);
+  });
+  svg.appendChild(defs);
+  let sameColIdx = 0;
+  E.forEach(([a, b, kind]) => {
+    const A = boxes[a], B = boxes[b];
+    const path = document.createElementNS(ns, "path");
+    const y1 = A.offsetTop + A.offsetHeight / 2, y2 = B.offsetTop + B.offsetHeight / 2;
+    if (N[a][0] === N[b][0]) {
+      // same column: loop out on the right side and enter the target from its right edge
+      const xr = A.offsetLeft + A.offsetWidth, bulge = 28 + 16 * sameColIdx++;
+      path.setAttribute("d", `M${xr + 2},${y1} C${xr + bulge},${y1} ${xr + bulge},${y2} ${xr + 3},${y2}`);
+    } else {
+      const x1 = A.offsetLeft + A.offsetWidth, x2 = B.offsetLeft, mid = (x1 + x2) / 2;
+      path.setAttribute("d", `M${x1 + 2},${y1} C${mid},${y1} ${mid},${y2} ${x2 - 3},${y2}`);
+    }
+    path.setAttribute("fill", "none");
+    const dash = kind === "dash";
+    path.setAttribute("stroke", dash ? "#d0473a" : "#b3c2c1");
+    path.setAttribute("stroke-width", dash ? "1.8" : "1.4");
+    if (dash) path.setAttribute("stroke-dasharray", "5 4");
+    path.setAttribute("marker-end", dash ? "url(#ar1)" : "url(#ar0)");
+    path.classList.add("edge");
+    if (dash) path.classList.add("dash");
+    svg.appendChild(path);
+    paths.push({ a, b, el: path });
+  });
+});
+
+const paths = [];
+let selected = null;
+const walk = (from, dir) =>
+  new Set(E.filter(([a, b]) => (dir === "up" ? b : a) === from).map(([a, b]) => (dir === "up" ? a : b)));
+const clearFocus = () => {
+  selected = null;
+  map.classList.remove("focus");
+  Object.values(boxes).forEach(el => el.classList.remove("sel", "up", "down"));
+  paths.forEach(p => p.el.classList.remove("up", "down"));
+};
+const focusOn = id => {
+  clearFocus();
+  selected = id;
+  const ups = walk(id, "up"), downs = walk(id, "down");
+  map.classList.add("focus");
+  boxes[id].classList.add("sel");
+  ups.forEach(n => boxes[n].classList.add("up"));
+  downs.forEach(n => boxes[n].classList.add("down"));
+  paths.forEach(p => {
+    if (p.b === id) p.el.classList.add("up");
+    if (p.a === id) p.el.classList.add("down");
+  });
+};
+Object.entries(boxes).forEach(([id, el]) => {
+  el.addEventListener("click", e => { e.stopPropagation(); selected === id ? clearFocus() : focusOn(id); });
+});
+map.addEventListener("click", clearFocus);
+
+/* ---------- gantt ---------- */
+const start = new Date(2026, 9, 19), end = new Date(2026, 10, 20);
+const days = [];
+for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) days.push(new Date(d));
+const idx = (m, d) => days.findIndex(x => x.getMonth() === m - 1 && x.getDate() === d);
+// group label rows: ["#", title]; task rows: [lane, sub, fm, fd, tm, td, type, label]
+const rows = [
+  ["#", "主体与牌照"],
+  ["公司注册", "COI + CA", 10, 19, 10, 22, "done", "10-22 ✓"],
+  ["BIR 2303", "等 Sec Cert", 10, 23, 10, 28, "plan", "10-23 → 10-28"],
+  ["Business Permit", "等 OA 审批", 10, 23, 10, 30, "plan", "10-23 → 10-30"],
+  ["AMLC / NPC / CIC", "未启动", 10, 23, 11, 4, "risk", "建议今天启动 · 时长待法务确认"],
+  ["Business Plan", "依赖 AMLC/NPC/CIC 号", 10, 23, 11, 2, "risk", "草拟中 · 等注册号"],
+  ["OLP 登记", "依赖官网 + Business Plan", 10, 23, 11, 4, "plan", "10-23 提交 → 11-4 获批"],
+  ["#", "Google / 商店账号"],
+  ["域名 + 企业邮箱", "已完成", 10, 23, 10, 23, "done", "✓"],
+  ["官网正式上线", "已完成", 10, 23, 10, 23, "done", "✓"],
+  ["Google 账号", "需菲律宾手机号 + 本地操作", 10, 26, 10, 26, "plan", "10-26 建号"],
+  ["Firebase 项目", "FCM / 归因，不等 D-U-N-S", 10, 26, 10, 30, "est", "建项目 → 研发接入"],
+  ["D-U-N-S", "公示期后申请", 10, 26, 11, 5, "risk", "10-26 提交加急 · 约 8 个工作日"],
+  ["Play 开发者认证", "D-U-N-S 后", 11, 5, 11, 12, "est", "身份审核约 3–5 个工作日"],
+  ["Apple 开发者账号", "D-U-N-S 后", 11, 5, 11, 12, "est", "主体核实"],
+  ["App 提审 & 发布", "认证完成 + OLP 获批", 11, 12, 11, 20, "risk", "11-12 起 →"],
+  ["#", "支付"],
+  ["对公银行账户", "BIR + Permit 后", 10, 30, 11, 6, "est", "时长待财务确认"],
+  ["支付签约 / 进件", "可能需要 OLP 证明", 10, 30, 11, 6, "est", "材料齐后进件"],
+  ["支付联调", "拿到商户号后", 11, 6, 11, 13, "risk", "放款 / 还款通道"],
+  ["#", "短信"],
+  ["Sender ID", "需 OLP 登记（已确认）", 11, 4, 11, 18, "risk", "OLP 获批后提交 · 审批约 1–2 周"],
+  ["OTP 短信可用", "SID + 模板", 11, 18, 11, 20, "risk", "上线阻塞项"],
+];
+const grid = document.getElementById("grid");
+grid.style.gridTemplateColumns = `190px repeat(${days.length}, minmax(28px, 1fr))`;
+const put = (el, col, row) => { el.style.gridColumn = col; el.style.gridRow = String(row); grid.appendChild(el); };
+put(Object.assign(document.createElement("div"), { className: "hd" }), "1", 1);
+days.forEach((d, i) => {
+  const el = document.createElement("div");
+  const we = d.getDay() === 0 || d.getDay() === 6;
+  const first = d.getDate() === 1 || i === 0;
+  el.className = "hd" + (we ? " we" : "") + (first ? " mon" : "");
+  el.textContent = (first ? (d.getMonth() + 1) + "/" : "") + d.getDate();
+  put(el, String(i + 2), 1);
+});
+rows.forEach((r, ri) => {
+  const row = ri + 2;
+  if (r[0] === "#") {
+    const g = document.createElement("div"); g.className = "grp"; g.textContent = r[1];
+    put(g, "1 / -1", row); return;
+  }
+  const lane = document.createElement("div"); lane.className = "lane";
+  lane.innerHTML = `${r[0]}<small>${r[1]}</small>`;
+  put(lane, "1", row);
+  days.forEach((d, i) => {
+    const c = document.createElement("div");
+    c.className = "cell" + (d.getDay() === 0 || d.getDay() === 6 ? " we" : "");
+    put(c, String(i + 2), row);
+  });
+  const bar = document.createElement("div"); bar.className = "bar " + r[6]; bar.textContent = r[7];
+  put(bar, `${idx(r[2], r[3]) + 2} / ${idx(r[4], r[5]) + 3}`, row);
+});
+const vline = (m, d, cls, text) => {
+  const el = document.createElement("div"); el.className = "vline " + cls;
+  el.innerHTML = `<span>${text}</span>`; grid.appendChild(el);
+  requestAnimationFrame(() => {
+    const cell = grid.querySelectorAll(".hd")[idx(m, d) + 1];
+    el.style.left = (cell.offsetLeft + (cls === "today" ? 0 : cell.offsetWidth / 2)) + "px";
+  });
+};
+vline(10, 23, "today", "今天 10-23");
+vline(11, 10, "launch", "目标上线 11-10");
+</script>
+</body>
+</html>

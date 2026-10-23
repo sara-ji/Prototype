@@ -14,6 +14,8 @@ https://sara-ji.github.io/Prototype/
 | SahodNow 官网 | https://sara-ji.github.io/Prototype/sahodnow/official/index.html |
 | SahodNow Backend | https://sara-ji.github.io/Prototype/sahodnow/backend.html |
 | SahodNow 业务邮箱说明 | https://sara-ji.github.io/Prototype/wiki/sahodnow-business-email.html |
+| Google Play 开发者账号注册与认证全流程 | https://sara-ji.github.io/Prototype/wiki/google-play-verification/index.html |
+| SahodNow上线-资源依赖同步 | https://sara-ji.github.io/Prototype/sahodnow/launch-dependencies.html |
 | OFW KidlatPeso V3 | https://sara-ji.github.io/Prototype/ofw/kidlatpeso-v3-0818.html |
 | OFW Admin | https://sara-ji.github.io/Prototype/ofw/kidlatpeso-admin-0814.html |
 | OFW OCR 字段抽取对照报告 | https://sara-ji.github.io/Prototype/ofw/ocr-field-accuracy-report.html |
