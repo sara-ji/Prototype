@@ -22,6 +22,7 @@ https://sara-ji.github.io/Prototype/
 | OFW 人审审核记录分析 | https://sara-ji.github.io/Prototype/ofw/manual-review-analysis.html |
 | OFW 10月月会 · 产品路径 | https://sara-ji.github.io/Prototype/ofw/product-path-2026-10.html |
 | OFW OCR 填资功能说明 | https://sara-ji.github.io/Prototype/ofw/ocr-function-guide.html |
+| OFW Co-maker 地址证明功能说明 | https://sara-ji.github.io/Prototype/ofw/comaker-address-proof-guide.html |
 
 ## 注意
 

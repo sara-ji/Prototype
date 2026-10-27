@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Co-maker 地址证明 · 功能说明</title>
+<style>
+  :root {
+    --ink: #1c1917;
+    --muted: #57534e;
+    --line: #e6dfd4;
+    --paper: #f6f3ee;
+    --card: #fffdfb;
+    --accent: #9a4d12;
+    --accent-bg: #fff3e8;
+    --must: #b42318;
+    --must-bg: #fdecea;
+    --opt: #1f7a4d;
+    --opt-bg: #e7f5ee;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    color: var(--ink);
+    background: var(--paper);
+    font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    line-height: 1.55;
+  }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 40px 24px 80px; }
+  .eyebrow { font-size: 12px; letter-spacing: 0.08em; color: var(--accent); font-weight: 650; }
+  h1 { margin: 6px 0 8px; font-size: 30px; letter-spacing: -0.03em; }
+  .lead { margin: 0 0 8px; color: var(--muted); }
+  .prd { display: inline-block; margin-top: 8px; color: var(--accent); font-weight: 650; }
+  h2 { margin: 40px 0 12px; font-size: 18px; }
+  .where { margin: 0 0 12px; font-size: 14px; color: var(--muted); }
+  .where b { color: var(--ink); }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 16px;
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 650; font-size: 12px; white-space: nowrap; }
+  tr:last-child td { border-bottom: 0; }
+  td .en { display: block; color: var(--muted); font-size: 12px; }
+  .merged { vertical-align: middle; color: var(--accent); font-weight: 650; border-left: 1px solid var(--line); }
+  .tag {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 650;
+    white-space: nowrap;
+  }
+  .tag.must { color: var(--must); background: var(--must-bg); }
+  .tag.opt { color: var(--opt); background: var(--opt-bg); }
+  .note {
+    margin-top: 12px;
+    background: var(--accent-bg);
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 14px;
+  }
+  .note b { color: var(--accent); }
+  .split { display: grid; grid-template-columns: 1fr 260px; gap: 16px; align-items: start; }
+  .shot { margin: 0; }
+  .shot img {
+    width: 100%;
+    display: block;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: #fff;
+  }
+  .shot figcaption { margin-top: 6px; font-size: 12px; color: var(--muted); text-align: center; }
+  .wide { margin-top: 14px; }
+  .points { display: grid; gap: 10px; }
+  .point {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 14px 16px;
+  }
+  .point b { display: block; margin-bottom: 4px; }
+  .point p { margin: 0; color: var(--muted); font-size: 14px; }
+  .point ul { margin: 4px 0 0; padding-left: 18px; color: var(--muted); font-size: 14px; }
+  @media (max-width: 760px) {
+    .split { grid-template-columns: 1fr; }
+    .split .shot { max-width: 300px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Kidlat Peso · OFW</div>
+  <h1>Co-maker 地址证明 · 功能说明</h1>
+  <p class="lead">担保人填资新增电商地址证明和门口视频；销售可以代填，人审可以审核并补录地址，方便贷后找到担保人。</p>
+  <a class="prd" href="https://doc.weixin.qq.com/doc/w3_AHIAzXj8ABACN3l1T8tBaQGKic5ds_a?scode=AGMA_AdxAAsvTX9qErAHIAzXj8ABA">完整规则见需求文档</a>
+
+  <h2>1. APP 端：用户填资</h2>
+  <p class="where">位置：<b>Co-maker 页 →「Address &amp; Proof of Address」模块</b>，在原有地址证明下方新增 3 个字段。本土、海外流程一致。</p>
+  <div class="split">
+    <div>
+      <div class="card">
+        <table>
+          <thead>
+            <tr>
+              <th>新增字段</th>
+              <th>是否必填</th>
+              <th>填写 / 上传方式</th>
+              <th>格式要求</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>电商地址证明类型<span class="en">E-commerce Address Proof Type</span></td>
+              <td><span class="tag must">必填</span></td>
+              <td>单选：Grab / Shopee / Lazada / Foodpanda</td>
+              <td class="merged" rowspan="3">审核标准由贷后与人审共同约定</td>
+            </tr>
+            <tr>
+              <td>电商地址证明<span class="en">E-commerce Address Proof</span></td>
+              <td><span class="tag must">必填</span></td>
+              <td>图片或 PDF</td>
+            </tr>
+            <tr>
+              <td>门口视频<span class="en">Doorway video</span></td>
+              <td><span class="tag opt">选填</span></td>
+              <td>MP4 / MOV，最大 25MB</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note"><b>补件时：</b>电商地址证明的类型和文件是一组，任一项被退回或 Pending，类型和文件需要一起重新提交。门口视频单独处理。</div>
+    </div>
+    <figure class="shot">
+      <img src="comaker-address-proof/app-comaker-address.png" alt="APP Co-maker 页地址证明模块" />
+      <figcaption>APP · Co-maker 页</figcaption>
+    </figure>
+  </div>
+
+  <h2>2. 销售端：代填与补件</h2>
+  <p class="where">位置：<b>Backend 用户详情 → Co-maker 资料</b>，新增展示电商地址证明类型、电商地址证明、门口视频。</p>
+  <div class="points">
+    <div class="point">
+      <b>可以编辑这 3 项</b>
+      <p>和现有担保人资料同一套规则，不单独开权限。必填规则与 APP 一致：类型必填、电商地址证明至少 1 个图片或 PDF、门口视频选填。</p>
+    </div>
+    <div class="point">
+      <b>什么时候能改</b>
+      <p>与现有担保人资料相同：终审填资、人审退回等销售可以改担保人资料的时候，这 3 项可以一起改。</p>
+    </div>
+    <div class="point">
+      <b>人审 Pending 时</b>
+      <p>只放开被人审标记的项。门口视频被 Pending 时，由销售补传。</p>
+    </div>
+  </div>
+  <figure class="shot wide">
+    <img src="comaker-address-proof/backend-sales-comaker.png" alt="销售后台 Co-maker 资料" />
+    <figcaption>Backend · Co-maker 资料（底部一行为新增字段）</figcaption>
+  </figure>
+
+  <h2>3. 人审端：审核与补录地址</h2>
+  <p class="where">位置：<b>审核详情 → Co-maker Information Review</b>。审核标准由贷后与人审共同约定。</p>
+  <div class="card">
+    <table>
+      <thead>
+        <tr>
+          <th>审核项</th>
+          <th>可选结论</th>
+          <th>说明</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>电商地址证明类型<span class="en">Co-maker Information</span></td>
+          <td>退回 / Pending / 拒绝</td>
+          <td>与其他担保人字段一致</td>
+        </tr>
+        <tr>
+          <td>电商地址证明<span class="en">Co-maker Materials</span></td>
+          <td>通过 / 退回 / Pending / 拒绝</td>
+          <td>与现有证件材料一致</td>
+        </tr>
+        <tr>
+          <td>门口视频<span class="en">Co-maker Materials</span></td>
+          <td>通过 / 退回 / Pending / 拒绝</td>
+          <td>没上传不挡通过，也不计入「必须标记」的材料；需要时可以标 Pending，让销售补传</td>
+        </tr>
+        <tr>
+          <td>Mother's Maiden Name</td>
+          <td>新增可 Pending</td>
+          <td>本土、海外都支持；Pending 后销售可改，退回 / 拒绝规则不变</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="points wide">
+    <div class="point">
+      <b>新增：人审补录地址（Address Information · Manual Fill）</b>
+      <ul>
+        <li>借款人、担保人各一组：省 / 市 / 区 + 详细地址。</li>
+        <li>都非必填，不影响通过、退回、Pending、拒绝。</li>
+        <li>担保人地址给贷后上门参考；借款人地址只作辅助，不作为上门地址。</li>
+        <li>只提供给贷后，不回写用户资料。</li>
+      </ul>
+    </div>
+  </div>
+  <figure class="shot wide">
+    <img src="comaker-address-proof/backend-review-comaker.png" alt="人审 Co-maker 审核详情" />
+    <figcaption>人审 · Co-maker 审核详情（含新增材料与补录地址）</figcaption>
+  </figure>
+</div>
+</body>
+</html>
