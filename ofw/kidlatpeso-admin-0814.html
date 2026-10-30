@@ -4317,7 +4317,7 @@
       render();
     }
 
-    function goList() { view = 'list'; selectedUserId = null; reviewSelected.clear(); render(); }
+    function goList() { channelPage = false; channelEditId = null; view = 'list'; selectedUserId = null; reviewSelected.clear(); render(); }
 
     function openUser(id, tab) {
       const u = getUser(id);
@@ -4444,8 +4444,13 @@
       document.getElementById('lang-switch').innerHTML = `
         <button type="button" class="lang-btn${lang==='en'?' on':''}" onclick="setLang('en')">English</button>
         <button type="button" class="lang-btn${lang==='zh'?' on':''}" onclick="setLang('zh')">中文</button>`;
-      document.getElementById('nav').innerHTML =
-        `<button type="button" class="nav-link active" onclick="goList()">${info.label}</button>`;
+      const navLinks = [
+        `<button type="button" class="nav-link${channelPage ? '' : ' active'}" onclick="goList()">${info.label}</button>`,
+      ];
+      if (canSeeChannelMgmt()) {
+        navLinks.push(`<button type="button" class="nav-link${channelPage ? ' active' : ''}" onclick="openChannelPage()">${lang === 'zh' ? 'OFW渠道管理' : 'OFW Channels'}</button>`);
+      }
+      document.getElementById('nav').innerHTML = navLinks.join('');
       const hints = {
         team_b: t('hint_team_b'), team_mgmt: t('hint_team_mgmt'),
         reviewer: t('hint_reviewer'), review_admin: t('hint_review_admin'),
@@ -5672,14 +5677,335 @@
     }
 
 
+    /* ── OFW 渠道管理（渠道联系人手机号修改 · 渠道备注） ── */
+    let channelPage = false;
+    let channelEditId = null;
+    let channelFilter = { type: '', q: '' };
+    const Lc = (zh, en) => (lang === 'zh' ? zh : en);
+
+    const CHANNEL_TYPES = ['Manpower Agency', 'LC', 'Sales'];
+    const CHANNEL_LOAN_LABEL = {
+      LOAN_COMAKER_CONFIRM: ['待担保人确认', 'Awaiting co-maker'],
+      LOAN_REVIEWING: ['发标审核中', 'Listing under review'],
+      DISBURSING: ['放款中', 'Disbursing'],
+      REPAYING: ['已放款未结清', 'Disbursed, not settled'],
+      OVERDUE: ['逾期', 'Overdue'],
+    };
+    const CHANNEL_EXTRA_REGISTERED = ['09171234567', '09181112222', '09175550101'];
+
+    const channels = [
+      {
+        id: 'ch1', type: 'Manpower Agency', name: 'UNI-TRUST INTERNATIONAL SERVICES',
+        first: 'ROSALYN', middle: 'B', last: 'GARCIA', phone: '09199914761', userId: '25150280',
+        invite: 'UT8K2Q', address: 'Ermita, Manila', payChannel: 'GCash', payAccount: '09199914761',
+        rebate: '终审通过 · 3%', operator: '朱礼峰', opTime: '2026-10-20 14:02:34', enabled: true,
+        remark: 'sarah_lim', withdrawing: 0, loanStatus: null, guaranteeing: false,
+        phoneLog: [{ op: 'grace_mgr', time: '2026-09-02 10:15:08', from: '09171230001', to: '09199914761' }],
+      },
+      {
+        id: 'ch2', type: 'Manpower Agency', name: 'Jobsglobal.Com Employment Services',
+        first: 'Catherine', middle: '', last: 'Aspa', phone: '09997058971', userId: '25150311',
+        invite: 'JG4M7P', address: 'Pasig City', payChannel: 'GCash', payAccount: '09997058971',
+        rebate: '终审通过 · 3%', operator: '朱礼峰', opTime: '2026-10-19 18:40:38', enabled: true,
+        remark: 'mike_tan', withdrawing: 1, loanStatus: null, guaranteeing: false, phoneLog: [],
+      },
+      {
+        id: 'ch3', type: 'Manpower Agency', name: 'Skyhigh Manpower Recruitment International',
+        first: 'Rubilyn', middle: '', last: 'Paragatos', phone: '09973683588', userId: '25150402',
+        invite: 'SH2N9R', address: 'Malate, Manila', payChannel: 'Maya', payAccount: '09973683588',
+        rebate: '终审通过 · 2.5%', operator: '王嘉阳', opTime: '2026-10-19 16:31:32', enabled: true,
+        remark: '', withdrawing: 0, loanStatus: 'LOAN_REVIEWING', guaranteeing: false, phoneLog: [],
+      },
+      {
+        id: 'ch4', type: 'Manpower Agency', name: '(Ria) Philworld Recruitment',
+        first: 'Ria', middle: '', last: 'Clemente', phone: '09260751958', userId: '25150477',
+        invite: 'PW6T3L', address: 'Quezon City', payChannel: 'GCash', payAccount: '09260751958',
+        rebate: '终审通过 · 3%', operator: '朱礼峰', opTime: '2026-10-19 09:12:40', enabled: true,
+        remark: 'jenny_wu', withdrawing: 0, loanStatus: null, guaranteeing: true, phoneLog: [],
+      },
+      {
+        id: 'ch5', type: 'LC', name: 'LC Manila', first: 'Maria', middle: '', last: 'Santos',
+        phone: '09178880123', userId: '', invite: 'LC3Q8W', address: 'Tondo, Manila',
+        payChannel: 'GCash', payAccount: '09178880123', rebate: '预审通过 · 2%',
+        operator: '王嘉阳', opTime: '2026-10-15 11:20:05', enabled: true,
+        remark: '', withdrawing: 0, loanStatus: null, guaranteeing: false, phoneLog: [],
+      },
+    ];
+
+    function normalizePhPhone(raw) {
+      let d = String(raw || '').replace(/\D/g, '');
+      if (d.startsWith('63') && d.length === 12) d = '0' + d.slice(2);
+      if (d.startsWith('9') && d.length === 10) d = '0' + d;
+      return d;
+    }
+    function isPhoneRegistered(p) {
+      const n = normalizePhPhone(p);
+      if (CHANNEL_EXTRA_REGISTERED.includes(n)) return true;
+      if (users.some(u => normalizePhPhone(u.mobile) === n)) return true;
+      return channels.some(c => c.userId && normalizePhPhone(c.phone) === n);
+    }
+    function phoneOwnerChannel(p, selfId) {
+      const n = normalizePhPhone(p);
+      return channels.find(c => c.id !== selfId && normalizePhPhone(c.phone) === n) || null;
+    }
+    function canSeeChannelMgmt() { return role === 'team_b' || role === 'team_mgmt'; }
+    function canEditChannelPhone() { return role === 'team_mgmt'; }
+    function channelOperator() { return role === 'team_mgmt' ? 'grace_mgr' : currentSalesRepId(); }
+    function channelNowStr() {
+      const d = new Date(); const p = n => String(n).padStart(2, '0');
+      return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
+    }
+
+    function channelPhoneBlockers(c) {
+      const out = [];
+      if (c.withdrawing > 0) {
+        out.push(Lc('该渠道有提现中的佣金，请等提现完成后再修改', 'This channel has a withdrawal in progress. Wait until it finishes.'));
+      }
+      if (c.userId && c.loanStatus) {
+        const lbl = CHANNEL_LOAN_LABEL[c.loanStatus] || [c.loanStatus, c.loanStatus];
+        out.push(Lc(`该联系人有未结束的借款订单（${lbl[0]}），请等订单结束后再修改`,
+          `The key person has an unfinished loan (${lbl[1]}). Wait until it ends.`));
+      }
+      if (c.userId && c.guaranteeing) {
+        out.push(Lc('该联系人有担保中的订单，请等担保结束后再修改', 'The key person is guaranteeing an active loan. Wait until it ends.'));
+      }
+      return out;
+    }
+
+    function openChannelPage() {
+      channelPage = true;
+      channelEditId = null;
+      view = 'list';
+      selectedUserId = null;
+      render();
+    }
+    function openChannelEdit(id) { channelEditId = id; render(); }
+    function closeChannelEdit() { channelEditId = null; render(); }
+
+    function filteredChannels() {
+      const q = channelFilter.q.trim().toLowerCase();
+      return channels.filter(c => {
+        if (channelFilter.type && c.type !== channelFilter.type) return false;
+        if (!q) return true;
+        return [c.name, c.phone, c.first, c.last, c.remark, c.invite].some(v => String(v || '').toLowerCase().includes(q));
+      });
+    }
+
+    function renderChannelList() {
+      const rows = filteredChannels().map((c, i) => `
+        <tr>
+          <td>${i + 1}</td>
+          <td style="font-size:12px">${esc(c.type)}</td>
+          <td style="font-size:12px;max-width:180px">${esc(c.name)}</td>
+          <td style="font-size:12px">${esc([c.first, c.middle, c.last].filter(Boolean).join(' '))}</td>
+          <td style="white-space:nowrap">${esc(c.phone)}</td>
+          <td>${esc(c.userId || '-')}</td>
+          <td>${esc(c.invite || '-')}</td>
+          <td style="font-size:12px">${esc(c.remark || '-')}</td>
+          <td style="font-size:12px">${esc(c.operator)}</td>
+          <td style="font-size:12px;white-space:nowrap">${esc(c.opTime)}</td>
+          <td>${c.enabled ? `<span class="tag tag-success">${Lc('启用', 'Enabled')}</span>` : `<span class="tag">${Lc('禁用', 'Disabled')}</span>`}</td>
+          <td><button type="button" class="btn-sm primary" onclick="openChannelEdit('${c.id}')">${Lc('编辑', 'Edit')}</button></td>
+        </tr>`).join('');
+
+      return `
+        <div class="breadcrumb">${Lc('业务相关', 'Business')}<span>/</span>${Lc('OFW渠道管理', 'OFW Channels')}</div>
+        <div class="toolbar">
+          <select onchange="channelFilter.type=this.value;render()">
+            <option value="">${Lc('全部渠道类型', 'All types')}</option>
+            ${CHANNEL_TYPES.map(tp => `<option value="${esc(tp)}"${channelFilter.type === tp ? ' selected' : ''}>${esc(tp)}</option>`).join('')}
+          </select>
+          <input type="search" placeholder="${esc(Lc('渠道名称 / 手机号 / 备注', 'Name / phone / remark'))}" value="${esc(channelFilter.q)}"
+            onchange="channelFilter.q=this.value;render()" />
+          <span style="flex:1"></span>
+          <button type="button" class="btn-sm primary" onclick="openChannelEdit('__new__')">＋ ${Lc('新增', 'New')}</button>
+        </div>
+        <p class="ch-demo-tip">${Lc(
+          '演示：「Team B · 销售代填管理」角色下，UNI-TRUST、LC Manila 手机号可编辑；Jobsglobal（提现中）、Skyhigh（联系人发标审核中）、Philworld（联系人担保中）锁定。新号演示：09171234567 已注册，09997058971 是其他渠道的号。',
+          'Demo: only the Sales Mgmt role can change the channel phone. UNI-TRUST and LC Manila can change; Jobsglobal has a withdrawal in progress; Skyhigh key person has a loan under review; Philworld key person is guaranteeing. Try 09171234567 (registered) or 09997058971 (another channel).'
+        )}</p>
+        <div class="card table-wrap">
+          <table class="list-table">
+            <thead><tr>
+              <th>${Lc('序号', 'No.')}</th><th>${Lc('渠道类型', 'Type')}</th><th>${Lc('渠道名称', 'Channel')}</th>
+              <th>${Lc('姓名', 'Name')}</th><th>${Lc('渠道手机号', 'Phone')}</th><th>User ID</th>
+              <th>${Lc('邀请码', 'Invite code')}</th><th>${Lc('备注', 'Remark')}${fieldTipMark('new')}</th>
+              <th>${Lc('操作人', 'Operator')}</th><th>${Lc('操作时间', 'Updated')}</th>
+              <th>${Lc('状态', 'Status')}</th><th>${Lc('操作', 'Action')}</th>
+            </tr></thead>
+            <tbody>${rows || `<tr><td colspan="12" style="text-align:center;color:var(--text-muted)">${Lc('暂无渠道', 'No channels')}</td></tr>`}</tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function renderChannelDrawerHost() {
+      let host = document.getElementById('channel-drawer-host');
+      if (!host) {
+        host = document.createElement('div');
+        host.id = 'channel-drawer-host';
+        document.body.appendChild(host);
+      }
+      host.innerHTML = channelPage && channelEditId ? renderChannelDrawer() : '';
+    }
+
+    function chRow(label, control, req) {
+      return `<div class="form-row"><label class="form-label">${req ? '<span class="req">*</span>' : ''}${label}</label><div class="form-control">${control}</div></div>`;
+    }
+
+    function renderChannelPhoneControl(c, isNew) {
+      if (isNew) {
+        return `<input id="ch-phone-new" class="kv-input" placeholder="${esc(Lc('请输入渠道手机号', 'Channel phone'))}" />
+          <div class="ch-err" id="ch-phone-err"></div>`;
+      }
+      if (!canEditChannelPhone() || channelPhoneBlockers(c).length) {
+        return `<input class="kv-input" value="${esc(c.phone)}" disabled />`;
+      }
+      return `<input id="ch-phone-new" class="kv-input" value="${esc(c.phone)}" placeholder="${esc(Lc('请输入渠道手机号', 'Channel phone'))}" />
+        <div class="ch-err" id="ch-phone-err"></div>`;
+    }
+
+    function renderChannelPhoneLog(c) {
+      if (!canEditChannelPhone()) return '';
+      const rows = (c.phoneLog || []).slice().reverse().map(l => `
+        <tr><td>${esc(l.op)}</td><td style="white-space:nowrap">${esc(l.time)}</td><td>${esc(l.from)}</td><td>${esc(l.to)}</td></tr>`).join('');
+      return `<div class="ch-log">
+        <div class="ch-log-title">${Lc('改号记录', 'Phone change log')}${fieldTipMark('new')}</div>
+        <table class="ch-log-table">
+          <thead><tr><th>${Lc('操作人', 'Operator')}</th><th>${Lc('操作时间', 'Time')}</th><th>${Lc('旧手机号', 'Old phone')}</th><th>${Lc('新手机号', 'New phone')}</th></tr></thead>
+          <tbody>${rows || `<tr><td colspan="4" style="text-align:center;color:var(--text-muted)">${Lc('暂无改号记录', 'No changes yet')}</td></tr>`}</tbody>
+        </table>
+      </div>`;
+    }
+
+    function renderChannelDrawer() {
+      const isNew = channelEditId === '__new__';
+      const c = isNew
+        ? { type: '', name: '', first: '', middle: '', last: '', address: '', payChannel: '', payAccount: '', rebate: '', remark: '', phoneLog: [] }
+        : channels.find(x => x.id === channelEditId);
+      if (!c) return '';
+      const dis = isNew ? '' : 'disabled';
+      const inp = (id, val, ph, extra = '') => `<input id="${id}" class="kv-input" value="${esc(val || '')}" placeholder="${esc(ph || '')}" ${extra} />`;
+      return `
+        <div class="ch-mask" onclick="closeChannelEdit()"></div>
+        <aside class="ch-drawer">
+          <div class="ch-drawer-head">
+            <h3>${isNew ? Lc('新增', 'New channel') : Lc('编辑', 'Edit channel')}</h3>
+            <button type="button" class="modal-x" onclick="closeChannelEdit()">×</button>
+          </div>
+          <div class="ch-drawer-body">
+            ${chRow(Lc('渠道类型', 'Type'), `<select id="ch-type" class="kv-input" ${dis}>
+              <option value="">${Lc('请选择渠道类型', 'Select type')}</option>
+              ${CHANNEL_TYPES.map(tp => `<option${c.type === tp ? ' selected' : ''}>${esc(tp)}</option>`).join('')}
+            </select>`, true)}
+            ${chRow(Lc('渠道名称', 'Channel name'), inp('ch-name', c.name, Lc('请输入渠道名称', 'Channel name'), dis), true)}
+            ${chRow(Lc('渠道手机号', 'Channel phone'), renderChannelPhoneControl(c, isNew), true)}
+            ${chRow('First Name', inp('ch-first', c.first, 'First Name'), true)}
+            ${chRow(`Middle Name <span class="ch-opt">${Lc('（选填）', '(optional)')}</span>`, inp('ch-middle', c.middle, 'Middle Name'))}
+            ${chRow('Last Name', inp('ch-last', c.last, 'Last Name'), true)}
+            ${chRow(Lc('地址', 'Address'), inp('ch-address', c.address, Lc('请输入地址', 'Address')), true)}
+            ${chRow(Lc('提现渠道', 'Payout channel'), `<select id="ch-paych" class="kv-input">
+              <option value="">${Lc('请选择提现渠道', 'Select')}</option>
+              ${['GCash', 'Maya', 'Bank'].map(p => `<option${c.payChannel === p ? ' selected' : ''}>${p}</option>`).join('')}
+            </select>`, true)}
+            ${chRow(Lc('提现账号', 'Payout account'), inp('ch-payacc', c.payAccount, Lc('请输入提现账号', 'Payout account')), true)}
+            ${chRow(Lc('返佣规则', 'Rebate rule'), inp('ch-rebate', c.rebate, Lc('业务节点 · 比例', 'Node · rate')), true)}
+            ${chRow(`${Lc('备注', 'Remark')} <span class="ch-opt">${Lc('（选填）', '(optional)')}</span>${fieldTipMark('new')}`,
+              inp('ch-remark', c.remark, Lc('跟进销售的名字', 'Follow-up sales name'), 'maxlength="50"'))}
+            ${isNew ? '' : renderChannelPhoneLog(c)}
+          </div>
+          <div class="ch-drawer-foot">
+            <button type="button" class="btn-sm" onclick="closeChannelEdit()">${Lc('取消', 'Cancel')}</button>
+            <button type="button" class="btn-sm primary" onclick="saveChannelEdit()">${isNew ? Lc('生成邀请码', 'Generate invite code') : Lc('保存', 'Save')}</button>
+          </div>
+        </aside>`;
+    }
+
+    function saveChannelEdit() {
+      const isNew = channelEditId === '__new__';
+      const val = id => (document.getElementById(id)?.value || '').trim();
+      const errEl = document.getElementById('ch-phone-err');
+      const showErr = msg => { if (errEl) errEl.textContent = msg; };
+      const newPhoneRaw = val('ch-phone-new');
+
+      const checkNewPhone = (selfId, oldPhone) => {
+        const n = normalizePhPhone(newPhoneRaw);
+        if (!/^09\d{9}$/.test(n)) return Lc('请输入正确的菲律宾手机号', 'Enter a valid Philippine mobile number');
+        if (oldPhone && n === normalizePhPhone(oldPhone)) return Lc('新手机号不能与当前手机号相同', 'New number must differ from the current one');
+        if (phoneOwnerChannel(n, selfId)) return Lc('该手机号已是其他渠道联系人', 'This number already belongs to another channel');
+        if (isPhoneRegistered(n)) return Lc('该手机号已注册，不能作为渠道联系人', 'This number is already registered and cannot be used');
+        return '';
+      };
+
+      if (isNew) {
+        const err = checkNewPhone(null, '');
+        if (err) { showErr(err); return; }
+        channels.unshift({
+          id: 'ch' + Date.now(), type: val('ch-type') || 'LC', name: val('ch-name') || 'New Channel',
+          first: val('ch-first'), middle: val('ch-middle'), last: val('ch-last'),
+          phone: normalizePhPhone(newPhoneRaw), userId: '', invite: Math.random().toString(36).slice(2, 8).toUpperCase(),
+          address: val('ch-address'), payChannel: val('ch-paych'), payAccount: val('ch-payacc'), rebate: val('ch-rebate'),
+          operator: channelOperator(), opTime: channelNowStr(), enabled: true, remark: val('ch-remark'),
+          withdrawing: 0, loanStatus: null, guaranteeing: false, phoneLog: [],
+        });
+        channelEditId = null;
+        render();
+        return;
+      }
+
+      const c = channels.find(x => x.id === channelEditId);
+      if (!c) return;
+      let phoneChanged = false;
+      const phoneInput = document.getElementById('ch-phone-new');
+      if (phoneInput && !newPhoneRaw) { showErr(Lc('请输入渠道手机号', 'Enter the channel phone')); return; }
+      if (phoneInput && normalizePhPhone(newPhoneRaw) !== normalizePhPhone(c.phone)) {
+        const blockers = channelPhoneBlockers(c);
+        if (blockers.length) { showErr(blockers.join('；')); return; }
+        const err = checkNewPhone(c.id, c.phone);
+        if (err) { showErr(err); return; }
+        const to = normalizePhPhone(newPhoneRaw);
+        c.phoneLog = c.phoneLog || [];
+        c.phoneLog.push({ op: channelOperator(), time: channelNowStr(), from: c.phone, to });
+        c.phone = to;
+        c.userId = '';
+        c.loanStatus = null;
+        c.guaranteeing = false;
+        phoneChanged = true;
+      }
+      c.first = val('ch-first');
+      c.middle = val('ch-middle');
+      c.last = val('ch-last');
+      c.address = val('ch-address');
+      c.payChannel = val('ch-paych');
+      c.payAccount = val('ch-payacc');
+      c.rebate = val('ch-rebate');
+      c.remark = val('ch-remark');
+      c.operator = channelOperator();
+      c.opTime = channelNowStr();
+      channelEditId = null;
+      render();
+      if (phoneChanged) {
+        alert(Lc('手机号已修改：旧号账号已取消渠道身份；新联系人用新号注册 App 后即可查看渠道佣金。',
+          'Phone changed. The old account lost channel access; the new key person sees channel commission after registering with the new number.'));
+      }
+    }
+
     function render() {
       menu = currentMenu();
       if (!(view === 'detail' && menu === 'review' && selectedUserId && isPendingHoldActive(getUser(selectedUserId)))) {
         clearPendingTick();
       }
+      if (channelPage && !canSeeChannelMgmt()) channelPage = false;
+      renderChannelDrawerHost();
       renderNav();
       renderNotifBell();
       renderNotifToasts();
+      if (channelPage) {
+        document.getElementById('page-title').textContent = Lc('OFW渠道管理', 'OFW Channels');
+        document.getElementById('page-sub').textContent = Lc('渠道信息、联系人手机号与备注', 'Channels, key person phone and remarks');
+        document.getElementById('content').innerHTML = renderChannelList();
+        return;
+      }
       const info = getMenus()[menu];
       const titles = {
         list: [info.label, info.sub],
@@ -5914,6 +6240,34 @@
       .sidebar { position: relative; height: auto; }
       .save-bar { left: 0; }
     }
+    .ch-demo-tip { font-size: 12px; color: var(--text-muted); margin: -4px 0 12px; line-height: 1.6; }
+    .ch-mask { position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 900; }
+    .ch-drawer {
+      position: fixed; top: 0; right: 0; bottom: 0; width: min(520px, 100%); background: var(--surface);
+      z-index: 901; display: flex; flex-direction: column; box-shadow: -4px 0 16px rgba(0,0,0,.12);
+    }
+    .ch-drawer-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid var(--border); }
+    .ch-drawer-head h3 { font-size: 15px; font-weight: 600; }
+    .ch-drawer-body { flex: 1; overflow-y: auto; padding: 16px; }
+    .ch-drawer-body .kv-input { width: 100%; padding: 6px 8px; border: 1px solid var(--border); border-radius: 4px; font-size: 13px; }
+    .ch-drawer-body .kv-input:disabled { background: #f5f7fa; color: var(--text-muted); }
+    .ch-drawer-foot { padding: 12px 16px; border-top: 1px solid var(--border); display: flex; justify-content: center; gap: 10px; }
+    .ch-opt { font-size: 11px; color: var(--text-muted); }
+    .ch-hint { font-size: 12px; color: var(--text-muted); margin-top: 4px; line-height: 1.5; }
+    .ch-err { font-size: 12px; color: var(--danger); margin-top: 4px; }
+    .ch-block {
+      margin-top: 8px; padding: 8px 10px; border: 1px solid #ffe58f; background: var(--warning-bg);
+      color: #ad6800; border-radius: 4px; font-size: 12px; line-height: 1.6;
+    }
+    .ch-block ul { margin: 4px 0 0 16px; padding: 0; }
+    .ch-drawer-body .form-row { align-items: flex-start; }
+    .ch-drawer-body .form-row .form-label { padding-top: 6px; }
+    .ch-current { font-size: 13px; padding: 6px 0 6px; color: var(--text); }
+    .ch-log-table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
+    .ch-log-table th, .ch-log-table td { border: 1px solid var(--border); padding: 6px 8px; text-align: left; word-break: break-all; }
+    .ch-log-table th { background: #fafafa; font-weight: 600; }
+    .ch-log { margin-top: 16px; padding-top: 12px; border-top: 1px dashed var(--border); }
+    .ch-log-title { font-weight: 600; font-size: 13px; margin-bottom: 8px; }
   </style>
 </body>
 </html>
