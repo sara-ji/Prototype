@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>菲律宾开发者账号认证 · 最终方案与材料清单</title>
+<style>
+  :root { --teal:#018b8d; --ink:#14201f; --muted:#66706f; --line:#e4ebea; --low:#2e9e6b; --mid:#c98a10; --high:#d0473a; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:"PingFang SC","Microsoft YaHei","Segoe UI",sans-serif; color:var(--ink); background:#f5f8f8; line-height:1.65; font-size:14px; }
+  .wrap { max-width:1120px; margin:0 auto; padding:28px 24px 48px; }
+  h1 { margin:0 0 4px; font-size:24px; }
+  .sub { color:var(--muted); margin:0 0 18px; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:12px; padding:20px 22px; margin-bottom:18px; }
+  h2 { margin:0 0 12px; font-size:17px; color:var(--teal); }
+  h3 { margin:16px 0 8px; font-size:15px; }
+  .summary { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+  .sum { border-radius:10px; padding:12px 14px; }
+  .sum b { display:block; font-size:15px; margin-bottom:4px; }
+  .sum.ok { background:#e8f6ef; } .sum.warn { background:#fff4dc; } .sum.bad { background:#fdeceb; }
+  ul.dot { list-style:none; margin:0; padding:0; }
+  ul.dot li { position:relative; padding-left:14px; margin:2px 0; }
+  ul.dot li::before { content:"·"; position:absolute; left:2px; top:-1px; font-weight:700; font-size:16px; }
+  table { width:100%; border-collapse:collapse; font-size:13.5px; }
+  th, td { border-bottom:1px solid var(--line); padding:9px 8px; text-align:left; vertical-align:top; }
+  th { color:var(--muted); font-weight:600; font-size:12.5px; background:#f7faf9; }
+  td.k { font-weight:600; white-space:nowrap; }
+  .lv { display:inline-block; font-size:12px; font-weight:600; padding:1px 9px; border-radius:10px; white-space:nowrap; }
+  .lv.low { background:#e8f6ef; color:var(--low); }
+  .lv.mid { background:#fff4dc; color:#9a6700; }
+  .lv.high { background:#fdeceb; color:var(--high); }
+  .st { display:inline-block; font-size:12px; font-weight:600; padding:1px 8px; border-radius:10px; white-space:nowrap; }
+  .st.done { background:#e8f6ef; color:var(--low); }
+  .st.todo { background:#fff4dc; color:#9a6700; }
+  .st.risk { background:#fdeceb; color:var(--high); }
+  .src { display:inline-block; font-size:11.5px; color:var(--muted); border:1px solid var(--line); border-radius:8px; padding:0 6px; margin-top:3px; }
+  td .why { display:block; color:var(--muted); font-size:12.5px; margin-top:3px; }
+  .rec { background:#eef7f7; border-left:4px solid var(--teal); border-radius:8px; padding:12px 16px; }
+  .rec ol { margin:6px 0 0; padding-left:20px; }
+  .note { color:var(--muted); font-size:12.5px; margin-top:10px; }
+  .ref { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .ref div { background:#f7faf9; border:1px solid var(--line); border-radius:10px; padding:12px 14px; }
+  .ref div > b:first-child { display:block; margin-bottom:4px; }
+  .appendix { border-top:2px dashed var(--line); margin-top:28px; padding-top:18px; }
+  .appendix > h2 { font-size:18px; color:var(--ink); margin-bottom:14px; }
+  ol.steps { margin:0; padding-left:20px; }
+  ol.steps li { margin:4px 0; }
+  a { color:var(--teal); }
+  @media (max-width:860px) { .summary, .ref { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>菲律宾开发者账号认证 · 最终方案与材料清单</h1>
+  <p class="sub">2026-10-30｜主体：LendWise Financing Corp.（产品 SahodNow）｜适用：Google Play 组织账号、Apple Developer 组织账号｜用途：拿到 D-U-N-S（邓白氏编码）后立即认证开发者账号，请提前备齐材料</p>
+
+  <!-- ========== 1. 最终方案 ========== -->
+  <div class="card">
+    <h2>一、确认的最终方案</h2>
+    <div class="summary">
+      <div class="sum ok"><b>采用当前方案，不设菲律宾代持人</b>
+        <ul class="dot">
+          <li>授权代表：coco（LendWise 法人）本人</li>
+          <li>两步验证手机号、付款卡：秋奕老师本人</li>
+          <li>联系电话：LendWise 公司号码（法务维护）</li>
+          <li>邮箱：公司企业邮箱</li>
+          <li>环境：跳板机固定环境</li>
+        </ul>
+      </div>
+      <div class="sum bad"><b>认证前必须落实的两项</b>
+        <ul class="dot">
+          <li><b>公司名称、地址统一：</b>D-U-N-S、付款资料、官网三处必须逐字一致，否则认证失败</li>
+          <li><b>秋奕老师的手机号、付款卡专号专用：</b>长期可用、不得用于其他开发者账号；手机号为菲律宾号码，须已实名</li>
+        </ul>
+      </div>
+      <div class="sum warn"><b>时间点</b>
+        <ul class="dot">
+          <li>D-U-N-S 已于 10-26 申请，等待下发</li>
+          <li>下发后约 2 个工作日同步到 Apple，即可认证</li>
+          <li>两边认证预计 1 周左右完成（~11-12）</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>方案明细</h3>
+    <table>
+      <tr><th style="width:15%">要素</th><th style="width:27%">最终方案</th><th style="width:12%">风险</th><th>落实要求</th></tr>
+      <tr>
+        <td class="k">授权代表 / 证件</td>
+        <td>coco（LendWise 法人）本人证件</td>
+        <td><span class="lv low">低</span></td>
+        <td>证件可以是任意国家签发，须在有效期内、彩色原件拍摄；姓名与付款资料联系人一致。Apple 还要求 coco 有权代表公司签约，可能电话核实，需本人配合</td>
+      </tr>
+      <tr>
+        <td class="k">两步验证手机号</td>
+        <td>秋奕老师本人号码 +63 968 475 0878</td>
+        <td><span class="lv mid">中</span></td>
+        <td>用于 Google 账号、Apple ID 的两步验证，须能收短信或语音验证码并长期可用。要求：① 号码长期由秋奕老师本人持有，换号、离职前先在后台更新；② <b>不能再用于其他开发者账号</b>，避免账号关联；③ 菲律宾号码须已按 RA 11934 实名（未实名会被停用）。手机号、付款卡同属秋奕老师，两项信息一致</td>
+      </tr>
+      <tr>
+        <td class="k">联系电话（不公开）</td>
+        <td>LendWise 公司号码 +63 961 970 8611</td>
+        <td><span class="lv low">低</span></td>
+        <td>Google 用来联系公司，须能收验证码并长期可用；由法务维护。与邓白氏档案登记的公司电话一致，同时用作组织电话</td>
+      </tr>
+      <tr>
+        <td class="k">邮箱</td>
+        <td>公司企业邮箱（@sahodnow.com）</td>
+        <td><span class="lv low">低</span></td>
+        <td>Google 联系邮箱用 CS@sahodnow.com；开发者邮箱（Play 公开展示）用 developer@sahodnow.com；Apple ID 用企业邮箱注册</td>
+      </tr>
+      <tr>
+        <td class="k">付款卡</td>
+        <td>秋奕老师的 Visa</td>
+        <td><span class="lv mid">中</span></td>
+        <td>须为信用卡或借记卡，<b>不能是预付卡</b>。持卡人与授权代表不一致时，Google 可能要求补材料；这张卡<b>只用于本主体</b>，不能再绑其他开发者账号，避免关联封号。Apple 组织账号可在付款 Apple ID 中添加该卡</td>
+      </tr>
+      <tr>
+        <td class="k">开发者电话（公开）</td>
+        <td>客服热线 +63 2 8841 9886</td>
+        <td><span class="lv low">低</span></td>
+        <td>固话可用语音接收验证码</td>
+      </tr>
+      <tr>
+        <td class="k">登录环境</td>
+        <td>跳板机 + 固定浏览器</td>
+        <td><span class="lv low">低</span></td>
+        <td>Owner / Account Holder 只在固定环境登录；研发用各自账号被邀请加入，不共享主账号</td>
+      </tr>
+      <tr>
+        <td class="k">账号控制权</td>
+        <td>企业邮箱 + 秋奕老师手机号</td>
+        <td><span class="lv mid">中</span></td>
+        <td>两步验证绑定秋奕老师手机号，登录需本人配合收码；建议同时开启验证器 App 或安全密钥作为第二种验证方式，备用验证码由公司保管；授权代表或两步验证手机号持有人变动时，需走账号信息变更流程</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- ========== 2. 材料清单 ========== -->
+  <div class="card">
+    <h2>二、所需材料清单（Google + Apple）</h2>
+    <p class="note" style="margin-top:0">来源均为 Google、Apple 官方帮助中心，链接见文末。「两边都要」的材料只需准备一份。</p>
+
+    <h3>1. 公司材料</h3>
+    <table>
+      <tr><th style="width:18%">材料</th><th style="width:12%">Google</th><th style="width:12%">Apple</th><th style="width:30%">要求</th><th style="width:16%">当前状态</th><th>负责人</th></tr>
+      <tr><td class="k">D-U-N-S 编码</td><td>必须</td><td>必须</td><td>9 位数字；邓白氏档案中的<b>名称和地址</b>必须与 Google 付款资料完全一致；Google 端输入次数有限，拿到后再填</td><td><span class="st todo">10-26 已申请</span></td><td>产品</td></tr>
+      <tr><td class="k">法定名称</td><td>必须</td><td>必须</td><td>LendWise Financing Corp.，与 SEC 证书逐字一致。Apple <b>不接受经营名</b>，App Store 卖家名会显示 LendWise；开发者名称可以用 SahodNow</td><td><span class="st done">已有</span></td><td>法务</td></tr>
+      <tr><td class="k">公司地址</td><td>必须</td><td>必须（总部地址）</td><td>D-U-N-S、Google 付款资料、Apple、官网四处<b>写法完全一致</b>，不能用邮政信箱</td><td><span class="st risk">待统一</span><span class="why">公司章程上的地址与官网页脚写法不同，需先确认以哪个为准，并核对 D-U-N-S 申请时填的是哪个</span></td><td>机构与产品</td></tr>
+      <tr><td class="k">公司电话</td><td>必须（组织电话、联系电话）</td><td>必须（总部电话）</td><td>LendWise 公司号码；与 D-U-N-S 档案中登记的电话一致</td><td><span class="st done">+63 961 970 8611</span></td><td>法务</td></tr>
+      <tr><td class="k">SEC 注册证书（COI）</td><td>必须</td><td>可能要求</td><td>彩色、清晰、非复印件；Apple 可能要求<b>公证件</b></td><td><span class="st done">已有</span></td><td>法务</td></tr>
+      <tr><td class="k">公司章程（AOI）/ 最新 GIS</td><td>建议备</td><td>可能要求</td><td>COI 通常不含地址，用来佐证地址和董事名单</td><td><span class="st todo">GIS 待确认</span></td><td>法务</td></tr>
+      <tr><td class="k">牌照文件</td><td>上架时要</td><td>审核备注</td><td>Google Play「财务功能声明」上传 SEC 证书、融资牌照 CA（F-26-0147-92）；OLP 登记获批后补传</td><td><span class="st done">CA 已有</span> <span class="st todo">OLP 待批</span></td><td>法务</td></tr>
+      <tr><td class="k">授权证明</td><td>备用</td><td>建议备</td><td>董事会决议或秘书证明，写明由 coco 代表公司办理 Google、Apple 开发者账号</td><td><span class="st todo">待准备</span></td><td>法务</td></tr>
+      <tr><td class="k">官网</td><td>必须</td><td>必须</td><td>公开可访问、内容完整（不能是空页或社媒链接）；展示公司名、地址、SEC 号、CA 号；Google 需在 Search Console 验证所有权</td><td><span class="st done">已上线，已验证</span></td><td>产品</td></tr>
+    </table>
+
+    <h3>2. 授权代表（coco）个人材料</h3>
+    <table>
+      <tr><th style="width:18%">材料</th><th style="width:12%">Google</th><th style="width:12%">Apple</th><th style="width:30%">要求</th><th style="width:16%">当前状态</th><th>负责人</th></tr>
+      <tr><td class="k">本人证件</td><td>必须</td><td>必须</td><td>护照 / 身份证 / 驾照任一，可任意国家签发；在有效期内；彩色原件拍摄。Apple 在多数地区接受护照</td><td><span class="st todo">待提供</span></td><td>coco</td></tr>
+      <tr><td class="k">法定姓名</td><td>必须</td><td>必须</td><td>与证件一致；Apple ID 的名和姓必须是法定姓名，不能用昵称或公司名，否则审核延迟</td><td><span class="st todo">待提供</span></td><td>coco</td></tr>
+      <tr><td class="k">签约权确认</td><td>—</td><td>必须</td><td>Apple 要求操作人是公司所有者 / 创始人、高管，或经高管授权的员工；不是创始人时须提供一位能确认其签约权的联系人</td><td><span class="st todo">待确认</span></td><td>coco</td></tr>
+      <tr><td class="k">配合核实</td><td>可能</td><td>可能</td><td>Apple、邓白氏可能电话核实；Google 可能要求补充材料</td><td>—</td><td>coco</td></tr>
+    </table>
+
+    <h3>3. 账号与联系方式</h3>
+    <table>
+      <tr><th style="width:18%">项</th><th style="width:12%">Google</th><th style="width:12%">Apple</th><th style="width:30%">要求</th><th style="width:16%">当前状态</th><th>负责人</th></tr>
+      <tr><td class="k">主账号</td><td>Google 账号</td><td>Apple ID</td><td>用企业邮箱注册，开启两步验证。Apple 用 Developer App 注册时须用同一台 iPhone / iPad / Mac 完成全程</td><td><span class="st done">Google 已建</span> <span class="st todo">Apple 待建</span></td><td>产品</td></tr>
+      <tr><td class="k">联系邮箱</td><td>必须（不公开）</td><td>工作邮箱</td><td>CS@sahodnow.com；与官网同域名、代表公司；需验证码验证</td><td><span class="st done">已有</span></td><td>产品</td></tr>
+      <tr><td class="k">开发者邮箱</td><td>必须（公开）</td><td>—</td><td>developer@sahodnow.com</td><td><span class="st done">已有</span></td><td>产品</td></tr>
+      <tr><td class="k">两步验证手机号</td><td>两步验证用</td><td>两步验证用</td><td>秋奕老师本人号码 +63 968 475 0878；能收短信或语音验证码，长期可用，不用于其他开发者账号；须已实名</td><td><span class="st done">已有</span></td><td>秋奕老师</td></tr>
+      <tr><td class="k">联系电话</td><td>必须（不公开）</td><td>—</td><td>LendWise 公司号码 +63 961 970 8611，能收验证码</td><td><span class="st done">已有</span></td><td>法务</td></tr>
+      <tr><td class="k">开发者电话</td><td>必须（公开）</td><td>—</td><td>+63 2 8841 9886</td><td><span class="st done">已有</span></td><td>客服</td></tr>
+      <tr><td class="k">付款</td><td>25 美元，一次性</td><td>99 美元 / 年</td><td>Visa / Mastercard，不能用预付卡；Apple 按年自动续费</td><td><span class="st todo">待确认卡可用</span></td><td>秋奕老师</td></tr>
+    </table>
+
+    <h3>4. 上架时还需要（认证完成后）</h3>
+    <ul class="dot">
+      <li><b>Google：</b>注册包名（Android 开发者验证）；财务功能声明及牌照；隐私政策 URL；商店描述须写公司名、SEC 号、CA 号、最短和最长还款期（≥ 61 天）、最高 APR、总成本示例；可重复使用的英文审核测试账号</li>
+      <li><b>Apple：</b>隐私政策 URL、App 隐私标签、审核测试账号、审核备注附牌照说明</li>
+    </ul>
+  </div>
+
+  <!-- ========== 3. 认证步骤 ========== -->
+  <div class="card">
+    <h2>三、拿到 D-U-N-S 后的操作顺序</h2>
+    <ol class="steps">
+      <li><b>核对：</b>先查邓白氏档案上的公司名、地址、电话，与 SEC 文件、官网逐字比对；不一致就先改（改邓白氏约需 7–9 天同步到 Google）。</li>
+      <li><b>Google：</b>在跳板机上登录 Owner 账号 → 注册 Play Console 组织账号 → 创建付款资料（名称、地址照抄邓白氏）→ 填 D-U-N-S → 上传 COI 和 coco 证件 → 验证网站和电话 → 付 25 美元。</li>
+      <li><b>Apple：</b>D-U-N-S 下发 2 个工作日后，由 coco 用企业邮箱 Apple ID 提交组织注册 → 拍摄证件 → 填写公司信息和签约权确认人 → 等待 Apple 审核或来电 → 付 99 美元。</li>
+      <li><b>授权：</b>两边认证通过后，给研发、产品按角色开子账号，不共享主账号。</li>
+    </ol>
+    <p class="note">如发现信息不一致，Google 给 28 天整改，逾期账号和 App 会被移除。</p>
+  </div>
+
+  <!-- ========== 4. 需要老板配合 ========== -->
+  <div class="card">
+    <h2>四、需要老板确认 / 协调</h2>
+    <div class="rec">
+      <ol>
+        <li><b>coco 配合：</b>提供证件、确认作为 Google / Apple 账号授权代表，配合 Apple 签约权核实和可能的来电。</li>
+        <li><b>秋奕老师配合：</b>提供两步验证手机号和 Visa（非预付卡），两者都只用于本主体、不再绑其他开发者账号；认证和日常登录需要收验证码时配合；Apple 年费按年续费。</li>
+        <li><b>地址口径：</b>与法务确认公司地址以哪份文件的写法为准，统一后再做认证。</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>公开资料来源</h2>
+    <ul class="dot">
+      <li>Google：<a href="https://support.google.com/googleplay/android-developer/answer/13628312">创建 Play Console 开发者账号所需信息</a>；<a href="https://static.googleusercontent.com/media/play.google.com/en//console/about/static/pdf/Verifying_your_Play_Console_developer_account_for_organizations.pdf">组织账号验证指南（PDF）</a>；<a href="https://support.google.com/paymentscenter/answer/13992651">用 D-U-N-S 更新付款资料</a></li>
+      <li>Apple：<a href="https://developer.apple.com/programs/enroll/">Enroll</a>；<a href="https://developer.apple.com/help/account/membership/program-enrollment/">Enrollment</a>；<a href="https://developer.apple.com/help/account/membership/enrolling-in-the-app/">用 Developer App 注册</a>；<a href="https://developer.apple.com/help/account/membership/D-U-N-S/">D-U-N-S Number</a></li>
+      <li>菲律宾 SIM 卡实名：<a href="https://lawphil.net/statutes/repacts/ra2022/ra_11934_2022.html">RA 11934</a>；<a href="https://lawphil.net/statutes/repacts/ra2022/irr_11934_2022.html">实施细则 NTC MC 001-12-2022</a></li>
+      <li>完整注册流程与风险：《Google Play开发者账号注册与认证全流程》</li>
+    </ul>
+  </div>
+
+  <!-- ========== 附件 ========== -->
+  <div class="appendix">
+    <h2>附件：原方案对比与其他国家参考（2026-10-27 原文）</h2>
+
+    <div class="card">
+      <h2>关键结论（原文）</h2>
+      <div class="summary">
+        <div class="sum ok"><b>账号代持人方案：整体低风险</b>
+          <ul class="dot">
+            <li>证件、手机号、付款卡都来自同一位当地法人，与主体一致</li>
+            <li>墨西哥已用此方式完成认证</li>
+            <li>主要风险是依赖个人配合，需代持协议约束</li>
+          </ul>
+        </div>
+        <div class="sum bad"><b>当前菲律宾方案：有两个高风险点</b>
+          <ul class="dot">
+            <li>手机号未实名：菲律宾要求 SIM 卡实名，未实名卡会被停用</li>
+            <li>付款卡、证件、手机号分属三个人，信息不一致</li>
+            <li>证件人（coco）尚未确定，是认证卡点</li>
+          </ul>
+        </div>
+        <div class="sum warn"><b>建议：以 coco 为代持人统一资料</b>
+          <ul class="dot">
+            <li>证件、实名手机号、付款卡都用 coco 本人</li>
+            <li>邮箱、两步验证备用码由公司保管</li>
+            <li>保留跳板机环境隔离，并做资料隔离</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>按认证资料逐项对比（原文）</h2>
+      <table>
+        <tr>
+          <th style="width:15%">认证资料</th>
+          <th style="width:23%">Google 要求</th>
+          <th style="width:25%">账号代持人方案<br><span style="font-weight:400">（当地法人统一提供）</span></th>
+          <th style="width:37%">当前菲律宾方案</th>
+        </tr>
+        <tr>
+          <td class="k">授权代表证件</td>
+          <td>董事 / CEO / 法人等授权代表本人的有效证件；姓名须与付款资料联系人一致</td>
+          <td><span class="lv low">低</span> 当地法人本人证件，与 SEC 文件一致</td>
+          <td><span class="lv mid">中</span> 计划用 coco（LendWise 法人），<b>尚未确定</b><span class="why">证件人选是认证卡点；确定 coco 后风险与代持人方案相同</span></td>
+        </tr>
+        <tr>
+          <td class="k">联系电话<br>（不公开）</td>
+          <td>需短信或语音验证码，并在账号存续期间一直可用；Google 会抽查账号是否可联系</td>
+          <td><span class="lv low">低</span> 法人本人实名号码，长期稳定</td>
+          <td><span class="lv high">高</span> 菲律宾未实名卡<span class="why">菲律宾《SIM 卡注册法》（RA 11934）要求所有 SIM 卡实名，未实名卡会被停用。号码失效后收不到验证码，两步验证、账号找回、Google 核验都会受影响，严重时 App 会因联系方式失效被下架</span></td>
+        </tr>
+        <tr>
+          <td class="k">开发者电话<br>（Play 公开）</td>
+          <td>需验证码验证，在商店公开展示</td>
+          <td><span class="lv low">低</span> 用客服热线</td>
+          <td><span class="lv low">低</span> 用客服热线 0288419886</td>
+        </tr>
+        <tr>
+          <td class="k">邮箱</td>
+          <td>联系邮箱、开发者邮箱需与官网同域名，代表组织</td>
+          <td><span class="lv low">低</span> 企业邮箱</td>
+          <td><span class="lv low">低</span> 企业邮箱</td>
+        </tr>
+        <tr>
+          <td class="k">注册费付款卡</td>
+          <td>非预付卡；官方提示可能要求证件和信用卡都在本人法定名下</td>
+          <td><span class="lv low">低</span> 法人本人名下或公司卡</td>
+          <td><span class="lv high">高</span> 秋奕老师的 Visa<span class="why">持卡人与证件人、主体都不一致，可能触发人工审核或追加材料；这张卡如果也用于其他开发者账号，会形成账号关联，其中一个账号被封会牵连本账号</span></td>
+        </tr>
+        <tr>
+          <td class="k">信息一致性</td>
+          <td>所有资料须与付款资料完全一致；不一致是认证失败的首要原因</td>
+          <td><span class="lv low">低</span> 证件、电话、付款卡同一人</td>
+          <td><span class="lv mid">中</span> 手机号（持有人不明）、付款卡（秋奕）、证件（coco）分属三人<span class="why">任一项被核查时都需要解释和补材料</span></td>
+        </tr>
+        <tr>
+          <td class="k">账号控制权</td>
+          <td>Owner 账号无法直接更换，只能走 App 转移</td>
+          <td><span class="lv mid">中</span> 两步验证、来电核实依赖法人个人配合<span class="why">需签代持协议，备用码由公司保管</span></td>
+          <td><span class="lv high">高</span> 邮箱公司可控，但两步验证依赖未实名卡<span class="why">卡被停用即可能无法登录</span></td>
+        </tr>
+        <tr>
+          <td class="k">人员变动</td>
+          <td>资料变化需及时更新，否则账号受限</td>
+          <td><span class="lv mid">中</span> 法人更换或不配合时，需走账号信息变更</td>
+          <td><span class="lv mid">中</span> 秋奕老师离职或卡注销需换卡；证件人未定</td>
+        </tr>
+      </table>
+      <p class="note">风险等级：<span class="lv low">低</span> 符合 Google 要求、无明显隐患 <span class="lv mid">中</span> 可控，但需补措施 <span class="lv high">高</span> 可能导致认证失败、账号失联或被封。D-U-N-S、组织注册文件、官网两种方案相同，未列入对比。</p>
+    </div>
+
+    <div class="card">
+      <h2>其他国家参考（原文）</h2>
+      <div class="ref">
+        <div><b>公司内部</b>
+          <ul class="dot">
+            <li><b>墨西哥：</b>跳板机 + 账号代持人。找了公司对应的当地法人，用他的号码完成开发者账号认证。资料与主体一致，环境和资料都做了隔离。</li>
+            <li><b>泰国：</b>手机号、信用卡、证件都用刘昱璐个人的。只做了环境隔离，未做资料隔离：资料一致，但个人资料与公司账号绑定，存在人员变动和跨账号关联风险。</li>
+          </ul>
+        </div>
+        <div><b>公司外部</b>
+          <ul class="dot">
+            <li><b>信飞、快牛：</b>都有账号代持人的概念，或直接使用当地法人的证件完成认证。</li>
+          </ul>
+        </div>
+      </div>
+      <p class="note">墨西哥、泰国情况来自内部同步；信飞、快牛为行业了解，未经核实。</p>
+    </div>
+  </div>
+</div>
+</body>
+</html>
