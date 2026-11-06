@@ -20,6 +20,7 @@ https://sara-ji.github.io/Prototype/
 | SahodNow上线-资源依赖同步（10-23 版） | https://sara-ji.github.io/Prototype/sahodnow/launch-dependencies.html |
 | OFW KidlatPeso V3 | https://sara-ji.github.io/Prototype/ofw/kidlatpeso-v3-0818.html |
 | OFW Admin | https://sara-ji.github.io/Prototype/ofw/kidlatpeso-admin-0814.html |
+| OFW 延期 APP（不换标） | https://sara-ji.github.io/Prototype/ofw/kidlatpeso-loan-extension-1106.html |
 | OFW OCR 字段抽取对照报告 | https://sara-ji.github.io/Prototype/ofw/ocr-field-accuracy-report.html |
 | OFW 人审审核记录分析 | https://sara-ji.github.io/Prototype/ofw/manual-review-analysis.html |
 | OFW 10月月会 · 产品路径 | https://sara-ji.github.io/Prototype/ofw/product-path-2026-10.html |

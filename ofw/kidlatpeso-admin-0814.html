@@ -77,6 +77,7 @@
             <option value="team_mgmt">Team B · 销售代填管理</option>
             <option value="reviewer">人审 · 普通审核员</option>
             <option value="review_admin">人审 · 管理员</option>
+            <option value="cs">客服 · 用户查询</option>
           </select>
         </div>
         <nav id="nav"></nav>
@@ -691,6 +692,8 @@
         role_team_mgmt: 'Team B · 销售代填管理',
         role_reviewer: '人审 · 普通审核员',
         role_review_admin: '人审 · 管理员',
+        role_cs: '客服 · 用户查询',
+        hint_cs: '客服：按 User ID / 手机号 / Listing ID / 姓名查询用户，只读查看用户资料与资产信息；资产信息中可查看标的展期标识、展期天数、展期费与展期记录。',
         menu_sales_fill: '销售代填',
         menu_sales_fill_sub: '协助填写用户资料（不可新增担保人）',
         menu_sales_mgmt: '销售代填管理',
@@ -1122,6 +1125,8 @@
         role_team_mgmt: 'Team B · Sales Assist Admin',
         role_reviewer: 'Manual Review · Auditor',
         role_review_admin: 'Manual Review · Admin',
+        role_cs: 'CS · User Search',
+        hint_cs: 'CS: search users by User ID / mobile / Listing ID / name and view profile and assets read-only, including listing extension flag, days, fee and extension records.',
         menu_sales_fill: 'Sales Assist',
         menu_sales_fill_sub: 'Help fill profiles (cannot add co-maker)',
         menu_sales_mgmt: 'Sales Assist Admin',
@@ -1756,6 +1761,7 @@
         'sales-fill': { label: t('menu_sales_fill'), sub: t('menu_sales_fill_sub') },
         'sales-fill-mgmt': { label: t('menu_sales_mgmt'), sub: t('menu_sales_mgmt_sub') },
         'review':     { label: t('menu_review'), sub: t('menu_review_sub') },
+        'cs-search':  { label: Lc('用户查询', 'User Search'), sub: Lc('客服相关 · 用户资料与资产信息（只读）', 'Customer service · profile & assets (read-only)') },
       };
     }
 
@@ -1764,6 +1770,7 @@
       team_mgmt:  { labelKey: 'role_team_mgmt', menu: 'sales-fill-mgmt', canEdit: true,  canReview: false },
       reviewer:   { labelKey: 'role_reviewer', menu: 'review', canEdit: false, canReview: true, isReviewAdmin: false },
       review_admin: { labelKey: 'role_review_admin', menu: 'review', canEdit: false, canReview: true, isReviewAdmin: true },
+      cs:         { labelKey: 'role_cs', menu: 'cs-search', canEdit: false, canReview: false },
     };
     function roleLabel(r) { return t(ROLES[r].labelKey); }
     function isReviewAdmin() { return !!ROLES[role]?.isReviewAdmin; }
@@ -4441,6 +4448,7 @@
       sel.options[1].text = t('role_team_mgmt');
       sel.options[2].text = t('role_reviewer');
       sel.options[3].text = t('role_review_admin');
+      if (sel.options[4]) sel.options[4].text = t('role_cs');
       document.getElementById('lang-switch').innerHTML = `
         <button type="button" class="lang-btn${lang==='en'?' on':''}" onclick="setLang('en')">English</button>
         <button type="button" class="lang-btn${lang==='zh'?' on':''}" onclick="setLang('zh')">中文</button>`;
@@ -4454,6 +4462,7 @@
       const hints = {
         team_b: t('hint_team_b'), team_mgmt: t('hint_team_mgmt'),
         reviewer: t('hint_reviewer'), review_admin: t('hint_review_admin'),
+        cs: t('hint_cs'),
       };
       document.getElementById('perm-hint').innerHTML = `<strong>${roleLabel(role)}</strong>${hints[role]}`;
       document.getElementById('role-badge').textContent = roleLabel(role);
@@ -6007,6 +6016,13 @@
         return;
       }
       const info = getMenus()[menu];
+      if (menu === 'cs-search') {
+        const cu = view === 'detail' ? getUser(selectedUserId) : null;
+        document.getElementById('page-title').textContent = cu ? Lc('用户资料', 'User Profile') : info.label;
+        document.getElementById('page-sub').textContent = cu ? `${cu.id} · ${cu.mobile}` : info.sub;
+        document.getElementById('content').innerHTML = cu ? renderCsDetail(cu) : renderCsSearch();
+        return;
+      }
       const titles = {
         list: [info.label, info.sub],
         detail: [`${info.label} · ${t('detail_suffix')}`, esc(getUser(selectedUserId)?.name || '')],
@@ -6017,6 +6033,269 @@
 
       document.getElementById('content').innerHTML =
         view === 'detail' ? renderUserDetail() : (menu === 'review' ? renderReviewList() : renderUserList());
+    }
+
+    /* ── 客服 · 用户查询：用户资料 + 资产信息（OFW 延期：Listing 展期字段与展期记录） ── */
+    let csQuery = { type: 'userId', q: '' };
+    let csDemo = { phase: 'after', withFailed: true };
+    let csOpen = { '78982532': true };
+    let csListingFilter = { status: '', ext: '' };
+
+    const CS_EXT = {
+      order: 'EXT20270108000016', batch: 'CDS-20270108', applyAt: '2027-01-08 10:21:36', effAt: '2027-01-08 10:24:05',
+      days: 14, oldDue: '2027-01-03', newDue: '2027-01-22', fee: 1344, svc: 3000, pen: 84.01, over: 0, channel: 'GCash',
+    };
+    const CS_EXT_FAILED = {
+      order: 'EXT20270107000009', batch: 'CDS-20270107', applyAt: '2027-01-07 09:12:40',
+      days: 7, oldDue: '2027-01-03', newDue: '2027-01-14', fee: 672, svc: 3000, pen: 67.21, over: 0, channel: '', fail: 'expired',
+    };
+    const csFmt = n => Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const csPad = n => String(n).padStart(2, '0');
+    const csPay = r => Math.round((r.fee + r.svc + r.pen) * 100) / 100;
+
+    function csListingA() {
+      const after = csDemo.phase === 'after';
+      const debts = [];
+      for (let i = 1; i <= 9; i++) {
+        const p = i === 1 ? 0 : (i === 9 ? 7493 : 7501);
+        const orig = i === 1 ? '2026-12-03' : `2027-${csPad(i - 1)}-03`;
+        const d = { no: i, id: 163969459 + i - 1, due: orig, orig: null, od: 0, should: p + 3000, unpaid: p + 3000, uP: p, uI: 0, uPen: 0, uSvc: 3000, last: '', st: 'repaying' };
+        if (i === 1) Object.assign(d, { unpaid: 0, uP: 0, uSvc: 0, last: '2026-12-02 10:15:22', st: 'paid' });
+        else if (i === 2 && !after) Object.assign(d, { od: 5, uPen: 84.01, should: d.should + 84.01, unpaid: d.unpaid + 84.01, st: 'overdue' });
+        else if (i === 2) Object.assign(d, { due: CS_EXT.newDue, orig, should: d.should + 84.01, unpaid: p, uSvc: 0, last: CS_EXT.effAt });
+        else if (after) Object.assign(d, { due: `2027-${csPad(i - 1)}-22`, orig });
+        debts.push(d);
+      }
+      const recs = [];
+      if (after) recs.push({ ...CS_EXT, ok: true });
+      if (csDemo.withFailed) recs.push({ ...CS_EXT_FAILED, ok: false });
+      return {
+        scene: 'OFW-CL', id: '78982532', lender: 'Wefund', at: '2026-11-03 18:03:04', amount: 60000, svc: 27000, interest: 0,
+        pen: '0.16%', emi: 9667, terms: 9, withdraw: 60000, ch: 'BPI', acct: '4076531797', status: 'repaying',
+        ext: after ? CS_EXT : null, count: after ? 1 : 0, recs, debts,
+      };
+    }
+    function csListingB() {
+      const debts = [];
+      for (let i = 1; i <= 6; i++) {
+        const p = i === 1 ? 0 : 4000;
+        debts.push({ no: i, id: 152330101 + i - 1, due: `2026-${csPad(3 + i)}-02`, orig: null, od: 0, should: p + 1500, unpaid: 0, uP: 0, uI: 0, uPen: 0, uSvc: 0, last: `2026-${csPad(3 + i)}-01 18:20:11`, st: 'paid' });
+      }
+      return {
+        scene: 'OFW-CL', id: '77810021', lender: 'Wefund', at: '2026-03-02 10:11:05', amount: 20000, svc: 9000, interest: 0,
+        pen: '0.16%', emi: 4833.33, terms: 6, withdraw: 20000, ch: 'GCash', acct: '0917****321', status: 'settled',
+        ext: null, count: 0, recs: [], debts,
+      };
+    }
+    function csListingC() {
+      return {
+        scene: 'OFW-CL', id: '79011876', lender: 'Wefund', at: '2026-08-01 09:00:12', amount: 9000, svc: 4050, interest: 0,
+        pen: '0.16%', emi: 1087.5, terms: 12, withdraw: 9000, ch: 'BDO', acct: '0031****8890', status: 'withdrawing',
+        ext: null, count: 0, recs: [], debts: [],
+      };
+    }
+    function csListingsOf(uid) {
+      if (uid === 'U1012') return [csListingA(), csListingB()];
+      if (uid === 'U1011') return [csListingC()];
+      return [];
+    }
+    function csListingStatus(s) {
+      return {
+        repaying: Lc('提现成功等待还款', 'Disbursed · repaying'),
+        settled: Lc('标的所有债务还清', 'All debts settled'),
+        withdrawing: Lc('提现中', 'Withdrawing'),
+      }[s] || s;
+    }
+    function csDebtStatus(s) {
+      if (s === 'overdue') return `<span class="tag tag-danger">${Lc('逾期', 'Overdue')}</span>`;
+      return s === 'paid' ? Lc('已还清', 'Paid') : Lc('还款中', 'Repaying');
+    }
+    function csRecStatus(r) {
+      if (r.ok) return `<span class="tag tag-success">${Lc('已生效', 'Effective')}</span>`;
+      const why = {
+        expired: Lc('已过期', 'expired'), partial: Lc('少付', 'underpaid'),
+        split: Lc('分笔', 'split payment'), voided: Lc('被普通还款作废', 'voided by repayment'),
+      }[r.fail] || '';
+      return `<span class="tag cs-tag-gray">${Lc('未生效', 'Not effective')} · ${why}</span>`;
+    }
+
+    function csUsers() {
+      const q = csQuery.q.trim().toLowerCase().replace(/\s+/g, '');
+      if (!q) return users;
+      return users.filter(u => {
+        if (csQuery.type === 'userId') return u.id.toLowerCase().includes(q);
+        if (csQuery.type === 'mobile') return String(u.mobile).replace(/\s+/g, '').includes(q);
+        if (csQuery.type === 'listingId') return csListingsOf(u.id).some(l => l.id.includes(q));
+        if (csQuery.type === 'name') return String(u.name).toLowerCase().replace(/\s+/g, '').includes(q);
+        return true;
+      });
+    }
+    function runCsSearch() {
+      csQuery.type = document.getElementById('cs-q-type').value;
+      csQuery.q = document.getElementById('cs-q').value;
+      render();
+    }
+    function csToggle(id) { csOpen[id] = !csOpen[id]; render(); }
+
+    function renderCsSearch() {
+      const list = csUsers();
+      const opt = (v, l) => `<option value="${v}" ${csQuery.type === v ? 'selected' : ''}>${l}</option>`;
+      return `
+        <div class="breadcrumb">${Lc('客服相关', 'Customer service')} <span>/</span> ${Lc('用户查询', 'User Search')}</div>
+        <div class="toolbar">
+          <select id="cs-q-type">${opt('userId', 'User ID')}${opt('mobile', Lc('手机号', 'Mobile'))}${opt('listingId', 'Listing ID')}${opt('name', Lc('姓名', 'Name'))}</select>
+          <input id="cs-q" placeholder="${Lc('请输入', 'Enter keyword')}" value="${esc(csQuery.q)}" onkeydown="if(event.key==='Enter')runCsSearch()" />
+          <button type="button" class="btn-sm primary" style="height:32px" onclick="runCsSearch()">${Lc('搜索', 'Search')}</button>
+          <span class="cs-demo-tip">${Lc('演示数据：U1012 Rico Yu 名下标的 78982532 已展期', 'Demo: listing 78982532 of U1012 Rico Yu is extended')}</span>
+        </div>
+        <div class="card table-wrap"><table class="list-table">
+          <thead><tr>
+            <th>User ID</th><th>${Lc('姓名', 'Name')}</th><th>${Lc('注册手机', 'Mobile')}</th><th>${t('user_version')}</th>
+            <th>${Lc('注册时间', 'Registered')}</th><th>${Lc('在贷笔数', 'Active loans')}</th><th>${Lc('展期标的', 'Extended listings')}${fieldTipMark('new')}</th>
+          </tr></thead>
+          <tbody>${list.length ? list.map(u => {
+            const ls = csListingsOf(u.id);
+            const active = ls.filter(l => l.status !== 'settled').length;
+            const ext = ls.filter(l => l.ext).length;
+            return `<tr>
+              <td><button type="button" class="cs-link" onclick="openUser('${u.id}')">${esc(u.id)}</button></td>
+              <td class="name-cell">${esc(u.name)}</td><td>${esc(u.mobile)}</td><td>${flowBadge(u.flow)}</td>
+              <td>${esc(u.registeredAt)}</td><td>${active}</td>
+              <td>${ext ? `<span class="tag tag-warning">${ext}</span>` : '<span class="kv-empty">0</span>'}</td>
+            </tr>`;
+          }).join('') : `<tr><td colspan="7" class="kv-empty" style="padding:24px">${Lc('无匹配结果', 'No results')}</td></tr>`}</tbody>
+        </table></div>`;
+    }
+
+    function renderCsDetail(user) {
+      return `
+        <div class="breadcrumb"><button type="button" onclick="goList()">${Lc('用户查询', 'User Search')}</button><span>/</span><span>${esc(user.name)}</span></div>
+        ${renderUserSummaryCard(user)}
+        ${renderTipLegend()}
+        <div class="tab-body">${renderProfileSections(user, false)}</div>
+        ${renderCsAssets(user)}`;
+    }
+
+    function renderCsAssets(user) {
+      let list = csListingsOf(user.id);
+      if (csListingFilter.status) list = list.filter(l => l.status === csListingFilter.status);
+      if (csListingFilter.ext) list = list.filter(l => (csListingFilter.ext === 'yes') === !!l.ext);
+      const sOpt = (v, l, cur) => `<option value="${v}" ${cur === v ? 'selected' : ''}>${l}</option>`;
+      const nw = fieldTipMark('new');
+      const demo = user.id === 'U1012' ? `
+        <div class="cs-demo">
+          <b>${Lc('原型演示', 'Prototype')}</b>
+          <span>${Lc('标的 78982532', 'Listing 78982532')}：
+            <button type="button" class="btn-sm ${csDemo.phase === 'before' ? 'primary' : ''}" onclick="csDemo.phase='before';render()">${Lc('延期前', 'Before')}</button>
+            <button type="button" class="btn-sm ${csDemo.phase === 'after' ? 'primary' : ''}" onclick="csDemo.phase='after';render()">${Lc('延期后', 'After')}</button></span>
+          <span>${Lc('未生效申请', 'Failed attempt')}：
+            <button type="button" class="btn-sm ${csDemo.withFailed ? 'primary' : ''}" onclick="csDemo.withFailed=true;render()">${Lc('有 1 条', '1')}</button>
+            <button type="button" class="btn-sm ${!csDemo.withFailed ? 'primary' : ''}" onclick="csDemo.withFailed=false;render()">${Lc('无', 'None')}</button></span>
+          <span class="cs-demo-tip">${Lc('示例：今天 2027-01-08，第 2 期逾期 5 天，延期 14 天；展期费按日费率 0.16% 演示', 'Demo: 2027-01-08, installment 2 overdue 5 days, extended 14 days; fee at 0.16%/day for demo')}</span>
+        </div>` : '';
+      const head = ['', Lc('序号', 'No.'), Lc('借款场景', 'Scene'), 'Listing ID',
+        Lc('是否展期', 'Extended') + nw, Lc('展期天数', 'Ext. days') + nw, Lc('展期费', 'Ext. fee') + nw, Lc('展期生效时间', 'Extended at') + nw,
+        'Lender', Lc('发标时间', 'Listed at'), Lc('借款金额', 'Amount'), Lc('服务费', 'Service fee'), Lc('利息', 'Interest'),
+        Lc('罚息费率', 'Penalty rate'), Lc('每期期供金额', 'Installment'), Lc('期数', 'Tenor'), Lc('提现金额', 'Withdrawn'),
+        Lc('提现渠道', 'Channel'), Lc('提现账号', 'Account'), Lc('标的状态', 'Status')];
+      return `
+        <div class="info-block">
+          <div class="info-block-title">${Lc('资产信息', 'Assets')}</div>
+          <div class="cs-assets">
+            ${demo}
+            <div class="cs-toolbar">
+              <span class="cs-t">Listing信息</span>
+              <span>${Lc('标的状态', 'Status')}</span>
+              <select onchange="csListingFilter.status=this.value;render()">
+                ${sOpt('', Lc('所有', 'All'), csListingFilter.status)}${sOpt('withdrawing', csListingStatus('withdrawing'), csListingFilter.status)}${sOpt('repaying', csListingStatus('repaying'), csListingFilter.status)}${sOpt('settled', csListingStatus('settled'), csListingFilter.status)}
+              </select>
+              <span>${Lc('是否展期', 'Extended')}${nw}</span>
+              <select onchange="csListingFilter.ext=this.value;render()">
+                ${sOpt('', Lc('所有', 'All'), csListingFilter.ext)}${sOpt('yes', Lc('是', 'Yes'), csListingFilter.ext)}${sOpt('no', Lc('否', 'No'), csListingFilter.ext)}
+              </select>
+              <button type="button" class="btn-sm primary" style="height:32px">${Lc('筛选', 'Filter')}</button>
+            </div>
+            <div class="table-wrap cs-wrap"><table class="list-table cs-lt">
+              <thead><tr>${head.map(h => `<th>${h}</th>`).join('')}</tr></thead>
+              <tbody>${list.length ? list.map((l, i) => renderCsListingRow(l, i)).join('')
+                : `<tr><td colspan="20" class="kv-empty" style="padding:24px">${Lc('暂无 Listing', 'No listings')}</td></tr>`}</tbody>
+            </table></div>
+            <div class="cs-pager">${Lc(`共 ${list.length} 条`, `${list.length} total`)}</div>
+          </div>
+        </div>`;
+    }
+
+    function renderCsListingRow(l, i) {
+      const open = !!csOpen[l.id];
+      const e = l.ext;
+      const dash = '<span class="kv-empty">—</span>';
+      return `
+        <tr>
+          <td><button type="button" class="cs-caret${open ? ' open' : ''}" onclick="csToggle('${l.id}')">›</button></td>
+          <td>${i + 1}</td><td>${l.scene}</td>
+          <td><span class="cs-link">${l.id}</span>${e ? `<span class="tag tag-warning" style="margin-left:6px">${Lc('已展期', 'Extended')}</span>` : ''}</td>
+          <td>${e ? Lc('是', 'Yes') : Lc('否', 'No')}</td>
+          <td>${e ? e.days : dash}</td>
+          <td>${e ? csFmt(e.fee) : dash}</td>
+          <td class="cs-wrap-cell">${e ? e.effAt : dash}</td>
+          <td>${l.lender}</td><td class="cs-wrap-cell">${l.at}</td>
+          <td>${csFmt(l.amount)}</td><td>${csFmt(l.svc)}</td><td>${csFmt(l.interest)}</td><td>${l.pen}</td>
+          <td>${csFmt(l.emi)}</td><td>${l.terms}${Lc('月', ' mo')}</td><td>${csFmt(l.withdraw)}</td>
+          <td>${l.ch}</td><td>${l.acct}</td><td class="cs-wrap-cell">${csListingStatus(l.status)}</td>
+        </tr>
+        ${open ? `<tr class="cs-expand"><td colspan="20">${renderCsExpand(l)}</td></tr>` : ''}`;
+    }
+
+    function renderCsExpand(l) {
+      const nw = fieldTipMark('new');
+      const dash = '<span class="kv-empty">—</span>';
+      const summary = l.ext ? `
+        <div class="cs-ext-sum">
+          <span><b>${Lc('展期信息', 'Extension')}</b>${nw}</span>
+          <span>${Lc('已展期次数', 'Times')}：${l.count} / 1</span>
+          <span>${Lc('展期天数', 'Days')}：${l.ext.days}</span>
+          <span>${Lc('当期应还时间', 'Current due')}：${l.ext.oldDue} → <b>${l.ext.newDue}</b></span>
+          <span>${Lc('本次实付', 'Paid')}：${csFmt(csPay(l.ext) + l.ext.over)}（${Lc('展期费', 'fee')} ${csFmt(l.ext.fee)} + ${Lc('当期服务费', 'service fee')} ${csFmt(l.ext.svc)} + ${Lc('当期罚息', 'penalty')} ${csFmt(l.ext.pen)}）</span>
+          <span>${Lc('生效时间', 'Effective')}：${l.ext.effAt}</span>
+        </div>` : '';
+      const recs = l.recs.length ? `
+        <div class="cs-sub-title">${Lc('展期记录', 'Extension records')}${nw}<span class="cs-sub-hint">${Lc('按申请时间倒序；未生效的申请同样保留，不占展期次数', 'Newest first; failed attempts are kept and do not count')}</span></div>
+        <div class="table-wrap"><table class="list-table cs-sub">
+          <thead><tr>
+            <th>${Lc('延期订单号', 'Order No.')}</th><th>${Lc('CDS 名单批次', 'CDS batch')}</th><th>${Lc('申请时间', 'Applied at')}</th><th>${Lc('展期天数', 'Days')}</th>
+            <th>${Lc('当期应还时间（原 → 新）', 'Current due (old → new)')}</th><th>${Lc('展期费', 'Ext. fee')}</th><th>${Lc('当期服务费', 'Service fee')}</th>
+            <th>${Lc('当期罚息', 'Penalty')}</th><th>${Lc('应付合计', 'Payable')}</th><th>${Lc('实付金额', 'Paid')}</th><th>${Lc('多付冲抵', 'Overpaid → next bill')}</th>
+            <th>${Lc('支付渠道', 'Channel')}</th><th>${Lc('状态', 'Status')}</th><th>${Lc('生效时间', 'Effective at')}</th>
+          </tr></thead>
+          <tbody>${l.recs.map(r => `
+            <tr>
+              <td>${r.order}</td><td>${r.batch}</td><td>${r.applyAt}</td><td>${r.days}</td>
+              <td>${r.oldDue} → ${r.newDue}</td><td>${csFmt(r.fee)}</td><td>${csFmt(r.svc)}</td><td>${csFmt(r.pen)}</td>
+              <td>${csFmt(csPay(r))}</td><td>${r.ok ? csFmt(csPay(r) + r.over) : '0.00'}</td>
+              <td>${r.ok ? csFmt(r.over) : dash}</td><td>${r.channel || dash}</td>
+              <td>${csRecStatus(r)}</td><td>${r.ok ? r.effAt : dash}</td>
+            </tr>`).join('')}</tbody>
+        </table></div>` : '';
+      const debts = l.debts.length ? `
+        <div class="cs-sub-title">${Lc('债务明细', 'Debts')}${l.ext ? `<span class="cs-sub-hint">${Lc('应还时间为延期后的最新日期；被改期的期次底色标黄', 'Due date shows the latest date; shifted installments are highlighted')}</span>` : ''}</div>
+        <div class="table-wrap"><table class="list-table cs-sub">
+          <thead><tr>
+            <th>${Lc('期数', 'No.')}</th><th>${Lc('债务ID', 'Debt ID')}</th><th>${Lc('应还时间', 'Due date')}</th><th>${Lc('原应还时间', 'Original due')}${nw}</th>
+            <th>${Lc('逾期天数', 'DPD')}</th><th>${Lc('应还款金额', 'Amount due')}</th><th>${Lc('未还款金额', 'Unpaid')}</th><th>${Lc('未还本金', 'Unpaid principal')}</th>
+            <th>${Lc('未还利息', 'Unpaid interest')}</th><th>${Lc('未还罚息', 'Unpaid penalty')}</th><th>${Lc('未还服务费', 'Unpaid service fee')}</th>
+            <th>${Lc('最近还款时间', 'Last paid at')}</th><th>${Lc('状态', 'Status')}</th>
+          </tr></thead>
+          <tbody>${l.debts.map(d => `
+            <tr class="${d.orig ? 'cs-shift' : ''}">
+              <td>${d.no}</td><td>${d.id}</td><td>${d.due}</td>
+              <td>${d.orig ? `<span class="cs-old">${d.orig}</span>` : dash}</td>
+              <td>${d.od}</td><td>${csFmt(d.should)}</td><td>${csFmt(d.unpaid)}</td><td>${csFmt(d.uP)}</td>
+              <td>${csFmt(d.uI)}</td><td>${csFmt(d.uPen)}</td><td>${csFmt(d.uSvc)}</td>
+              <td>${d.last}</td><td>${csDebtStatus(d.st)}</td>
+            </tr>`).join('')}</tbody>
+        </table></div>`
+        : `<div class="kv-empty" style="padding:12px 4px">${Lc('暂无债务（提现中）', 'No debts yet (withdrawing)')}</div>`;
+      return summary + recs + debts;
     }
 
     render();
@@ -6103,6 +6382,30 @@
       background: var(--surface); border: 1px solid var(--border);
       margin-bottom: 12px; overflow: hidden;
     }
+    /* 客服 · 用户查询 · 资产信息 */
+    .cs-link { border: none; background: none; color: #2f3fd6; cursor: pointer; font-size: 13px; padding: 0; }
+    .cs-demo-tip { font-size: 12px; color: #8c6d1f; }
+    .cs-assets { padding: 12px 14px 14px; }
+    .cs-demo { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; padding: 8px 12px; margin-bottom: 12px; background: var(--warning-bg); border: 1px dashed #f0c36d; font-size: 12px; }
+    .cs-demo b { color: #ad6800; }
+    .cs-toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 12px; }
+    .cs-toolbar .cs-t { font-size: 14px; margin-right: 8px; }
+    .cs-toolbar select { height: 32px; min-width: 150px; padding: 0 10px; border: 1px solid #dcdfe6; border-radius: 4px; background: #fff; color: #606266; }
+    .cs-wrap { border: 1px solid var(--border); }
+    .list-table.cs-lt { min-width: 2300px; }
+    .list-table.cs-sub { min-width: 1500px; background: #fff; }
+    .cs-lt td, .cs-sub td { color: #606266; white-space: nowrap; }
+    .cs-lt td.cs-wrap-cell { white-space: normal; min-width: 96px; }
+    .cs-caret { border: none; background: none; cursor: pointer; color: #909399; font-size: 15px; transition: transform .15s; }
+    .cs-caret.open { transform: rotate(90deg); }
+    .list-table tbody tr.cs-expand:hover td, .cs-expand > td { background: #fafafa; text-align: left; padding: 6px 12px 14px; }
+    .cs-sub-title { font-weight: 600; margin: 10px 0 6px; display: flex; align-items: center; gap: 6px; }
+    .cs-sub-hint { font-weight: 400; font-size: 12px; color: var(--text-muted); margin-left: 6px; }
+    .cs-ext-sum { display: flex; flex-wrap: wrap; gap: 6px 22px; align-items: center; margin-top: 6px; padding: 8px 12px; background: var(--warning-bg); border: 1px solid #ffe58f; font-size: 12px; color: #614700; }
+    .list-table tbody tr.cs-shift td { background: #fffdf2; }
+    .cs-old { text-decoration: line-through; color: #c0c4cc; }
+    .cs-tag-gray { background: #f5f5f5; color: #8c8c8c; border-color: #d9d9d9; }
+    .cs-pager { font-size: 12px; color: var(--text-muted); margin-top: 10px; }
     .info-block-title {
       background: var(--section-head); text-align: center; font-weight: 600;
       font-size: 13px; padding: 10px 16px; border-bottom: 1px solid var(--border);

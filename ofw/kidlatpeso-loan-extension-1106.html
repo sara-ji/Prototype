@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>OFW 延期原型 · 不换标（11/03 会议定稿）</title>
+<style>
+  :root {
+    --primary: #0b3aa4;
+    --primary-soft: #dfe7fb;
+    --ink: #1c1f2a;
+    --muted: #8a8f9c;
+    --line: #eceef3;
+    --yellow: #f0b400;
+    --red: #e5484d;
+    --green: #1f9d55;
+    --t-green: #8fe3b5;
+    --t-yellow: #ffd84d;
+    --t-red: #f7a1a1;
+    --t-gray: #e3e5ea;
+    --t-blue: #dfe7fb;
+    --side: #f4f5f8;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; color: var(--ink); background: #e9ebf1; }
+  .app { display: grid; grid-template-columns: 250px 1fr 330px; min-height: 100vh; }
+
+  .side { background: var(--side); border-right: 1px solid #dde0e7; padding: 18px 14px; overflow-y: auto; }
+  .brand { font-weight: 700; font-size: 16px; }
+  .mode { margin: 8px 0 4px; display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 650; background: #e3f5ea; color: #145c38; }
+  .gt { font-size: 12px; color: var(--muted); margin: 14px 0 6px; font-weight: 650; }
+  .seg { display: flex; flex-wrap: wrap; gap: 6px; }
+  .seg button { border: 1px solid #d5d9e2; background: #fff; border-radius: 8px; padding: 5px 8px; font-size: 12px; cursor: pointer; color: var(--ink); }
+  .seg button.on { background: var(--primary); color: #fff; border-color: var(--primary); }
+  .plist a { display: block; padding: 7px 10px; border-radius: 8px; font-size: 13px; color: var(--ink); text-decoration: none; cursor: pointer; }
+  .plist a:hover { background: #e7e9f0; }
+  .plist a.on { background: #fff; font-weight: 650; box-shadow: 0 1px 2px rgba(0,0,0,.06); }
+  .plist .grp { font-size: 11px; color: var(--muted); margin: 10px 10px 2px; }
+  .reset { margin-top: 14px; width: 100%; border: 1px dashed #b9bfcc; background: transparent; border-radius: 8px; padding: 7px; cursor: pointer; font-size: 12px; }
+
+  .stage { display: flex; justify-content: center; align-items: flex-start; padding: 24px 12px; }
+  .phone { width: 375px; height: 812px; border-radius: 36px; background: #000; padding: 10px; box-shadow: 0 20px 40px rgba(20,30,60,.18); }
+  .screen { width: 100%; height: 100%; border-radius: 28px; overflow: hidden; position: relative; display: flex; flex-direction: column; background: #f4f4f6; }
+  .screen.grad { background: linear-gradient(180deg, #dfe3fb 0%, #f3f1fb 180px, #f4f4f6 320px); }
+  .sbar { height: 30px; display: flex; justify-content: space-between; align-items: center; padding: 0 22px; font-size: 12px; font-weight: 600; }
+  .hdr { height: 48px; display: grid; grid-template-columns: 56px 1fr 72px; align-items: center; }
+  .hdr .back { font-size: 26px; padding-left: 18px; cursor: pointer; color: #333; line-height: 1; }
+  .hdr .title { text-align: center; font-size: 18px; }
+  .hdr .right { text-align: right; padding-right: 16px; color: var(--primary); font-size: 14px; cursor: pointer; }
+  .body { flex: 1; overflow-y: auto; padding: 4px 14px 16px; }
+  .foot { padding: 12px 16px 22px; }
+  .foot.white { background: #fff; border-top: 1px solid var(--line); }
+
+  .card { background: #fff; border-radius: 14px; padding: 16px; margin-bottom: 12px; position: relative; }
+  .row { display: flex; justify-content: space-between; align-items: center; font-size: 14px; padding: 7px 0; gap: 10px; }
+  .row .k { color: var(--muted); }
+  .row .v { font-weight: 600; text-align: right; }
+  .hr { height: 1px; background: var(--line); margin: 8px 0; }
+  .big { font-size: 32px; font-weight: 700; margin: 2px 0 6px; letter-spacing: -.5px; }
+  .lbl { font-size: 13px; color: #555b68; }
+  .sub { font-size: 12px; color: var(--muted); }
+  .sec { font-size: 16px; font-weight: 650; margin: 16px 2px 10px; }
+  .red { color: var(--red); }
+
+  .tg { display: inline-block; font-size: 11px; padding: 3px 10px; font-weight: 600; }
+  .tg.green { background: var(--t-green); color: #145c38; }
+  .tg.yellow { background: var(--t-yellow); color: #5a4300; }
+  .tg.red { background: var(--t-red); color: #8a1c1c; }
+  .tg.gray { background: var(--t-gray); color: #555b68; }
+  .tg.blue { background: var(--t-blue); color: var(--primary); }
+  .tg.tr { position: absolute; top: 0; right: 0; border-radius: 0 12px 0 12px; }
+  .tg.tl { border-radius: 0 999px 999px 0; }
+  .tg.pill { border-radius: 999px; padding: 2px 8px; }
+
+  .billhdr { background: #fff; }
+  .billhdr .t { text-align: center; font-size: 18px; padding: 10px 0 12px; }
+  .tabs { display: flex; }
+  .tabs div { flex: 1; text-align: center; font-size: 15px; font-weight: 650; padding: 8px 0 10px; cursor: pointer; color: var(--ink); }
+  .tabs div.on { color: var(--primary); position: relative; }
+  .tabs div.on::after { content: ''; position: absolute; left: 34%; right: 34%; bottom: 0; height: 2px; background: var(--primary); }
+  .bcard { background: #fff; border-radius: 14px; margin-bottom: 12px; overflow: hidden; }
+  .bcard .top { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px 10px 0; border-bottom: 1px solid var(--line); }
+  .bcard .top .dt { font-size: 13px; cursor: pointer; }
+  .bcard .in { padding: 12px 16px; }
+  .amtrow { display: flex; justify-content: space-between; align-items: center; }
+  .btn-sm { background: var(--primary); color: #fff; border: 0; border-radius: 8px; padding: 9px 26px; font-size: 14px; font-weight: 600; cursor: pointer; }
+  .btn-sm:disabled { background: #c9cdd8; cursor: not-allowed; }
+  .exrow { display: flex; align-items: center; gap: 8px; background: #f2f5ff; border-radius: 10px; padding: 10px 12px; margin-top: 8px; cursor: pointer; }
+  .exrow .tx { flex: 1; font-size: 13px; }
+  .exrow .tx b { color: var(--primary); }
+  .exrow.pending { background: #fff7de; }
+  .fold { display: flex; justify-content: space-between; align-items: center; font-size: 14px; font-weight: 600; padding: 10px 0 2px; cursor: pointer; border-top: 1px solid var(--line); margin-top: 6px; }
+  .tabbar { display: flex; background: #fff; border-top: 1px solid var(--line); padding: 8px 0 18px; }
+  .tabbar div { flex: 1; text-align: center; font-size: 11px; color: var(--muted); }
+  .tabbar div .i { font-size: 20px; display: block; }
+  .tabbar div.on { color: var(--primary); font-weight: 650; }
+
+  .entry { display: flex; gap: 10px; align-items: center; background: #fff; border: 1px solid #cdd8f6; border-radius: 14px; padding: 12px 14px; margin-bottom: 12px; cursor: pointer; }
+  .entry .ic { width: 34px; height: 34px; border-radius: 10px; background: var(--primary-soft); display: grid; place-items: center; font-size: 17px; }
+  .entry .tx { flex: 1; }
+  .entry .tx b { display: block; font-size: 14px; }
+  .entry .tx span { font-size: 12px; color: var(--muted); }
+  .entry.pending { border-color: #f3d27a; background: #fffbea; }
+  .chev { color: #aab; font-size: 20px; }
+
+  .tl .it { display: grid; grid-template-columns: 14px 1fr auto; gap: 8px; padding: 9px 0; position: relative; }
+  .tl .it:not(:last-child)::before { content: ''; position: absolute; left: 6px; top: 22px; bottom: -2px; width: 0; border-left: 1.5px dashed #d5d8e0; }
+  .tl .dot { width: 10px; height: 10px; border-radius: 50%; background: #c9ccd6; margin-top: 5px; border: 2px solid #fff; box-shadow: 0 0 0 1.5px #c9ccd6; z-index: 1; }
+  .tl .dot.cur { background: var(--primary); box-shadow: 0 0 0 1.5px var(--primary); }
+  .tl .d { font-size: 15px; font-weight: 650; }
+  .tl .n { font-size: 11px; color: var(--muted); }
+  .tl .a { text-align: right; font-size: 15px; font-weight: 700; }
+  .tl .s { font-size: 11px; color: var(--muted); text-align: right; }
+  .s.overdue { color: var(--red); }
+  .s.current { color: var(--yellow); }
+  .s.blue { color: var(--primary); }
+  .old { text-decoration: line-through; color: #b0b4bf; font-weight: 500; font-size: 12px; margin-right: 4px; }
+
+  .opts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .opt { background: #fff; border: 1.5px solid #d6def3; border-radius: 12px; padding: 9px 0; text-align: center; cursor: pointer; }
+  .opt .w { font-size: 11px; color: var(--muted); }
+  .opt .dd { font-size: 15px; font-weight: 700; margin: 2px 0; }
+  .opt.on { background: var(--primary); border-color: var(--primary); }
+  .opt.on .w, .opt.on .dd { color: #fff; }
+  .res { border: 1.5px solid #cdd8f6; }
+  .btn { width: 100%; border: 0; border-radius: 12px; background: var(--primary); color: #fff; font-size: 17px; font-weight: 650; padding: 14px 0; cursor: pointer; }
+  .btn:disabled { background: #dcdde2; cursor: not-allowed; }
+  .btn.ghost { background: #fff; color: var(--primary); border: 1.5px solid var(--primary); margin-top: 10px; }
+  .info { background: #eef3ff; border-radius: 12px; padding: 12px; font-size: 13px; line-height: 1.5; margin-bottom: 12px; }
+  .info.warn { background: #fff7e0; }
+  .agree { display: flex; gap: 8px; font-size: 13px; color: var(--muted); margin-bottom: 12px; align-items: flex-start; }
+  .agree input { margin-top: 2px; width: 16px; height: 16px; }
+  .agree a, .link { color: var(--primary); text-decoration: underline; cursor: pointer; }
+
+  .ch { background: #fff; border-radius: 14px; margin-bottom: 6px; position: relative; }
+  .ch .ln { display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-bottom: 1px solid var(--line); cursor: pointer; font-size: 15px; font-weight: 600; }
+  .ch .ln:last-child, .ch.rec .ln { border-bottom: 0; }
+  .ch .lg { width: 22px; height: 22px; border-radius: 6px; display: grid; place-items: center; color: #fff; font-size: 11px; font-weight: 700; }
+  .ch .ln .nm { flex: 1; }
+  .chtitle { display: flex; justify-content: space-between; font-size: 15px; font-weight: 650; margin: 16px 2px 8px; }
+  .chtitle span.rt { font-size: 12px; color: var(--muted); font-weight: 500; margin-left: 6px; }
+  .chtitle .more { color: var(--primary); font-size: 13px; font-weight: 500; }
+  .rec-tags { display: flex; gap: 6px; padding: 0 16px 12px 48px; margin-top: -6px; }
+  .rec-tags span { background: var(--primary-soft); color: var(--primary); font-size: 11px; padding: 3px 8px; border-radius: 999px; }
+  .star { position: absolute; top: 0; left: 0; background: var(--primary); color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 12px 0 10px 0; }
+
+  .demo { margin-top: 14px; border: 1.5px dashed #c3c7d2; border-radius: 12px; padding: 10px; background: #fff; }
+  .demo .dt { font-size: 11px; color: var(--muted); margin-bottom: 6px; }
+  .demo button { display: block; width: 100%; margin-top: 6px; border: 1px solid #d0d4de; background: #fafbfc; border-radius: 8px; padding: 8px; font-size: 12px; cursor: pointer; text-align: left; }
+
+  .center { text-align: center; padding-top: 30px; }
+  .ring { width: 72px; height: 72px; border-radius: 50%; display: grid; place-items: center; margin: 0 auto 14px; font-size: 34px; }
+  .ring.ok { background: #e3f5ea; color: var(--green); }
+  .ring.bad { background: #fde8e8; color: var(--red); }
+  .ring.wait { background: var(--primary-soft); color: var(--primary); }
+  .h2 { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+  .p { font-size: 14px; color: #555b68; line-height: 1.55; }
+  .doc { font-size: 12.5px; line-height: 1.6; color: #333; }
+  .doc h4 { margin: 12px 0 4px; font-size: 13px; }
+
+  .oa .row { font-size: 13px; padding: 5px 0; }
+  .oa .ttl { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+  .oa .new { background: #fff3c4; border-radius: 4px; padding: 0 4px; font-size: 10px; color: #7a5a00; margin-left: 4px; font-weight: 600; }
+
+  .notes { background: #fff; border-left: 1px solid #dde0e7; padding: 18px 16px; overflow-y: auto; font-size: 13px; line-height: 1.6; }
+  .notes h3 { margin: 0 0 4px; font-size: 15px; }
+  .notes .pg { color: var(--muted); font-size: 12px; margin-bottom: 10px; }
+  .notes ul { padding-left: 18px; margin: 6px 0; }
+  .notes li { margin-bottom: 6px; }
+  .notes .chg { margin-top: 12px; background: #eef3ff; border-radius: 10px; padding: 10px 12px; }
+  .notes .chg b { color: var(--primary); }
+  .notes .q { margin-top: 12px; background: #f4f5f8; border-radius: 10px; padding: 10px 12px; color: #555; }
+  @media (max-width: 1100px) { .app { grid-template-columns: 220px 1fr; } .notes { grid-column: 1 / -1; border-left: 0; border-top: 1px solid #dde0e7; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="brand">OFW 延期原型</div>
+    <span class="mode">不换标 · 改原标还款日</span>
+    <div class="gt">场景</div>
+    <div class="seg" id="scSeg"></div>
+    <div class="gt">这笔借款已延期</div>
+    <div class="seg" id="cntSeg"></div>
+    <div class="gt">延期进度</div>
+    <div class="seg" id="phSeg"></div>
+    <div class="gt">页面</div>
+    <div class="plist" id="plist"></div>
+    <button class="reset" onclick="resetFlow()">重置流程</button>
+  </aside>
+  <main class="stage"><div class="phone"><div class="screen" id="screen"></div></div></main>
+  <section class="notes" id="notes"></section>
+</div>
+
+<script>
+  const CFG = { rate: 0.0016, penRate: 0.0016, options: [7, 14, 21, 30], maxCount: 1 };
+  const LOAN_NO = 'KP20260824000088';
+  const ORDER_NO = 'EXT20261102000016';
+  const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const WEEK = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const D = (y, m, d) => new Date(y, m - 1, d);
+
+  const SC = {
+    normal: { label: '未逾期 · 到期前 6 天', paid: 2, today: D(2026, 11, 18), inList: true },
+    overdue: { label: '逾期 9 天', paid: 1, today: D(2026, 11, 2), inList: true },
+    out: { label: '不在 CDS 名单', paid: 1, today: D(2026, 11, 2), inList: false },
+  };
+  const CNT = { c0: '0 次', c1: '1 次（已用完）' };
+  const PHASE = { before: '延期前', pending: '待支付', after: '延期后' };
+
+  const PAGES = [
+    ['g', '生产页改造'],
+    ['bill', '账单 · Current'],
+    ['repay', '还款详情 · 入口'],
+    ['g', '延期流程（延期页只有一页）'],
+    ['ext', '延期页：选日期 · 费用 · 新计划'],
+    ['agreement', '延期补充协议'],
+    ['pay', '支付（生产渠道页）'],
+    ['wallet', '钱包内支付 · 结果演示'],
+    ['processing', '到账处理中'],
+    ['success', '延期成功'],
+    ['failed', '未生效'],
+    ['g', '延期后'],
+    ['after', '还款详情 · 延期后'],
+    ['history', '还款记录'],
+    ['oa', '客服后台 · 标的详情'],
+  ];
+
+  const state = { sc: 'overdue', cnt: 'c0', phase: 'before', page: 'bill', billTab: 'current', planOpen: false, days: null, agreed: false, fail: null, over: 0, channel: 'GCash' };
+
+  /* ---------- helpers ---------- */
+  const addDays = (dt, n) => { const x = new Date(dt); x.setDate(x.getDate() + n); return x; };
+  const diffDays = (a, b) => Math.round((b - a) / 86400000);
+  const anchorMonth = (d1, k) => { const y = d1.getFullYear(), m = d1.getMonth() + k; const last = new Date(y, m + 1, 0).getDate(); return new Date(y, m, Math.min(d1.getDate(), last)); };
+  const fmt = dt => `${dt.getDate()} ${MON[dt.getMonth()]} ${dt.getFullYear()}`;
+  const fmtShort = dt => `${dt.getDate()} ${MON[dt.getMonth()]}`;
+  const round2 = n => Math.round(n * 100) / 100;
+  const money = n => '₱' + n.toLocaleString('en-US', { minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2 });
+  const num = n => n.toLocaleString('en-US', { minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2 });
+  const ord = n => n + (n % 10 === 1 && n !== 11 ? 'st' : n % 10 === 2 && n !== 12 ? 'nd' : n % 10 === 3 && n !== 13 ? 'rd' : 'th');
+
+  function basePlan() {
+    const p = [];
+    for (let i = 1; i <= 6; i++) p.push({ no: i, due: new Date(2026, 7 + i, 24), principal: i === 1 ? 0 : 8000, interest: 2000 });
+    return p;
+  }
+
+  function ctx() {
+    const sc = SC[state.sc];
+    const today = sc.today;
+    const plan = basePlan().map(p => ({ ...p, paid: p.no <= sc.paid }));
+    const unpaid = plan.filter(p => !p.paid);
+    const cur = unpaid[0];
+    const dpd = Math.max(0, diffDays(cur.due, today));
+    const penalty = round2((cur.principal + cur.interest) * CFG.penRate * dpd);
+    const pTotal = unpaid.reduce((s, p) => s + p.principal, 0);
+    const reasons = [];
+    if (!sc.inList) reasons.push('不在当天 CDS 名单');
+    if (state.cnt === 'c1') reasons.push(`已延期 ${CFG.maxCount} 次，达到上限`);
+    return { sc, today, plan, unpaid, cur, dpd, penalty, pTotal, eligible: reasons.length === 0, reasons };
+  }
+
+  const baseDate = c => (c.cur.due > c.today ? c.cur.due : c.today);
+  const defaultDays = () => CFG.options[1];
+
+  function quote(c, N) {
+    N = N || defaultDays();
+    const d1 = addDays(baseDate(c), N);
+    const fee = round2(N * c.pTotal * CFG.rate);
+    const interest = c.cur.interest;
+    const pay = round2(fee + interest + c.penalty);
+    const rows = c.unpaid.map((p, i) => {
+      const it = i === 0 ? 0 : p.interest;
+      return {
+        no: p.no, oldDue: p.due, due: i === 0 ? d1 : anchorMonth(d1, i),
+        principal: p.principal, interest: it, amt: p.principal + it, oldAmt: p.principal + p.interest,
+      };
+    });
+    return { N, d1, fee, interest, pay, rows };
+  }
+
+  function feeLines(c, q) {
+    return `
+      <div class="row"><span class="k">Extension fee</span><span class="v">${money(q.fee)}</span></div>
+      <div class="sub" style="margin:-4px 0 6px">${q.N} days × ${money(c.pTotal)} × 0.16% per day</div>
+      <div class="row"><span class="k">Interest + service fee</span><span class="v">${money(q.interest)}</span></div>
+      <div class="sub" style="margin:-4px 0 6px">This month's, collected now. Your next bill is principal only.</div>
+      ${c.penalty > 0 ? `<div class="row"><span class="k">Overdue penalty</span><span class="v">${money(c.penalty)}</span></div>
+      <div class="sub" style="margin:-4px 0 6px">${c.dpd} days overdue</div>` : ''}
+      <div class="hr"></div>
+      <div class="row"><span class="k" style="color:var(--ink);font-weight:650">Pay now</span><span class="v" style="font-size:18px">${money(q.pay)}</span></div>`;
+  }
+  const feeShort = (c, q) => `Extension fee ${money(q.fee)} · Interest + fee ${money(q.interest)}${c.penalty > 0 ? ` · Penalty ${money(c.penalty)}` : ''}`;
+
+  function dueTag(today, due, dpd) {
+    if (dpd > 0) return { cls: 'red', text: 'Overdue' };
+    return diffDays(today, due) <= 7 ? { cls: 'yellow', text: 'Current due' } : { cls: 'green', text: 'Upcoming due' };
+  }
+
+  /* ---------- shells ---------- */
+  function shell(title, body, foot, opts = {}) {
+    const back = opts.back ? `<div class="back" onclick="go('${opts.back}')">‹</div>` : '<div></div>';
+    const right = opts.right ? `<div class="right" onclick="go('${opts.right[1]}')">${opts.right[0]}</div>` : '<div></div>';
+    return {
+      grad: opts.grad !== false,
+      html: `<div class="sbar"><span>9:41</span><span>Kidlat Peso</span><span>100%</span></div>
+        <div class="hdr">${back}<div class="title">${title}</div>${right}</div>
+        <div class="body">${body}</div>
+        ${foot ? `<div class="foot ${opts.whiteFoot ? 'white' : ''}">${foot}</div>` : ''}`,
+    };
+  }
+
+  function planList(items) {
+    return `<div class="tl">${items.map(it => `
+      <div class="it">
+        <div class="dot ${it.cur ? 'cur' : ''}"></div>
+        <div>${it.oldDate ? `<div class="n"><span class="old">${it.oldDate}</span></div>` : ''}<div class="d">${it.date}</div><div class="n">${it.n}</div></div>
+        <div>${it.oldAmt ? `<div class="n" style="text-align:right"><span class="old">${it.oldAmt}</span></div>` : ''}<div class="a">${it.amt}</div><div class="s ${it.cls || ''}">${it.status}</div></div>
+      </div>`).join('')}</div>`;
+  }
+
+  function oldPlanItems(c) {
+    return c.plan.map(p => {
+      let status = 'Upcoming due', cls = '';
+      if (p.paid) status = 'Paid';
+      else if (p === c.cur) { status = c.dpd > 0 ? 'Overdue' : 'Current Due'; cls = c.dpd > 0 ? 'overdue' : 'current'; }
+      return { date: fmt(p.due), n: `${p.no}/6`, amt: money(p.principal + p.interest), status, cls, cur: p === c.cur };
+    });
+  }
+
+  function newPlanItems(q, showOld) {
+    return q.rows.map((r, i) => ({
+      date: fmt(r.due), oldDate: showOld ? fmt(r.oldDue) : null, n: `${r.no}/6`,
+      amt: money(r.amt), oldAmt: showOld && r.amt !== r.oldAmt ? money(r.oldAmt) : null,
+      status: i === 0 ? 'Principal only' : 'Upcoming due', cls: i === 0 ? 'blue' : '', cur: i === 0,
+    }));
+  }
+
+  const rateNote = `<div class="sub" style="margin:10px 2px 0;line-height:1.5">Monthly Interest + Service Fee + Platform Fee Rate: 5%<br>Penalty Interest: 0.16%/day to be applied to your loan that remains to be unpaid after the due date.</div>`;
+
+  function foldPlan(items, meta) {
+    return `<div class="fold" onclick="event.stopPropagation();state.planOpen=!state.planOpen;render()"><span>Repayment Plan</span><span class="sub">${state.planOpen ? '︿' : '﹀'}</span></div>
+      ${state.planOpen ? `<div class="sub" style="margin:4px 0 2px">${meta}</div>${planList(items)}` : ''}`;
+  }
+
+  function extRow(c) {
+    if (state.phase === 'pending') {
+      const q = quote(c, state.days);
+      return `<div class="exrow pending" onclick="event.stopPropagation();go('pay')"><span>⏳</span><div class="tx">Due date change pending · <b>Pay ${money(q.pay)}</b> by 11:59 PM</div><span class="chev">›</span></div>`;
+    }
+    if (state.phase === 'before' && c.eligible) {
+      return `<div class="exrow" onclick="event.stopPropagation();go('ext')"><span>📅</span><div class="tx">Need more time? <b>Change due date</b></div><span class="chev">›</span></div>`;
+    }
+    return '';
+  }
+
+  /* ---------- Bill ---------- */
+  function pgBill() {
+    const c = ctx();
+    const q = quote(c, state.days);
+    let content;
+    if (state.billTab === 'history') {
+      content = `<div class="sub" style="text-align:center;padding:40px 0">No settled loans yet.</div>`;
+    } else if (state.phase === 'after') {
+      const first = q.rows[0];
+      const t = dueTag(c.today, first.due, 0);
+      const due = Math.max(0, first.amt - state.over);
+      content = `<div class="sec">Ready to Repay</div>
+        <div class="bcard" onclick="go('after')" style="cursor:pointer">
+          <div class="top"><span class="tg ${t.cls} tl">${t.text}</span><span class="dt">Details ›</span></div>
+          <div class="in">
+            <div class="lbl">Due Amount (₱) <span class="tg blue pill" style="margin-left:6px">Extended</span></div>
+            <div class="amtrow"><div class="big">${num(due)}</div><button class="btn-sm" onclick="event.stopPropagation()">Repay</button></div>
+            <div class="row"><span class="k">Due Date</span><span class="v">${fmt(first.due)}</span></div>
+            <div class="row"><span class="k">Due Tenor</span><span class="v">${first.no}/6</span></div>
+            ${foldPlan(newPlanItems(q, false), 'Loan Amount: ₱40,000  Borrow Date: 24 Aug 2026')}
+          </div>
+        </div>`;
+    } else {
+      const t = dueTag(c.today, c.cur.due, c.dpd);
+      const amt = c.cur.principal + c.cur.interest + c.penalty;
+      const right = c.dpd > 0 ? `<span class="dt red">${c.dpd} days overdue ›</span>` : `<span class="dt">Details ›</span>`;
+      content = `<div class="sec">Ready to Repay</div>
+        <div class="bcard" onclick="go('repay')" style="cursor:pointer">
+          <div class="top"><span class="tg ${t.cls} tl">${t.text}</span>${right}</div>
+          <div class="in">
+            <div class="lbl">Due Amount (₱)</div>
+            <div class="amtrow"><div class="big">${num(amt)}</div><button class="btn-sm" ${state.phase === 'pending' ? 'disabled' : ''} onclick="event.stopPropagation()">Repay</button></div>
+            <div class="row"><span class="k">Due Date</span><span class="v">${fmt(c.cur.due)}</span></div>
+            <div class="row"><span class="k">Due Tenor</span><span class="v">${c.cur.no}/6</span></div>
+            ${extRow(c)}
+            ${foldPlan(oldPlanItems(c), 'Loan Amount: ₱40,000  Borrow Date: 24 Aug 2026')}
+          </div>
+        </div>`;
+    }
+    return {
+      grad: false,
+      html: `<div class="billhdr"><div class="sbar"><span>12:30</span><span></span><span>100%</span></div>
+          <div class="t">Bill</div>
+          <div class="tabs"><div class="${state.billTab === 'current' ? 'on' : ''}" onclick="state.billTab='current';render()">Current</div><div class="${state.billTab === 'history' ? 'on' : ''}" onclick="state.billTab='history';render()">History</div></div></div>
+        <div class="body" style="padding-top:2px">${content}</div>
+        <div class="tabbar"><div><span class="i">⌂</span>Home</div><div class="on"><span class="i">▤</span>Bill</div><div><span class="i">◯</span>Me</div></div>`,
+    };
+  }
+
+  /* ---------- Repayment detail ---------- */
+  function pgRepay() {
+    if (state.phase === 'after') return pgAfter();
+    const c = ctx();
+    const t = dueTag(c.today, c.cur.due, c.dpd);
+    const amt = c.cur.principal + c.cur.interest + c.penalty;
+    let entry = '';
+    if (state.phase === 'pending') {
+      const q = quote(c, state.days);
+      entry = `<div class="entry pending" onclick="go('pay')"><div class="ic">⏳</div><div class="tx"><b>Due date change pending</b><span>Pay ${money(q.pay)} by 11:59 PM today</span></div><span class="chev">›</span></div>`;
+    } else if (c.eligible) {
+      entry = `<div class="entry" onclick="go('ext')"><div class="ic">📅</div><div class="tx"><b>Need more time to pay?</b><span>Move your due dates by up to ${CFG.options[CFG.options.length - 1]} days</span></div><span class="chev">›</span></div>`;
+    }
+    const body = `
+      <div class="card"><span class="tg ${t.cls} tr">${t.text}</span>
+        <div class="lbl">Due Amount (₱)</div>
+        <div class="amtrow"><div class="big">${num(amt)}</div>${c.dpd > 0 ? `<span class="red" style="font-size:14px">${c.dpd} days overdue</span>` : ''}</div>
+        ${c.dpd > 0 ? `<div class="row"><span class="k" style="font-weight:600">Overdue Penalty</span><span class="v red">${money(c.penalty)}</span></div>` : ''}
+        <div class="row"><span class="k">Due date</span><span class="v">${fmt(c.cur.due)}</span></div>
+        <div class="row"><span class="k">Due tenor</span><span class="v">${c.cur.no}/6</span></div>
+        <div class="hr"></div>
+        <div class="row"><span class="k">Loan Amount</span><span class="v">₱40,000</span></div>
+        <div class="row"><span class="k">Borrow Date</span><span class="v">24 Aug 2026</span></div>
+      </div>
+      ${entry}
+      <div class="sec">Repayment Plan</div>
+      <div class="card">${planList(oldPlanItems(c))}</div>
+      ${rateNote}`;
+    return shell('Repayment', body, `<button class="btn" ${state.phase === 'pending' ? 'disabled' : ''}>Repay</button>`, { back: 'bill', right: ['History', 'history'], grad: false });
+  }
+
+  /* ---------- Extension page (single page) ---------- */
+  function pgExt() {
+    const c = ctx();
+    const N = state.days;
+    const base = baseDate(c);
+    const opts = `<div class="opts">${CFG.options.map(n => {
+      const dt = addDays(base, n);
+      return `<div class="opt ${N === n ? 'on' : ''}" onclick="state.days=${n};state.agreed=false;render()">
+        <div class="w">${WEEK[dt.getDay()]}</div><div class="dd">${fmtShort(dt)}</div></div>`;
+    }).join('')}</div>`;
+    let detail = '';
+    let foot = `<button class="btn" disabled>Pick a date</button>`;
+    if (N) {
+      const q = quote(c, N);
+      detail = `
+        <div class="card res">
+          <div class="row"><span class="k">Extended by</span><span class="v" style="color:var(--primary);font-size:18px">${N} days</span></div>
+          <div class="hr"></div>
+          ${feeLines(c, q)}
+        </div>
+        <div class="sec">New repayment plan</div>
+        <div class="card">
+          ${planList(newPlanItems(q, true))}
+          <div class="sub" style="margin-top:4px">Due on the ${ord(q.d1.getDate())} of each month. Next bill is principal only; later amounts stay the same.</div>
+        </div>
+        <div class="info warn">Pay <b>${money(q.pay)}</b> in <b>one payment</b> by 11:59 PM today. Partial or split payments won't change your due date.</div>`;
+      foot = `
+        <label class="agree"><input type="checkbox" ${state.agreed ? 'checked' : ''} onchange="state.agreed=this.checked;render()">
+          <span>I have read and accepted the <a onclick="event.preventDefault();go('agreement')">Extension Agreement</a></span></label>
+        <button class="btn" ${state.agreed ? '' : 'disabled'} onclick="state.phase='pending';go('pay')">Pay ${money(q.pay)}</button>`;
+    }
+    const body = `
+      <div class="card">
+        <div class="row"><span class="k">Current due date</span><span class="v">${fmt(c.cur.due)}${c.dpd > 0 ? ` <span class="sub red">· ${c.dpd} days overdue</span>` : ''}</span></div>
+      </div>
+      <div class="sec">Pick your new due date</div>
+      ${opts}
+      <div class="sub" style="margin:8px 2px 12px;line-height:1.5">All remaining due dates of this loan will move with it. You can do this once for this loan, and it can't be undone.</div>
+      ${detail}`;
+    return shell('Change Due Date', body, foot, { back: 'repay', whiteFoot: true });
+  }
+
+  function pgAgreement() {
+    const c = ctx();
+    const q = quote(c, state.days);
+    const body = `
+      <div class="card doc">
+        <b>EXTENSION AGREEMENT</b><div class="sub">Supplement to Loan Agreement ${LOAN_NO}</div>
+        <h4>1. Your loan stays the same</h4>Loan number, principal, number of installments and co-maker do not change. Only the due dates change.
+        <h4>2. New due dates</h4>Installment ${q.rows[0].no}/6 moves from ${fmt(c.cur.due)} to ${fmt(q.d1)} (${money(q.rows[0].amt)}, principal only). The remaining installments keep their amounts and fall on the ${ord(q.d1.getDate())} of each month.
+        <h4>3. Amount to pay now</h4>Extension fee ${money(q.fee)}, this month's interest ${money(q.interest)}${c.penalty > 0 ? `, overdue penalty ${money(c.penalty)}` : ''}. Total ${money(q.pay)}.
+        <h4>4. When it takes effect</h4>Only after the full amount is received in one payment by 11:59 PM today. Partial or split payments are applied as normal repayments and the due dates do not change.
+        <h4>5. Once only</h4>This loan can be extended once. The change can't be undone after it takes effect.
+        <h4>6. Co-maker</h4>Your co-maker will be notified of the new due dates by SMS.
+      </div>`;
+    return shell('Extension Agreement', body, `<button class="btn" onclick="state.agreed=true;go('ext')">I agree</button>`, { back: 'ext', whiteFoot: true });
+  }
+
+  function pgPay() {
+    const c = ctx();
+    const q = quote(c, state.days);
+    const lg = (t, col) => `<span class="lg" style="background:${col}">${t}</span>`;
+    const line = (name, l) => `<div class="ln" onclick="state.channel='${name}';go('wallet')">${l}<span class="nm">${name}</span><span class="chev">›</span></div>`;
+    const body = `
+      <div class="card">
+        <div class="lbl">Extension Payment (₱)</div>
+        <div class="big">${q.pay.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
+        <div class="sub" style="margin-bottom:6px">${feeShort(c, q)}</div>
+        <div class="row"><span class="k">Pay by</span><span class="v red">11:59 PM, ${fmt(c.today)}</span></div>
+        <div class="row"><span class="k">Order No.</span><span class="v">${ORDER_NO}</span></div>
+        <div class="sub">Pay the exact amount in one payment.</div>
+      </div>
+      <div class="chtitle"><span>Recommended</span></div>
+      <div class="ch rec"><span class="star">☆</span>${line('Gcash Direct Wepay', lg('G', '#0a6cff'))}
+        <div class="rec-tags"><span>Real time</span><span>Enhanced Stability &amp; Security</span></div></div>
+      <div class="chtitle"><span>E-Wallet<span class="rt">Real Time</span></span><span class="more">More</span></div>
+      <div class="ch">${line('ShopeePay', lg('S', '#ee4d2d'))}${line('Maya Bank', lg('m', '#111'))}${line('GCash', lg('G', '#0a6cff'))}</div>
+      <div class="chtitle"><span>QRph<span class="rt">Real Time</span></span><span class="more">More</span></div>
+      <div class="ch">${line('QRph', lg('Q', '#e8a400'))}</div>
+      <div class="chtitle"><span>Bank</span><span class="more">More</span></div>
+      <div class="ch">${line('Union Bank', lg('U', '#f39200'))}${line('BDO', lg('B', '#1a4ea1'))}</div>
+      <div style="text-align:center;margin:16px 0 6px"><span class="link" onclick="go('agreement')">View Extension Agreement</span></div>`;
+    return shell('Repayment', body, '', { back: 'repay' });
+  }
+
+  function pgWallet() {
+    const c = ctx();
+    const q = quote(c, state.days);
+    const body = `
+      <div class="card" style="text-align:center">
+        <div class="lbl">${state.channel}</div>
+        <div class="big">${money(q.pay)}</div>
+        <div class="sub">Reference: ${ORDER_NO}</div>
+      </div>
+      <div class="info warn">Enter exactly <b>${money(q.pay)}</b> and pay once. If you pay less, or split it into several payments, your due date won't change and the money will be used as a normal repayment.</div>
+      <div class="demo"><div class="dt">原型演示：钱包内的支付结果</div>
+        <button onclick="state.fail=null;state.over=0;state.phase='after';go('success')">✅ 足额支付 ${money(q.pay)}</button>
+        <button onclick="state.fail=null;state.over=500;state.phase='after';go('success')">➕ 多付 ₱500（共 ${money(q.pay + 500)}）</button>
+        <button onclick="state.fail='partial';state.phase='before';go('failed')">⚠️ 只付 ₱1,000（少付）</button>
+        <button onclick="state.fail='split';state.phase='before';go('failed')">✂️ 分两笔：先付 ₱1,000，再付 ${money(q.pay - 1000)}</button>
+        <button onclick="state.fail='expired';state.phase='before';go('failed')">⌛ 23:59 前未付</button>
+        <button onclick="state.phase='pending';go('processing')">⏳ 已付款，渠道回调延迟</button>
+      </div>`;
+    return shell(state.channel, body, '', { back: 'pay' });
+  }
+
+  function pgProcessing() {
+    const q = quote(ctx(), state.days);
+    const body = `
+      <div class="center"><div class="ring wait">⟳</div><div class="h2">Payment received</div>
+        <div class="p">We're updating your due dates.<br>Please don't pay again.</div></div>
+      <div class="card" style="margin-top:18px">
+        <div class="row"><span class="k">Paid</span><span class="v">${money(q.pay)}</span></div>
+        <div class="row"><span class="k">New due date</span><span class="v">${fmt(q.d1)}</span></div>
+      </div>
+      <div class="demo"><div class="dt">原型演示</div>
+        <button onclick="state.fail=null;state.over=0;state.phase='after';go('success')">✅ 处理完成</button>
+      </div>`;
+    return shell('Processing', body, `<button class="btn ghost" style="margin-top:0" onclick="state.billTab='current';go('bill')">Back to Bill</button>`, {});
+  }
+
+  function pgSuccess() {
+    const c = ctx();
+    const q = quote(c, state.days);
+    const later = q.rows[1] ? q.rows[1].amt : q.rows[0].amt;
+    const body = `
+      <div class="center"><div class="ring ok">✓</div>
+        <div class="h2">Your due date has been changed</div>
+        <div class="p">Next payment: <b>${money(q.rows[0].amt)}</b> on <b>${fmt(q.d1)}</b> (principal only).<br>Then ${money(later)} on the ${ord(q.d1.getDate())} of each month.</div>
+      </div>
+      <div class="card" style="margin-top:18px">
+        <div class="row"><span class="k">Extended by</span><span class="v">${q.N} days</span></div>
+        <div class="row"><span class="k">Paid</span><span class="v">${money(q.pay + state.over)}</span></div>
+        ${state.over > 0 ? `<div class="row"><span class="k">Extra payment</span><span class="v">${money(state.over)}</span></div>
+        <div class="sub">The extra ${money(state.over)} has been applied to your next bill.</div>` : ''}
+      </div>
+      <div class="info">We've sent your co-maker an SMS about the new due dates.</div>`;
+    return shell('', body, `<button class="btn" onclick="go('after')">View repayment plan</button><button class="btn ghost" onclick="state.billTab='current';go('bill')">Back to Bill</button>`, {});
+  }
+
+  function pgFailed() {
+    const q = quote(ctx(), state.days);
+    const msg = {
+      partial: `We received ₱1,000, which is less than the ${money(q.pay)} required.<br>It has been applied to your bill as a normal repayment.`,
+      split: `Each payment must cover the full ${money(q.pay)}. Your payments of ₱1,000 and ${money(q.pay - 1000)} were applied to your bill as normal repayments.`,
+      expired: `Your payment order expired at 11:59 PM.<br>Your repayment plan has not changed.`,
+    }[state.fail || 'partial'];
+    const body = `
+      <div class="center"><div class="ring bad">!</div>
+        <div class="h2">Your due date was not changed</div>
+        <div class="p">${msg}</div>
+      </div>
+      <div class="info" style="margin-top:18px">You can still apply today if this option is available for your loan. The amount will be recalculated.</div>`;
+    return shell('', body, `<button class="btn" onclick="state.fail=null;go('repay')">Back to Repayment</button>`, {});
+  }
+
+  function pgAfter() {
+    const c = ctx();
+    const q = quote(c, state.days);
+    const first = q.rows[0];
+    const t = dueTag(c.today, first.due, 0);
+    const due = Math.max(0, first.amt - state.over);
+    const body = `
+      <div class="card"><span class="tg ${t.cls} tr">${t.text}</span>
+        <div class="lbl">Due Amount (₱) <span class="tg blue pill" style="margin-left:6px">Extended</span></div>
+        <div class="big">${num(due)}</div>
+        <div class="row"><span class="k">Due date</span><span class="v">${fmt(first.due)}</span></div>
+        <div class="row"><span class="k">Due tenor</span><span class="v">${first.no}/6</span></div>
+        ${state.over > 0 ? `<div class="row"><span class="k">Paid in advance</span><span class="v">${money(state.over)}</span></div>` : ''}
+        <div class="row"><span class="k">Due date changed</span><span class="v">${fmtShort(first.oldDue)} → ${fmtShort(first.due)}</span></div>
+        <div class="hr"></div>
+        <div class="row"><span class="k">Loan Amount</span><span class="v">₱40,000</span></div>
+        <div class="row"><span class="k">Borrow Date</span><span class="v">24 Aug 2026</span></div>
+      </div>
+      <div class="sec">Repayment Plan</div>
+      <div class="card">${planList(newPlanItems(q, false))}</div>
+      ${rateNote}`;
+    return shell('Repayment', body, `<button class="btn">Repay</button>`, { back: 'bill', right: ['History', 'history'], grad: false });
+  }
+
+  function pgHistory() {
+    const c = ctx();
+    const q = quote(c, state.days);
+    const recs = [];
+    if (state.phase === 'after') {
+      recs.push(`<div class="card">
+        <div class="row"><span class="v">Due date change</span><span class="v">${money(q.pay + state.over)}</span></div>
+        <div class="sub">${fmt(c.today)} · +${q.N} days</div>
+        <div class="sub">${feeShort(c, q)}${state.over > 0 ? ` · Extra ${money(state.over)} to next bill` : ''}</div>
+        <div class="sub">Due date ${fmt(c.cur.due)} → ${fmt(q.d1)}</div>
+      </div>`);
+    }
+    c.plan.filter(p => p.paid).reverse().forEach(p => recs.push(`<div class="card">
+      <div class="row"><span class="v">Repayment</span><span class="v">${money(p.principal + p.interest)}</span></div>
+      <div class="sub">${fmt(p.due)} · Installment ${p.no}/6</div></div>`));
+    return shell('History', recs.join('') || '<div class="sub" style="text-align:center;padding:40px 0">No records yet.</div>', '', { back: state.phase === 'after' ? 'after' : 'repay', grad: false });
+  }
+
+  function pgOA() {
+    const c = ctx();
+    const q = quote(c, state.days);
+    const ext = state.phase === 'after';
+    const nw = '<span class="new">新增</span>';
+    const body = `
+      <div class="card oa">
+        <div class="ttl">标的信息</div>
+        <div class="row"><span class="k">Listing No.</span><span class="v">${LOAN_NO}</span></div>
+        <div class="row"><span class="k">状态</span><span class="v">还款中</span></div>
+        <div class="row"><span class="k">Due date</span><span class="v">${ext ? fmt(q.d1) : fmt(c.cur.due)}</span></div>
+        <div class="row"><span class="k">是否展期${nw}</span><span class="v">${ext ? '是' : '否'}</span></div>
+        <div class="row"><span class="k">展期天数${nw}</span><span class="v">${ext ? q.N : '—'}</span></div>
+        <div class="row"><span class="k">已延期次数${nw}</span><span class="v">${ext ? 1 : 0} / ${CFG.maxCount}</span></div>
+        <div class="row"><span class="k">原应还日${nw}</span><span class="v">${ext ? fmt(c.cur.due) : '—'}</span></div>
+      </div>
+      ${ext ? `<div class="card oa">
+        <div class="ttl">延期记录${nw}</div>
+        <div class="row"><span class="k">延期订单号</span><span class="v">${ORDER_NO}</span></div>
+        <div class="row"><span class="k">CDS 名单批次</span><span class="v">CDS-${c.today.getFullYear()}${String(c.today.getMonth() + 1).padStart(2, '0')}${String(c.today.getDate()).padStart(2, '0')}</span></div>
+        <div class="row"><span class="k">生效时间</span><span class="v">${fmt(c.today)} 14:32</span></div>
+        <div class="row"><span class="k">延期天数</span><span class="v">${q.N}</span></div>
+        <div class="row"><span class="k">当期应还日</span><span class="v">${fmtShort(c.cur.due)} → ${fmtShort(q.d1)}</span></div>
+        <div class="row"><span class="k">应付分项</span><span class="v">费 ${money(q.fee)} · 息 ${money(q.interest)}${c.penalty > 0 ? ` · 罚 ${money(c.penalty)}` : ''}</span></div>
+        <div class="row"><span class="k">实付 / 多付</span><span class="v">${money(q.pay + state.over)} / ${money(state.over)}</span></div>
+      </div>
+      <div class="card oa">
+        <div class="ttl">还款计划版本${nw}</div>
+        <div class="row"><span class="k">v1 · 放款</span><span class="v">24 Aug 2026 · 历史</span></div>
+        <div class="row"><span class="k">v2 · 延期</span><span class="v">${fmt(c.today)} · 当前</span></div>
+      </div>` : '<div class="sub" style="padding:0 4px">切到「延期后」查看延期记录。</div>'}`;
+    return shell('客服后台 · 标的', body, '', { back: 'bill', grad: false });
+  }
+
+  const RENDER = {
+    bill: pgBill, repay: pgRepay, ext: pgExt, agreement: pgAgreement, pay: pgPay, wallet: pgWallet,
+    processing: pgProcessing, success: pgSuccess, failed: pgFailed, after: pgAfter, history: pgHistory, oa: pgOA,
+  };
+
+  /* ---------- notes ---------- */
+  const NOTES = {
+    bill: {
+      t: '账单 · Current',
+      li: [
+        '沿用生产账单页。可延期的标的，卡片内加一行 “Need more time? Change due date”。',
+        '只对当天 CDS 名单内、且本标未延期过的标的展示；不满足就不出现，不置灰。',
+        '待支付：这一行变成 “Due date change pending · Pay ₱x”，点进去回到同一张支付单；卡片 Repay 置灰。',
+        '延期后：Due Date 直接显示新日期，金额旁加 Extended 标；入口不再出现（每标只能延 1 次）。',
+      ],
+      chg: '新增：入口行、待支付态、Extended 标。',
+      q: '待确认：账单页和还款详情页是否都放入口。',
+    },
+    repay: {
+      t: '还款详情 · 入口',
+      li: [
+        '在当期应还卡片和 Repayment Plan 之间加入口条。',
+        '入口依据：系统每天通过接口拉一次 CDS 名单（用户 ID、标的、可延期天数、延期费）。当天在名单内、且本标未延期过，才展示。',
+        '点击入口时系统按实时数据再校验：标的未结清、没有进行中的延期单、当期本金 > 0。不通过不进入延期页。',
+        '待支付时入口变为继续支付，底部 Repay 置灰。',
+      ],
+      chg: '新增：延期入口条、待支付态。',
+    },
+    ext: {
+      t: '延期页（只有一页）',
+      li: [
+        '会议确定不换标后，延期只有这一页，从上到下：选日期 → 延期天数 + 费用 → 新还款计划 → 勾协议 → 去支付。',
+        '日期选项：CDS 下发可延期天数（示例 7 / 14 / 21 / 30），系统换算成具体 due date 展示（星期 + 日期），用户不用自己算。不默认选中。',
+        '起算日 = max(当期原应还日, 今天)：未逾期从原应还日算，逾期从今天算（待业务、贷后确认）。',
+        '选中后第一张卡：Extended by N days（横排），下面是本次应付 = 延期费（CDS 下发）+ 当期利息 + 当期罚息。未逾期不展示罚息一行。',
+        '最下面是新还款计划，直接展开：每期原日期、原金额划线，旁边是新值；从当期起所有期日期后移，以新日期的“日”为每月还款日；当期只剩本金，后续金额不变。',
+        '页面明确提示：必须一次付清；少付、分笔都不生效；只能延 1 次，生效后不可撤回。',
+        '确认后生成待支付单，当天 23:59 失效。',
+      ],
+      q: '示例费率 0.16%/天仅用于演示，最终定价由贷后通过 CDS 下发。',
+    },
+    agreement: {
+      t: '延期补充协议',
+      li: [
+        '原借款协议不变，另签一份延期补充协议。',
+        '写明：借款编号/本金/期数/Co-maker 不变；新还款日；本次应付分项；一次付清才生效；少付或分笔按普通还款处理；每标 1 次、不可撤回；Co-maker 短信通知。',
+      ],
+      q: '待法务确认：Co-maker 是否需要签署（产品建议只通知）；延期费的法律定性与费用上限。',
+    },
+    pay: {
+      t: '支付（生产渠道页）',
+      li: [
+        '复用生产还款渠道页：Recommended、E-Wallet、QRph、Bank。',
+        '金额卡标题改为 “Extension Payment”，列出费用分项；“Due Date” 改为 “Pay by 11:59 PM”；Order No. 为延期支付单号。',
+        '同一标的同时只有一张有效待支付单，重复进入回到这张单。',
+      ],
+      chg: '改动：金额卡标题、分项、截止时间、一次付清提示。渠道列表不变。',
+    },
+    wallet: {
+      t: '钱包内支付 · 结果演示',
+      li: [
+        '足额：实时生效。核销顺序：延期费 → 当期利息 → 当期罚息。',
+        '多付：先按足额生效，多出的部分冲抵这笔借款的待还款（下一期本金优先）；用户申请溢缴退款的，走现有退款流程。',
+        '少付：不生效，订单失效，已付金额按普通还款处理；延期费不收，不占延期次数。',
+        '分笔：每笔单独判断，不累计。第一笔不足额即按少付处理，之后的付款也按普通还款处理。',
+        '过期：23:59 前未足额到账，不生效，计划不变。',
+        '回调延迟：进入“到账处理中”，提示不要重复支付。',
+      ],
+    },
+    processing: {
+      t: '到账处理中',
+      li: [
+        '不换标时足额到账一般实时生效；只有渠道回调延迟时才会看到这一页。',
+        '处理中这笔借款冻结普通还款和再次申请，避免重复付款。',
+      ],
+    },
+    success: {
+      t: '延期成功',
+      li: [
+        '突出新的下一期日期和金额（只有本金），以及之后每月的还款日。',
+        '多付时说明多出的钱已冲抵下一期。',
+        '发短信通知 Co-maker 新的还款日。',
+      ],
+    },
+    failed: {
+      t: '未生效',
+      li: [
+        '三种情况：少付、分笔、过期。文案说明已付金额已按普通还款处理、计划没变。',
+        '未生效不占延期次数；当天仍在 CDS 名单的，可以重新申请，金额按最新数据重新计算。',
+      ],
+    },
+    after: {
+      t: '还款详情 · 延期后',
+      li: [
+        '借款编号、Borrow Date、Co-maker、还款码都不变。',
+        'Due date 直接显示新日期；期次编号不变（如 2/6）。新增一行 “Due date changed：原日期 → 新日期”。',
+        '计划读新版本，原计划作为历史版本保留。',
+        '当期不再算逾期；罚息按新还款日重新起算；历史逾期记录保留，不清零。',
+        '入口不再出现（每标只能延 1 次）。',
+      ],
+      chg: '改动：Extended 标、Due date changed 一行。',
+    },
+    history: { t: '还款记录', li: ['新增 “Due date change” 记录：日期、延期天数、实付金额与分项、原应还日 → 新应还日。'] },
+    oa: {
+      t: '客服后台 · 标的详情',
+      li: [
+        '会议确定：listing 新增「是否展期」「展期天数」两个字段；Due date 直接显示延期后的最新日期。',
+        '产品建议同时展示：已延期次数、原应还日、延期记录（订单号、CDS 批次、生效时间、分项、实付/多付）、计划版本，方便客服答疑。',
+        '表结构以研发评审为准；研发确认后同步产品，产品再同步风险、数分。',
+        'Backend 完整样式见 prototype/kidlatpeso-admin 0814.html：角色切换为「客服 · 用户查询」→ U1012 → 资产信息（标的 78982532）。',
+      ],
+      chg: '标黄“新增”的字段为本期新增。',
+    },
+  };
+
+  function notes(page) {
+    const n = NOTES[page];
+    const c = ctx();
+    const elig = page === 'bill' || page === 'repay'
+      ? `<div class="q">当前场景：${c.eligible ? '可申请，入口展示' : `不可申请（${c.reasons.join('；')}），入口不展示`}。</div>` : '';
+    return `<h3>${n.t}</h3><div class="pg">不换标 · 基于生产页改造 · 11/03 会议定稿口径</div>
+      <ul>${n.li.map(t => `<li>${t}</li>`).join('')}</ul>
+      ${n.chg ? `<div class="chg"><b>相对生产页：</b>${n.chg}</div>` : ''}
+      ${n.q ? `<div class="q">${n.q}</div>` : ''}${elig}`;
+  }
+
+  /* ---------- control ---------- */
+  function go(page) { state.page = page; render(); }
+  function sideGo(page) {
+    if (page === 'bill') state.billTab = 'current';
+    if (page !== 'bill' && page !== 'repay' && !state.days) state.days = defaultDays();
+    if (page === 'pay' || page === 'wallet' || page === 'processing') state.phase = 'pending';
+    if (page === 'success' || page === 'after') state.phase = 'after';
+    if ((page === 'repay' || page === 'ext') && state.phase === 'after') state.phase = 'before';
+    if (page === 'failed') { if (!state.fail) state.fail = 'partial'; state.phase = 'before'; }
+    go(page);
+  }
+  function resetFlow() {
+    Object.assign(state, { page: 'bill', billTab: 'current', planOpen: false, days: null, agreed: false, fail: null, over: 0, phase: 'before' });
+    render();
+  }
+  function setPhase(p) {
+    state.phase = p;
+    if (p !== 'before' && !state.days) state.days = defaultDays();
+    if (p !== 'after') state.over = 0;
+    state.page = 'bill';
+    render();
+  }
+
+  function renderSide() {
+    document.getElementById('scSeg').innerHTML = Object.entries(SC).map(([k, v]) =>
+      `<button class="${state.sc === k ? 'on' : ''}" onclick="state.sc='${k}';resetFlow()">${v.label}</button>`).join('');
+    document.getElementById('cntSeg').innerHTML = Object.entries(CNT).map(([k, v]) =>
+      `<button class="${state.cnt === k ? 'on' : ''}" onclick="state.cnt='${k}';resetFlow()">${v}</button>`).join('');
+    document.getElementById('phSeg').innerHTML = Object.entries(PHASE).map(([k, v]) =>
+      `<button class="${state.phase === k ? 'on' : ''}" onclick="setPhase('${k}')">${v}</button>`).join('');
+    document.getElementById('plist').innerHTML = PAGES.map(([id, label]) => id === 'g'
+      ? `<div class="grp">${label}</div>`
+      : `<a class="${state.page === id ? 'on' : ''}" onclick="sideGo('${id}')">${label}</a>`).join('');
+  }
+
+  function render() {
+    renderSide();
+    const r = RENDER[state.page]();
+    const scr = document.getElementById('screen');
+    scr.className = 'screen' + (r.grad ? ' grad' : '');
+    scr.innerHTML = r.html;
+    document.getElementById('notes').innerHTML = notes(state.page);
+  }
+
+  const [start, startPhase] = location.hash.slice(1).split('@');
+  if (start && RENDER[start]) {
+    sideGo(start);
+    if (startPhase && PHASE[startPhase]) { state.phase = startPhase; render(); }
+  } else render();
+</script>
+</body>
+</html>
