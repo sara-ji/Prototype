@@ -693,7 +693,7 @@
         role_reviewer: '人审 · 普通审核员',
         role_review_admin: '人审 · 管理员',
         role_cs: '客服 · 用户查询',
-        hint_cs: '客服：按 User ID / 手机号 / Listing ID / 姓名查询用户，只读查看用户资料与资产信息；资产信息中可查看标的展期标识、展期天数、展期费与改期后的债务明细。',
+        hint_cs: '客服：按 User ID / 手机号 / Listing ID / 姓名查询用户，只读查看用户资料与资产信息；资产信息中可查看标的延期标识、延期天数、延期费与改期后的债务明细。',
         menu_sales_fill: '销售代填',
         menu_sales_fill_sub: '协助填写用户资料（不可新增担保人）',
         menu_sales_mgmt: '销售代填管理',
@@ -6035,7 +6035,7 @@
         view === 'detail' ? renderUserDetail() : (menu === 'review' ? renderReviewList() : renderUserList());
     }
 
-    /* ── 客服 · 用户查询：用户资料 + 资产信息（OFW 延期：Listing 展期字段与改期后的债务明细） ── */
+    /* ── 客服 · 用户查询：用户资料 + 资产信息（OFW 延期：Listing 延期字段与改期后的债务明细） ── */
     let csQuery = { type: 'userId', q: '' };
     let csDemo = { phase: 'after', withFailed: true };
     let csOpen = { '78982532': true };
@@ -6146,12 +6146,12 @@
           <select id="cs-q-type">${opt('userId', 'User ID')}${opt('mobile', Lc('手机号', 'Mobile'))}${opt('listingId', 'Listing ID')}${opt('name', Lc('姓名', 'Name'))}</select>
           <input id="cs-q" placeholder="${Lc('请输入', 'Enter keyword')}" value="${esc(csQuery.q)}" onkeydown="if(event.key==='Enter')runCsSearch()" />
           <button type="button" class="btn-sm primary" style="height:32px" onclick="runCsSearch()">${Lc('搜索', 'Search')}</button>
-          <span class="cs-demo-tip">${Lc('演示数据：U1012 Rico Yu 名下标的 78982532 已展期', 'Demo: listing 78982532 of U1012 Rico Yu is extended')}</span>
+          <span class="cs-demo-tip">${Lc('演示数据：U1012 Rico Yu 名下标的 78982532 已延期', 'Demo: listing 78982532 of U1012 Rico Yu is extended')}</span>
         </div>
         <div class="card table-wrap"><table class="list-table">
           <thead><tr>
             <th>User ID</th><th>${Lc('姓名', 'Name')}</th><th>${Lc('注册手机', 'Mobile')}</th><th>${t('user_version')}</th>
-            <th>${Lc('注册时间', 'Registered')}</th><th>${Lc('在贷笔数', 'Active loans')}</th><th>${Lc('展期标的', 'Extended listings')}${fieldTipMark('new')}</th>
+            <th>${Lc('注册时间', 'Registered')}</th><th>${Lc('在贷笔数', 'Active loans')}</th><th>${Lc('延期标的', 'Extended listings')}${fieldTipMark('new')}</th>
           </tr></thead>
           <tbody>${list.length ? list.map(u => {
             const ls = csListingsOf(u.id);
@@ -6191,10 +6191,10 @@
           <span>${Lc('未生效申请', 'Failed attempt')}：
             <button type="button" class="btn-sm ${csDemo.withFailed ? 'primary' : ''}" onclick="csDemo.withFailed=true;render()">${Lc('有 1 条', '1')}</button>
             <button type="button" class="btn-sm ${!csDemo.withFailed ? 'primary' : ''}" onclick="csDemo.withFailed=false;render()">${Lc('无', 'None')}</button></span>
-          <span class="cs-demo-tip">${Lc('示例：今天 2027-01-08，第 2 期逾期 5 天，延期 14 天；展期费按日费率 0.16% 演示', 'Demo: 2027-01-08, installment 2 overdue 5 days, extended 14 days; fee at 0.16%/day for demo')}</span>
+          <span class="cs-demo-tip">${Lc('示例：今天 2027-01-08，第 2 期逾期 5 天，延期 14 天；延期费按日费率 0.16% 演示', 'Demo: 2027-01-08, installment 2 overdue 5 days, extended 14 days; fee at 0.16%/day for demo')}</span>
         </div>` : '';
       const head = ['', Lc('序号', 'No.'), Lc('借款场景', 'Scene'), 'Listing ID',
-        Lc('是否展期', 'Extended') + nw, Lc('展期天数', 'Ext. days') + nw, Lc('展期费', 'Ext. fee') + nw, Lc('展期生效时间', 'Extended at') + nw,
+        Lc('是否延期', 'Extended') + nw, Lc('延期天数', 'Ext. days') + nw, Lc('延期费', 'Ext. fee') + nw, Lc('延期生效时间', 'Extended at') + nw,
         'Lender', Lc('发标时间', 'Listed at'), Lc('借款金额', 'Amount'), Lc('服务费', 'Service fee'), Lc('利息', 'Interest'),
         Lc('罚息费率', 'Penalty rate'), Lc('每期期供金额', 'Installment'), Lc('期数', 'Tenor'), Lc('提现金额', 'Withdrawn'),
         Lc('提现渠道', 'Channel'), Lc('提现账号', 'Account'), Lc('标的状态', 'Status')];
@@ -6209,7 +6209,7 @@
               <select onchange="csListingFilter.status=this.value;render()">
                 ${sOpt('', Lc('所有', 'All'), csListingFilter.status)}${sOpt('withdrawing', csListingStatus('withdrawing'), csListingFilter.status)}${sOpt('repaying', csListingStatus('repaying'), csListingFilter.status)}${sOpt('settled', csListingStatus('settled'), csListingFilter.status)}
               </select>
-              <span>${Lc('是否展期', 'Extended')}${nw}</span>
+              <span>${Lc('是否延期', 'Extended')}${nw}</span>
               <select onchange="csListingFilter.ext=this.value;render()">
                 ${sOpt('', Lc('所有', 'All'), csListingFilter.ext)}${sOpt('yes', Lc('是', 'Yes'), csListingFilter.ext)}${sOpt('no', Lc('否', 'No'), csListingFilter.ext)}
               </select>
@@ -6233,7 +6233,7 @@
         <tr>
           <td><button type="button" class="cs-caret${open ? ' open' : ''}" onclick="csToggle('${l.id}')">›</button></td>
           <td>${i + 1}</td><td>${l.scene}</td>
-          <td><span class="cs-link">${l.id}</span>${e ? `<span class="tag tag-warning" style="margin-left:6px">${Lc('已展期', 'Extended')}</span>` : ''}</td>
+          <td><span class="cs-link">${l.id}</span>${e ? `<span class="tag tag-warning" style="margin-left:6px">${Lc('已延期', 'Extended')}</span>` : ''}</td>
           <td>${e ? Lc('是', 'Yes') : Lc('否', 'No')}</td>
           <td>${e ? e.days : dash}</td>
           <td>${e ? csFmt(e.fee) : dash}</td>
@@ -6251,11 +6251,11 @@
       const dash = '<span class="kv-empty">—</span>';
       const summary = l.ext ? `
         <div class="cs-ext-sum">
-          <span><b>${Lc('展期信息', 'Extension')}</b>${nw}</span>
-          <span>${Lc('已展期次数', 'Times')}：${l.count} / 1</span>
-          <span>${Lc('展期天数', 'Days')}：${l.ext.days}</span>
+          <span><b>${Lc('延期信息', 'Extension')}</b>${nw}</span>
+          <span>${Lc('已延期次数', 'Times')}：${l.count} / 1</span>
+          <span>${Lc('延期天数', 'Days')}：${l.ext.days}</span>
           <span>${Lc('当期应还时间', 'Current due')}：${l.ext.oldDue} → <b>${l.ext.newDue}</b></span>
-          <span>${Lc('本次实付', 'Paid')}：${csFmt(csPay(l.ext) + l.ext.over)}（${Lc('展期费', 'fee')} ${csFmt(l.ext.fee)} + ${Lc('当期服务费', 'service fee')} ${csFmt(l.ext.svc)} + ${Lc('当期罚息', 'penalty')} ${csFmt(l.ext.pen)}）</span>
+          <span>${Lc('本次实付', 'Paid')}：${csFmt(csPay(l.ext) + l.ext.over)}（${Lc('延期费', 'fee')} ${csFmt(l.ext.fee)} + ${Lc('当期服务费', 'service fee')} ${csFmt(l.ext.svc)} + ${Lc('当期罚息', 'penalty')} ${csFmt(l.ext.pen)}）</span>
           <span>${Lc('生效时间', 'Effective')}：${l.ext.effAt}</span>
         </div>` : '';
       const debts = l.debts.length ? `

@@ -692,8 +692,8 @@
         <div class="row"><span class="k">Listing No.</span><span class="v">${LOAN_NO}</span></div>
         <div class="row"><span class="k">状态</span><span class="v">还款中</span></div>
         <div class="row"><span class="k">Due date</span><span class="v">${ext ? fmt(q.d1) : fmt(c.cur.due)}</span></div>
-        <div class="row"><span class="k">是否展期${nw}</span><span class="v">${ext ? '是' : '否'}</span></div>
-        <div class="row"><span class="k">展期天数${nw}</span><span class="v">${ext ? q.N : '—'}</span></div>
+        <div class="row"><span class="k">是否延期${nw}</span><span class="v">${ext ? '是' : '否'}</span></div>
+        <div class="row"><span class="k">延期天数${nw}</span><span class="v">${ext ? q.N : '—'}</span></div>
         <div class="row"><span class="k">已延期次数${nw}</span><span class="v">${ext ? 1 : 0} / ${CFG.maxCount}</span></div>
         <div class="row"><span class="k">原应还日${nw}</span><span class="v">${ext ? fmt(c.cur.due) : '—'}</span></div>
       </div>
