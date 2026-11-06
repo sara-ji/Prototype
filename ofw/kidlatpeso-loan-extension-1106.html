@@ -23,7 +23,7 @@
   }
   * { box-sizing: border-box; }
   body { margin: 0; font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; color: var(--ink); background: #e9ebf1; }
-  .app { display: grid; grid-template-columns: 250px 1fr 330px; min-height: 100vh; }
+  .app { display: grid; grid-template-columns: 250px 1fr; min-height: 100vh; }
 
   .side { background: var(--side); border-right: 1px solid #dde0e7; padding: 18px 14px; overflow-y: auto; }
   .brand { font-weight: 700; font-size: 16px; }
@@ -88,7 +88,6 @@
   .exrow { display: flex; align-items: center; gap: 8px; background: #f2f5ff; border-radius: 10px; padding: 10px 12px; margin-top: 8px; cursor: pointer; }
   .exrow .tx { flex: 1; font-size: 13px; }
   .exrow .tx b { color: var(--primary); }
-  .exrow.pending { background: #fff7de; }
   .fold { display: flex; justify-content: space-between; align-items: center; font-size: 14px; font-weight: 600; padding: 10px 0 2px; cursor: pointer; border-top: 1px solid var(--line); margin-top: 6px; }
   .tabbar { display: flex; background: #fff; border-top: 1px solid var(--line); padding: 8px 0 18px; }
   .tabbar div { flex: 1; text-align: center; font-size: 11px; color: var(--muted); }
@@ -100,7 +99,6 @@
   .entry .tx { flex: 1; }
   .entry .tx b { display: block; font-size: 14px; }
   .entry .tx span { font-size: 12px; color: var(--muted); }
-  .entry.pending { border-color: #f3d27a; background: #fffbea; }
   .chev { color: #aab; font-size: 20px; }
 
   .tl .it { display: grid; grid-template-columns: 14px 1fr auto; gap: 8px; padding: 9px 0; position: relative; }
@@ -145,6 +143,14 @@
   .star { position: absolute; top: 0; left: 0; background: var(--primary); color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 12px 0 10px 0; }
 
   .demo { margin-top: 14px; border: 1.5px dashed #c3c7d2; border-radius: 12px; padding: 10px; background: #fff; }
+  .qrbrand { display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: .5px; color: #fff; background: #1b3f8f; border-radius: 6px; padding: 3px 10px; margin-bottom: 8px; }
+  .qrbox { display: flex; justify-content: center; }
+  .qrbox svg { border: 1px solid var(--line); border-radius: 10px; }
+  .push { background: rgba(255,255,255,.96); border-radius: 14px; box-shadow: 0 6px 18px rgba(20,30,60,.14); padding: 10px 12px; margin: 4px 0 6px; }
+  .push .pt { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+  .push .pl { width: 16px; height: 16px; border-radius: 4px; background: var(--primary); color: #fff; font-size: 10px; font-weight: 700; display: grid; place-items: center; }
+  .push .pb { font-size: 13px; line-height: 1.45; }
+  .toast { position: absolute; left: 50%; bottom: 120px; transform: translateX(-50%); background: rgba(30,30,30,.86); color: #fff; font-size: 13px; padding: 8px 14px; border-radius: 8px; z-index: 5; white-space: nowrap; }
   .demo .dt { font-size: 11px; color: var(--muted); margin-bottom: 6px; }
   .demo button { display: block; width: 100%; margin-top: 6px; border: 1px solid #d0d4de; background: #fafbfc; border-radius: 8px; padding: 8px; font-size: 12px; cursor: pointer; text-align: left; }
 
@@ -162,15 +168,7 @@
   .oa .ttl { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
   .oa .new { background: #fff3c4; border-radius: 4px; padding: 0 4px; font-size: 10px; color: #7a5a00; margin-left: 4px; font-weight: 600; }
 
-  .notes { background: #fff; border-left: 1px solid #dde0e7; padding: 18px 16px; overflow-y: auto; font-size: 13px; line-height: 1.6; }
-  .notes h3 { margin: 0 0 4px; font-size: 15px; }
-  .notes .pg { color: var(--muted); font-size: 12px; margin-bottom: 10px; }
-  .notes ul { padding-left: 18px; margin: 6px 0; }
-  .notes li { margin-bottom: 6px; }
-  .notes .chg { margin-top: 12px; background: #eef3ff; border-radius: 10px; padding: 10px 12px; }
-  .notes .chg b { color: var(--primary); }
-  .notes .q { margin-top: 12px; background: #f4f5f8; border-radius: 10px; padding: 10px 12px; color: #555; }
-  @media (max-width: 1100px) { .app { grid-template-columns: 220px 1fr; } .notes { grid-column: 1 / -1; border-left: 0; border-top: 1px solid #dde0e7; } }
+  @media (max-width: 1100px) { .app { grid-template-columns: 220px 1fr; } }
 </style>
 </head>
 <body>
@@ -189,7 +187,6 @@
     <button class="reset" onclick="resetFlow()">重置流程</button>
   </aside>
   <main class="stage"><div class="phone"><div class="screen" id="screen"></div></div></main>
-  <section class="notes" id="notes"></section>
 </div>
 
 <script>
@@ -203,10 +200,10 @@
   const SC = {
     normal: { label: '未逾期 · 到期前 6 天', paid: 2, today: D(2026, 11, 18), inList: true },
     overdue: { label: '逾期 9 天', paid: 1, today: D(2026, 11, 2), inList: true },
-    out: { label: '不在 CDS 名单', paid: 1, today: D(2026, 11, 2), inList: false },
+    out: { label: 'CDS 返回不可延期', paid: 1, today: D(2026, 11, 2), inList: false },
   };
   const CNT = { c0: '0 次', c1: '1 次（已用完）' };
-  const PHASE = { before: '延期前', pending: '待支付', after: '延期后' };
+  const PHASE = { before: '延期前', after: '延期后' };
 
   const PAGES = [
     ['g', '生产页改造'],
@@ -216,8 +213,8 @@
     ['ext', '延期页：选日期 · 费用 · 新计划'],
     ['agreement', '延期补充协议'],
     ['pay', '支付（生产渠道页）'],
-    ['wallet', '钱包内支付 · 结果演示'],
-    ['processing', '到账处理中'],
+    ['qr', 'QRPh 还款码'],
+    ['scan', '钱包内付款 · 结果演示'],
     ['success', '延期成功'],
     ['failed', '未生效'],
     ['g', '延期后'],
@@ -226,7 +223,16 @@
     ['oa', '客服后台 · 标的详情'],
   ];
 
-  const state = { sc: 'overdue', cnt: 'c0', phase: 'before', page: 'bill', billTab: 'current', planOpen: false, days: null, agreed: false, fail: null, over: 0, channel: 'GCash' };
+  const state = { sc: 'overdue', cnt: 'c0', phase: 'before', page: 'bill', billTab: 'current', planOpen: false, days: null, agreed: false, fail: null, over: 0, qrSeq: 0, channel: 'GCash' };
+
+  function toast(text) {
+    const scr = document.getElementById('screen');
+    const t = document.createElement('div');
+    t.className = 'toast';
+    t.textContent = text;
+    scr.appendChild(t);
+    setTimeout(() => t.remove(), 1600);
+  }
 
   /* ---------- helpers ---------- */
   const addDays = (dt, n) => { const x = new Date(dt); x.setDate(x.getDate() + n); return x; };
@@ -344,10 +350,6 @@
   }
 
   function extRow(c) {
-    if (state.phase === 'pending') {
-      const q = quote(c, state.days);
-      return `<div class="exrow pending" onclick="event.stopPropagation();go('pay')"><span>⏳</span><div class="tx">Due date change pending · <b>Pay ${money(q.pay)}</b> by 11:59 PM</div><span class="chev">›</span></div>`;
-    }
     if (state.phase === 'before' && c.eligible) {
       return `<div class="exrow" onclick="event.stopPropagation();go('ext')"><span>📅</span><div class="tx">Need more time? <b>Change due date</b></div><span class="chev">›</span></div>`;
     }
@@ -385,7 +387,7 @@
           <div class="top"><span class="tg ${t.cls} tl">${t.text}</span>${right}</div>
           <div class="in">
             <div class="lbl">Due Amount (₱)</div>
-            <div class="amtrow"><div class="big">${num(amt)}</div><button class="btn-sm" ${state.phase === 'pending' ? 'disabled' : ''} onclick="event.stopPropagation()">Repay</button></div>
+            <div class="amtrow"><div class="big">${num(amt)}</div><button class="btn-sm" onclick="event.stopPropagation()">Repay</button></div>
             <div class="row"><span class="k">Due Date</span><span class="v">${fmt(c.cur.due)}</span></div>
             <div class="row"><span class="k">Due Tenor</span><span class="v">${c.cur.no}/6</span></div>
             ${extRow(c)}
@@ -410,10 +412,7 @@
     const t = dueTag(c.today, c.cur.due, c.dpd);
     const amt = c.cur.principal + c.cur.interest + c.penalty;
     let entry = '';
-    if (state.phase === 'pending') {
-      const q = quote(c, state.days);
-      entry = `<div class="entry pending" onclick="go('pay')"><div class="ic">⏳</div><div class="tx"><b>Due date change pending</b><span>Pay ${money(q.pay)} by 11:59 PM today</span></div><span class="chev">›</span></div>`;
-    } else if (c.eligible) {
+    if (c.eligible) {
       entry = `<div class="entry" onclick="go('ext')"><div class="ic">📅</div><div class="tx"><b>Need more time to pay?</b><span>Move your due dates by up to ${CFG.options[CFG.options.length - 1]} days</span></div><span class="chev">›</span></div>`;
     }
     const body = `
@@ -431,7 +430,7 @@
       <div class="sec">Repayment Plan</div>
       <div class="card">${planList(oldPlanItems(c))}</div>
       ${rateNote}`;
-    return shell('Repayment', body, `<button class="btn" ${state.phase === 'pending' ? 'disabled' : ''}>Repay</button>`, { back: 'bill', right: ['History', 'history'], grad: false });
+    return shell('Repayment', body, `<button class="btn">Repay</button>`, { back: 'bill', right: ['History', 'history'], grad: false });
   }
 
   /* ---------- Extension page (single page) ---------- */
@@ -459,11 +458,11 @@
           ${planList(newPlanItems(q, true))}
           <div class="sub" style="margin-top:4px">Due on the ${ord(q.d1.getDate())} of each month. Next bill is principal only; later amounts stay the same.</div>
         </div>
-        <div class="info warn">Pay <b>${money(q.pay)}</b> in <b>one payment</b> by 11:59 PM today. Partial or split payments won't change your due date.</div>`;
+        <div class="info warn">Pay <b>${money(q.pay)}</b> in <b>one payment</b> by 11:59 PM today. When you scan the QR code, enter exactly <b>${money(q.pay)}</b>. If you pay less, your due date won't change.</div>`;
       foot = `
         <label class="agree"><input type="checkbox" ${state.agreed ? 'checked' : ''} onchange="state.agreed=this.checked;render()">
           <span>I have read and accepted the <a onclick="event.preventDefault();go('agreement')">Extension Agreement</a></span></label>
-        <button class="btn" ${state.agreed ? '' : 'disabled'} onclick="state.phase='pending';go('pay')">Pay ${money(q.pay)}</button>`;
+        <button class="btn" ${state.agreed ? '' : 'disabled'} onclick="state.qrSeq++;go('pay')">Pay ${money(q.pay)}</button>`;
     }
     const body = `
       <div class="card">
@@ -492,67 +491,102 @@
     return shell('Extension Agreement', body, `<button class="btn" onclick="state.agreed=true;go('ext')">I agree</button>`, { back: 'ext', whiteFoot: true });
   }
 
+  const refNo = () => `EXT${ORDER_NO.slice(3, 11)}${String(160 + state.qrSeq).padStart(6, '0')}`;
+
+  function qrSvg(seed) {
+    const n = 25, cell = 7;
+    let x = seed * 9301 + 49297;
+    const rnd = () => { x = (x * 9301 + 49297) % 233280; return x / 233280; };
+    const finder = (r, c) => {
+      const inBox = (r0, c0) => r >= r0 && r < r0 + 7 && c >= c0 && c < c0 + 7;
+      const box = inBox(0, 0) ? [0, 0] : inBox(0, n - 7) ? [0, n - 7] : inBox(n - 7, 0) ? [n - 7, 0] : null;
+      if (!box) return null;
+      const rr = r - box[0], cc = c - box[1];
+      const ring = rr === 0 || rr === 6 || cc === 0 || cc === 6;
+      const core = rr >= 2 && rr <= 4 && cc >= 2 && cc <= 4;
+      return ring || core;
+    };
+    let rects = '';
+    for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) {
+      const f = finder(r, c);
+      const on = f === null ? rnd() > 0.52 : f;
+      if (on) rects += `<rect x="${c * cell}" y="${r * cell}" width="${cell}" height="${cell}"/>`;
+    }
+    const s = n * cell;
+    return `<svg viewBox="-14 -14 ${s + 28} ${s + 28}" width="190" height="190" xmlns="http://www.w3.org/2000/svg"><rect x="-14" y="-14" width="${s + 28}" height="${s + 28}" fill="#fff"/><g fill="#111">${rects}</g></svg>`;
+  }
+
   function pgPay() {
     const c = ctx();
     const q = quote(c, state.days);
     const lg = (t, col) => `<span class="lg" style="background:${col}">${t}</span>`;
-    const line = (name, l) => `<div class="ln" onclick="state.channel='${name}';go('wallet')">${l}<span class="nm">${name}</span><span class="chev">›</span></div>`;
+    const line = (name, l, next) => `<div class="ln" onclick="state.channel='${name}';go('${next}')">${l}<span class="nm">${name}</span><span class="chev">›</span></div>`;
     const body = `
       <div class="card">
         <div class="lbl">Extension Payment (₱)</div>
         <div class="big">${q.pay.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
         <div class="sub" style="margin-bottom:6px">${feeShort(c, q)}</div>
-        <div class="row"><span class="k">Pay by</span><span class="v red">11:59 PM, ${fmt(c.today)}</span></div>
-        <div class="row"><span class="k">Order No.</span><span class="v">${ORDER_NO}</span></div>
-        <div class="sub">Pay the exact amount in one payment.</div>
+        <div class="row"><span class="k">Valid until</span><span class="v red">11:59 PM today</span></div>
+        <div class="row"><span class="k">Reference No.</span><span class="v">${refNo()}</span></div>
+        <div class="sub">Enter the exact amount and pay in one payment.</div>
       </div>
       <div class="chtitle"><span>Recommended</span></div>
-      <div class="ch rec"><span class="star">☆</span>${line('Gcash Direct Wepay', lg('G', '#0a6cff'))}
+      <div class="ch rec"><span class="star">☆</span>${line('Gcash Direct Wepay', lg('G', '#0a6cff'), 'scan')}
         <div class="rec-tags"><span>Real time</span><span>Enhanced Stability &amp; Security</span></div></div>
       <div class="chtitle"><span>E-Wallet<span class="rt">Real Time</span></span><span class="more">More</span></div>
-      <div class="ch">${line('ShopeePay', lg('S', '#ee4d2d'))}${line('Maya Bank', lg('m', '#111'))}${line('GCash', lg('G', '#0a6cff'))}</div>
+      <div class="ch">${line('ShopeePay', lg('S', '#ee4d2d'), 'scan')}${line('Maya Bank', lg('m', '#111'), 'scan')}${line('GCash', lg('G', '#0a6cff'), 'scan')}</div>
       <div class="chtitle"><span>QRph<span class="rt">Real Time</span></span><span class="more">More</span></div>
-      <div class="ch">${line('QRph', lg('Q', '#e8a400'))}</div>
+      <div class="ch">${line('QRph', lg('Q', '#e8a400'), 'qr')}</div>
       <div class="chtitle"><span>Bank</span><span class="more">More</span></div>
-      <div class="ch">${line('Union Bank', lg('U', '#f39200'))}${line('BDO', lg('B', '#1a4ea1'))}</div>
+      <div class="ch">${line('Union Bank', lg('U', '#f39200'), 'scan')}${line('BDO', lg('B', '#1a4ea1'), 'scan')}</div>
       <div style="text-align:center;margin:16px 0 6px"><span class="link" onclick="go('agreement')">View Extension Agreement</span></div>`;
-    return shell('Repayment', body, '', { back: 'repay' });
+    return shell('Repayment', body, '', { back: 'ext' });
   }
 
-  function pgWallet() {
+  function pgQr() {
     const c = ctx();
     const q = quote(c, state.days);
     const body = `
       <div class="card" style="text-align:center">
-        <div class="lbl">${state.channel}</div>
-        <div class="big">${money(q.pay)}</div>
-        <div class="sub">Reference: ${ORDER_NO}</div>
+        <div class="qrbrand">QR Ph</div>
+        <div class="qrbox">${qrSvg(state.qrSeq + 7)}</div>
+        <div class="lbl" style="margin-top:6px">Amount to pay</div>
+        <div class="big" style="margin-bottom:2px">${money(q.pay)}</div>
+        <div class="sub">${feeShort(c, q)}</div>
+        <div class="hr"></div>
+        <div class="row"><span class="k">Valid until</span><span class="v red">11:59 PM today</span></div>
+        <div class="row"><span class="k">Reference No.</span><span class="v">${refNo()}</span></div>
       </div>
-      <div class="info warn">Enter exactly <b>${money(q.pay)}</b> and pay once. If you pay less, or split it into several payments, your due date won't change and the money will be used as a normal repayment.</div>
-      <div class="demo"><div class="dt">原型演示：钱包内的支付结果</div>
-        <button onclick="state.fail=null;state.over=0;state.phase='after';go('success')">✅ 足额支付 ${money(q.pay)}</button>
-        <button onclick="state.fail=null;state.over=500;state.phase='after';go('success')">➕ 多付 ₱500（共 ${money(q.pay + 500)}）</button>
-        <button onclick="state.fail='partial';state.phase='before';go('failed')">⚠️ 只付 ₱1,000（少付）</button>
-        <button onclick="state.fail='split';state.phase='before';go('failed')">✂️ 分两笔：先付 ₱1,000，再付 ${money(q.pay - 1000)}</button>
-        <button onclick="state.fail='expired';state.phase='before';go('failed')">⌛ 23:59 前未付</button>
-        <button onclick="state.phase='pending';go('processing')">⏳ 已付款，渠道回调延迟</button>
-      </div>`;
-    return shell(state.channel, body, '', { back: 'pay' });
+      <div class="info warn">Scan with GCash, Maya or your bank app. Enter exactly <b>${money(q.pay)}</b> and pay in one payment.</div>
+      <div style="text-align:center;margin:10px 0 4px"><span class="link" onclick="go('agreement')">View Extension Agreement</span></div>
+      <div class="demo"><div class="dt">原型演示</div><button onclick="state.channel='QRph';go('scan')">📱 用户打开钱包扫码付款 →</button></div>`;
+    const foot = `<button class="btn" onclick="toast('QR code saved to gallery')">Save QR code</button>
+      <button class="btn ghost" onclick="go('repay')">Done</button>`;
+    return shell('Pay with QRPh', body, foot, { back: 'pay', whiteFoot: true });
   }
 
-  function pgProcessing() {
-    const q = quote(ctx(), state.days);
+  function pgScan() {
+    const c = ctx();
+    const q = quote(c, state.days);
     const body = `
-      <div class="center"><div class="ring wait">⟳</div><div class="h2">Payment received</div>
-        <div class="p">We're updating your due dates.<br>Please don't pay again.</div></div>
-      <div class="card" style="margin-top:18px">
-        <div class="row"><span class="k">Paid</span><span class="v">${money(q.pay)}</span></div>
-        <div class="row"><span class="k">New due date</span><span class="v">${fmt(q.d1)}</span></div>
+      <div class="card" style="text-align:center">
+        <div class="lbl">${state.channel === 'QRph' ? 'Scan QR Ph to pay' : 'Pay to Kidlat Peso'}</div>
+        <div class="sub" style="margin:6px 0">Kidlat Peso · Ref ${refNo()}</div>
+        <div class="row" style="justify-content:center;gap:6px"><span class="k">Amount</span><span class="v">₱ ______</span></div>
+        <div class="sub">The user types the amount in the wallet or bank app.</div>
       </div>
-      <div class="demo"><div class="dt">原型演示</div>
-        <button onclick="state.fail=null;state.over=0;state.phase='after';go('success')">✅ 处理完成</button>
+      <div class="demo"><div class="dt">原型演示：用户在钱包里输入的金额</div>
+        <button onclick="state.fail=null;state.over=0;state.phase='after';go('success')">✅ 输入 ${money(q.pay)}（足额）</button>
+        <button onclick="state.fail=null;state.over=500;state.phase='after';go('success')">➕ 输入 ${money(q.pay + 500)}（多付 ₱500）</button>
+        <button onclick="state.fail='partial';state.phase='before';go('failed')">⚠️ 输入 ₱1,000（少付）</button>
+        <button onclick="state.fail='split';state.phase='before';go('failed')">✂️ 分两笔：先付 ₱1,000，再付 ${money(q.pay - 1000)}</button>
+        <button onclick="state.fail=null;state.phase='before';go('repay')">⌛ 没付款，23:59 后失效（App 无变化）</button>
       </div>`;
-    return shell('Processing', body, `<button class="btn ghost" style="margin-top:0" onclick="state.billTab='current';go('bill')">Back to Bill</button>`, {});
+    return shell(state.channel === 'QRph' ? 'GCash' : state.channel, body, '', { back: state.channel === 'QRph' ? 'qr' : 'pay' });
+  }
+
+  function pushBanner(text) {
+    return `<div class="push"><div class="pt"><span class="pl">K</span>Kidlat Peso · now</div><div class="pb">${text}</div></div>`;
   }
 
   function pgSuccess() {
@@ -560,7 +594,8 @@
     const q = quote(c, state.days);
     const later = q.rows[1] ? q.rows[1].amt : q.rows[0].amt;
     const body = `
-      <div class="center"><div class="ring ok">✓</div>
+      ${pushBanner(`Your due date has been changed to ${fmt(q.d1)}. Next payment: ${money(q.rows[0].amt)}.`)}
+      <div class="center" style="padding-top:14px"><div class="ring ok">✓</div>
         <div class="h2">Your due date has been changed</div>
         <div class="p">Next payment: <b>${money(q.rows[0].amt)}</b> on <b>${fmt(q.d1)}</b> (principal only).<br>Then ${money(later)} on the ${ord(q.d1.getDate())} of each month.</div>
       </div>
@@ -579,10 +614,10 @@
     const msg = {
       partial: `We received ₱1,000, which is less than the ${money(q.pay)} required.<br>It has been applied to your bill as a normal repayment.`,
       split: `Each payment must cover the full ${money(q.pay)}. Your payments of ₱1,000 and ${money(q.pay - 1000)} were applied to your bill as normal repayments.`,
-      expired: `Your payment order expired at 11:59 PM.<br>Your repayment plan has not changed.`,
-    }[state.fail || 'partial'];
+    }[state.fail === 'split' ? 'split' : 'partial'];
     const body = `
-      <div class="center"><div class="ring bad">!</div>
+      ${pushBanner(`Your due date was not changed. The payment was applied to your bill as a normal repayment.`)}
+      <div class="center" style="padding-top:14px"><div class="ring bad">!</div>
         <div class="h2">Your due date was not changed</div>
         <div class="p">${msg}</div>
       </div>
@@ -650,156 +685,30 @@
       </div>
       ${ext ? `<div class="card oa">
         <div class="ttl">延期记录${nw}</div>
-        <div class="row"><span class="k">延期订单号</span><span class="v">${ORDER_NO}</span></div>
-        <div class="row"><span class="k">CDS 名单批次</span><span class="v">CDS-${c.today.getFullYear()}${String(c.today.getMonth() + 1).padStart(2, '0')}${String(c.today.getDate()).padStart(2, '0')}</span></div>
+        <div class="row"><span class="k">延期申请号</span><span class="v">${refNo()}</span></div>
+        <div class="row"><span class="k">CDS 决策号</span><span class="v">CDSD${c.today.getFullYear()}${String(c.today.getMonth() + 1).padStart(2, '0')}${String(c.today.getDate()).padStart(2, '0')}143140</span></div>
+        <div class="row"><span class="k">支付渠道</span><span class="v">QRPh · GCash</span></div>
         <div class="row"><span class="k">生效时间</span><span class="v">${fmt(c.today)} 14:32</span></div>
         <div class="row"><span class="k">延期天数</span><span class="v">${q.N}</span></div>
         <div class="row"><span class="k">当期应还日</span><span class="v">${fmtShort(c.cur.due)} → ${fmtShort(q.d1)}</span></div>
         <div class="row"><span class="k">应付分项</span><span class="v">费 ${money(q.fee)} · 息 ${money(q.interest)}${c.penalty > 0 ? ` · 罚 ${money(c.penalty)}` : ''}</span></div>
         <div class="row"><span class="k">实付 / 多付</span><span class="v">${money(q.pay + state.over)} / ${money(state.over)}</span></div>
-      </div>
-      <div class="card oa">
-        <div class="ttl">还款计划版本${nw}</div>
-        <div class="row"><span class="k">v1 · 放款</span><span class="v">24 Aug 2026 · 历史</span></div>
-        <div class="row"><span class="k">v2 · 延期</span><span class="v">${fmt(c.today)} · 当前</span></div>
       </div>` : '<div class="sub" style="padding:0 4px">切到「延期后」查看延期记录。</div>'}`;
     return shell('客服后台 · 标的', body, '', { back: 'bill', grad: false });
   }
 
   const RENDER = {
-    bill: pgBill, repay: pgRepay, ext: pgExt, agreement: pgAgreement, pay: pgPay, wallet: pgWallet,
-    processing: pgProcessing, success: pgSuccess, failed: pgFailed, after: pgAfter, history: pgHistory, oa: pgOA,
+    bill: pgBill, repay: pgRepay, ext: pgExt, agreement: pgAgreement, pay: pgPay, qr: pgQr, scan: pgScan,
+    success: pgSuccess, failed: pgFailed, after: pgAfter, history: pgHistory, oa: pgOA,
   };
-
-  /* ---------- notes ---------- */
-  const NOTES = {
-    bill: {
-      t: '账单 · Current',
-      li: [
-        '沿用生产账单页。可延期的标的，卡片内加一行 “Need more time? Change due date”。',
-        '只对当天 CDS 名单内、且本标未延期过的标的展示；不满足就不出现，不置灰。',
-        '待支付：这一行变成 “Due date change pending · Pay ₱x”，点进去回到同一张支付单；卡片 Repay 置灰。',
-        '延期后：Due Date 直接显示新日期，金额旁加 Extended 标；入口不再出现（每标只能延 1 次）。',
-      ],
-      chg: '新增：入口行、待支付态、Extended 标。',
-      q: '待确认：账单页和还款详情页是否都放入口。',
-    },
-    repay: {
-      t: '还款详情 · 入口',
-      li: [
-        '在当期应还卡片和 Repayment Plan 之间加入口条。',
-        '入口依据：系统每天通过接口拉一次 CDS 名单（用户 ID、标的、可延期天数、延期费）。当天在名单内、且本标未延期过，才展示。',
-        '点击入口时系统按实时数据再校验：标的未结清、没有进行中的延期单、当期本金 > 0。不通过不进入延期页。',
-        '待支付时入口变为继续支付，底部 Repay 置灰。',
-      ],
-      chg: '新增：延期入口条、待支付态。',
-    },
-    ext: {
-      t: '延期页（只有一页）',
-      li: [
-        '会议确定不换标后，延期只有这一页，从上到下：选日期 → 延期天数 + 费用 → 新还款计划 → 勾协议 → 去支付。',
-        '日期选项：CDS 下发可延期天数（示例 7 / 14 / 21 / 30），系统换算成具体 due date 展示（星期 + 日期），用户不用自己算。不默认选中。',
-        '起算日 = max(当期原应还日, 今天)：未逾期从原应还日算，逾期从今天算（待业务、贷后确认）。',
-        '选中后第一张卡：Extended by N days（横排），下面是本次应付 = 延期费（CDS 下发）+ 当期利息 + 当期罚息。未逾期不展示罚息一行。',
-        '最下面是新还款计划，直接展开：每期原日期、原金额划线，旁边是新值；从当期起所有期日期后移，以新日期的“日”为每月还款日；当期只剩本金，后续金额不变。',
-        '页面明确提示：必须一次付清；少付、分笔都不生效；只能延 1 次，生效后不可撤回。',
-        '确认后生成待支付单，当天 23:59 失效。',
-      ],
-      q: '示例费率 0.16%/天仅用于演示，最终定价由贷后通过 CDS 下发。',
-    },
-    agreement: {
-      t: '延期补充协议',
-      li: [
-        '原借款协议不变，另签一份延期补充协议。',
-        '写明：借款编号/本金/期数/Co-maker 不变；新还款日；本次应付分项；一次付清才生效；少付或分笔按普通还款处理；每标 1 次、不可撤回；Co-maker 短信通知。',
-      ],
-      q: '待法务确认：Co-maker 是否需要签署（产品建议只通知）；延期费的法律定性与费用上限。',
-    },
-    pay: {
-      t: '支付（生产渠道页）',
-      li: [
-        '复用生产还款渠道页：Recommended、E-Wallet、QRph、Bank。',
-        '金额卡标题改为 “Extension Payment”，列出费用分项；“Due Date” 改为 “Pay by 11:59 PM”；Order No. 为延期支付单号。',
-        '同一标的同时只有一张有效待支付单，重复进入回到这张单。',
-      ],
-      chg: '改动：金额卡标题、分项、截止时间、一次付清提示。渠道列表不变。',
-    },
-    wallet: {
-      t: '钱包内支付 · 结果演示',
-      li: [
-        '足额：实时生效。核销顺序：延期费 → 当期利息 → 当期罚息。',
-        '多付：先按足额生效，多出的部分冲抵这笔借款的待还款（下一期本金优先）；用户申请溢缴退款的，走现有退款流程。',
-        '少付：不生效，订单失效，已付金额按普通还款处理；延期费不收，不占延期次数。',
-        '分笔：每笔单独判断，不累计。第一笔不足额即按少付处理，之后的付款也按普通还款处理。',
-        '过期：23:59 前未足额到账，不生效，计划不变。',
-        '回调延迟：进入“到账处理中”，提示不要重复支付。',
-      ],
-    },
-    processing: {
-      t: '到账处理中',
-      li: [
-        '不换标时足额到账一般实时生效；只有渠道回调延迟时才会看到这一页。',
-        '处理中这笔借款冻结普通还款和再次申请，避免重复付款。',
-      ],
-    },
-    success: {
-      t: '延期成功',
-      li: [
-        '突出新的下一期日期和金额（只有本金），以及之后每月的还款日。',
-        '多付时说明多出的钱已冲抵下一期。',
-        '发短信通知 Co-maker 新的还款日。',
-      ],
-    },
-    failed: {
-      t: '未生效',
-      li: [
-        '三种情况：少付、分笔、过期。文案说明已付金额已按普通还款处理、计划没变。',
-        '未生效不占延期次数；当天仍在 CDS 名单的，可以重新申请，金额按最新数据重新计算。',
-      ],
-    },
-    after: {
-      t: '还款详情 · 延期后',
-      li: [
-        '借款编号、Borrow Date、Co-maker、还款码都不变。',
-        'Due date 直接显示新日期；期次编号不变（如 2/6）。新增一行 “Due date changed：原日期 → 新日期”。',
-        '计划读新版本，原计划作为历史版本保留。',
-        '当期不再算逾期；罚息按新还款日重新起算；历史逾期记录保留，不清零。',
-        '入口不再出现（每标只能延 1 次）。',
-      ],
-      chg: '改动：Extended 标、Due date changed 一行。',
-    },
-    history: { t: '还款记录', li: ['新增 “Due date change” 记录：日期、延期天数、实付金额与分项、原应还日 → 新应还日。'] },
-    oa: {
-      t: '客服后台 · 标的详情',
-      li: [
-        '会议确定：listing 新增「是否展期」「展期天数」两个字段；Due date 直接显示延期后的最新日期。',
-        '产品建议同时展示：已延期次数、原应还日、延期记录（订单号、CDS 批次、生效时间、分项、实付/多付）、计划版本，方便客服答疑。',
-        '表结构以研发评审为准；研发确认后同步产品，产品再同步风险、数分。',
-        'Backend 完整样式见 prototype/kidlatpeso-admin 0814.html：角色切换为「客服 · 用户查询」→ U1012 → 资产信息（标的 78982532）。',
-      ],
-      chg: '标黄“新增”的字段为本期新增。',
-    },
-  };
-
-  function notes(page) {
-    const n = NOTES[page];
-    const c = ctx();
-    const elig = page === 'bill' || page === 'repay'
-      ? `<div class="q">当前场景：${c.eligible ? '可申请，入口展示' : `不可申请（${c.reasons.join('；')}），入口不展示`}。</div>` : '';
-    return `<h3>${n.t}</h3><div class="pg">不换标 · 基于生产页改造 · 11/03 会议定稿口径</div>
-      <ul>${n.li.map(t => `<li>${t}</li>`).join('')}</ul>
-      ${n.chg ? `<div class="chg"><b>相对生产页：</b>${n.chg}</div>` : ''}
-      ${n.q ? `<div class="q">${n.q}</div>` : ''}${elig}`;
-  }
 
   /* ---------- control ---------- */
   function go(page) { state.page = page; render(); }
   function sideGo(page) {
     if (page === 'bill') state.billTab = 'current';
     if (page !== 'bill' && page !== 'repay' && !state.days) state.days = defaultDays();
-    if (page === 'pay' || page === 'wallet' || page === 'processing') state.phase = 'pending';
     if (page === 'success' || page === 'after') state.phase = 'after';
-    if ((page === 'repay' || page === 'ext') && state.phase === 'after') state.phase = 'before';
+    if (['repay', 'ext', 'pay', 'qr', 'scan'].includes(page) && state.phase === 'after') state.phase = 'before';
     if (page === 'failed') { if (!state.fail) state.fail = 'partial'; state.phase = 'before'; }
     go(page);
   }
@@ -833,7 +742,6 @@
     const scr = document.getElementById('screen');
     scr.className = 'screen' + (r.grad ? ' grad' : '');
     scr.innerHTML = r.html;
-    document.getElementById('notes').innerHTML = notes(state.page);
   }
 
   const [start, startPhase] = location.hash.slice(1).split('@');
