@@ -144,8 +144,16 @@
 
   .demo { margin-top: 14px; border: 1.5px dashed #c3c7d2; border-radius: 12px; padding: 10px; background: #fff; }
   .qrbrand { display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: .5px; color: #fff; background: #1b3f8f; border-radius: 6px; padding: 3px 10px; margin-bottom: 8px; }
-  .qrbox { display: flex; justify-content: center; }
-  .qrbox svg { border: 1px solid var(--line); border-radius: 10px; }
+  .qrbox { display: flex; justify-content: center; position: relative; margin: 8px 0 2px; }
+  .qrlogo { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 30px; height: 30px; border-radius: 6px; background: #fff; color: #18a0c9; font-weight: 800; font-size: 18px; display: grid; place-items: center; box-shadow: 0 0 0 3px #fff; }
+  .qrcard .big { font-size: 30px; }
+  .btn-copy { background: #0f3b36; color: #fff; border: 0; border-radius: 8px; padding: 8px 20px; font-size: 14px; font-weight: 650; cursor: pointer; }
+  .qrdash { border-top: 1px dashed #d5d8e0; margin: 12px 0 10px; }
+  .qrtip { margin-top: 10px; background: #e8f6f3; color: #11786a; border-radius: 6px; padding: 8px 10px; font-size: 12px; line-height: 1.45; }
+  .tips .tipsh { display: flex; justify-content: space-between; align-items: center; font-size: 16px; margin-bottom: 8px; }
+  .tips .link-s { font-size: 12px; color: var(--primary); font-weight: 600; }
+  .tips ul { margin: 0; padding-left: 16px; color: #8a8f9c; font-size: 12px; line-height: 1.55; }
+  .tips li { margin-bottom: 8px; }
   .push { background: rgba(255,255,255,.96); border-radius: 14px; box-shadow: 0 6px 18px rgba(20,30,60,.14); padding: 10px 12px; margin: 4px 0 6px; }
   .push .pt { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); margin-bottom: 4px; }
   .push .pl { width: 16px; height: 16px; border-radius: 4px; background: var(--primary); color: #fff; font-size: 10px; font-weight: 700; display: grid; place-items: center; }
@@ -526,7 +534,6 @@
         <div class="lbl">Extension Payment (₱)</div>
         <div class="big">${q.pay.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
         <div class="sub" style="margin-bottom:6px">${feeShort(c, q)}</div>
-        <div class="row"><span class="k">Valid until</span><span class="v red">11:59 PM today</span></div>
         <div class="row"><span class="k">Reference No.</span><span class="v">${refNo()}</span></div>
         <div class="sub">Enter the exact amount and pay in one payment.</div>
       </div>
@@ -546,23 +553,30 @@
   function pgQr() {
     const c = ctx();
     const q = quote(c, state.days);
+    const validUntil = `${c.today.getMonth() + 1}-${c.today.getDate()} 14:47:30`;
+    const transNo = `QR00 ${String(2611 + state.qrSeq).padStart(4, '0')} 0216 0000 1600 00`;
     const body = `
-      <div class="card" style="text-align:center">
-        <div class="qrbrand">QR Ph</div>
-        <div class="qrbox">${qrSvg(state.qrSeq + 7)}</div>
-        <div class="lbl" style="margin-top:6px">Amount to pay</div>
-        <div class="big" style="margin-bottom:2px">${money(q.pay)}</div>
-        <div class="sub">${feeShort(c, q)}</div>
-        <div class="hr"></div>
-        <div class="row"><span class="k">Valid until</span><span class="v red">11:59 PM today</span></div>
-        <div class="row"><span class="k">Reference No.</span><span class="v">${refNo()}</span></div>
+      <div class="card qrcard">
+        <div class="lbl">Repayment Amount</div>
+        <div class="amtrow"><div class="big" style="margin:2px 0 0">${money(q.pay)}</div>
+          <button class="btn-copy" onclick="toast('Amount copied')">Copy</button></div>
+        <div class="qrdash"></div>
+        <div class="sub" style="text-align:center">Trans No.&nbsp; ${transNo}</div>
+        <div class="qrbox">${qrSvg(state.qrSeq + 7)}<span class="qrlogo">S</span></div>
+        <div class="sub" style="text-align:center;font-size:11px">Valid until:&nbsp; ${validUntil}</div>
+        <div class="qrtip">Please take a screenshot of the QR code, then scan it with another wallet app to complete the payment.</div>
       </div>
-      <div class="info warn">Scan with GCash, Maya or your bank app. Enter exactly <b>${money(q.pay)}</b> and pay in one payment.</div>
-      <div style="text-align:center;margin:10px 0 4px"><span class="link" onclick="go('agreement')">View Extension Agreement</span></div>
+      <div class="card tips">
+        <div class="tipsh"><b>Tips</b><span class="link-s">How to Pay ▸</span></div>
+        <ul>
+          <li>Enter exactly <b>${money(q.pay)}</b> and pay in one payment to change your due date.</li>
+          <li>Please save the QR code in your phone's album. Then you can open the payment app, select the QR mode, and complete the repayment.</li>
+          <li>QRph supports multiple repayment methods. We recommend prioritizing the following methods:<br>Gcash<br>Paymaya<br>ShopeePay<br>BDOPay<br>GrabPay</li>
+          <li>The QR code is valid for 15 minutes.</li>
+        </ul>
+      </div>
       <div class="demo"><div class="dt">原型演示</div><button onclick="state.channel='QRph';go('scan')">📱 用户打开钱包扫码付款 →</button></div>`;
-    const foot = `<button class="btn" onclick="toast('QR code saved to gallery')">Save QR code</button>
-      <button class="btn ghost" onclick="go('repay')">Done</button>`;
-    return shell('Pay with QRPh', body, foot, { back: 'pay', whiteFoot: true });
+    return shell('Repayment', body, '', { back: 'pay' });
   }
 
   function pgScan() {

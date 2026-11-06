@@ -693,7 +693,7 @@
         role_reviewer: '人审 · 普通审核员',
         role_review_admin: '人审 · 管理员',
         role_cs: '客服 · 用户查询',
-        hint_cs: '客服：按 User ID / 手机号 / Listing ID / 姓名查询用户，只读查看用户资料与资产信息；资产信息中可查看标的展期标识、展期天数、展期费与展期记录。',
+        hint_cs: '客服：按 User ID / 手机号 / Listing ID / 姓名查询用户，只读查看用户资料与资产信息；资产信息中可查看标的展期标识、展期天数、展期费与改期后的债务明细。',
         menu_sales_fill: '销售代填',
         menu_sales_fill_sub: '协助填写用户资料（不可新增担保人）',
         menu_sales_mgmt: '销售代填管理',
@@ -6035,18 +6035,18 @@
         view === 'detail' ? renderUserDetail() : (menu === 'review' ? renderReviewList() : renderUserList());
     }
 
-    /* ── 客服 · 用户查询：用户资料 + 资产信息（OFW 延期：Listing 展期字段与展期记录） ── */
+    /* ── 客服 · 用户查询：用户资料 + 资产信息（OFW 延期：Listing 展期字段与改期后的债务明细） ── */
     let csQuery = { type: 'userId', q: '' };
     let csDemo = { phase: 'after', withFailed: true };
     let csOpen = { '78982532': true };
     let csListingFilter = { status: '', ext: '' };
 
     const CS_EXT = {
-      order: 'EXT20270108000016', batch: 'CDS-20270108', applyAt: '2027-01-08 10:21:36', effAt: '2027-01-08 10:24:05',
+      order: 'EXT20270108000016', batch: 'CDSD20270108102131', applyAt: '2027-01-08 10:21:36', effAt: '2027-01-08 10:24:05',
       days: 14, oldDue: '2027-01-03', newDue: '2027-01-22', fee: 1344, svc: 3000, pen: 84.01, over: 0, channel: 'GCash',
     };
     const CS_EXT_FAILED = {
-      order: 'EXT20270107000009', batch: 'CDS-20270107', applyAt: '2027-01-07 09:12:40',
+      order: 'EXT20270107000009', batch: 'CDSD20270107091238', applyAt: '2027-01-07 09:12:40',
       days: 7, oldDue: '2027-01-03', newDue: '2027-01-14', fee: 672, svc: 3000, pen: 67.21, over: 0, channel: '', fail: 'expired',
     };
     const csFmt = n => Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -6258,24 +6258,6 @@
           <span>${Lc('本次实付', 'Paid')}：${csFmt(csPay(l.ext) + l.ext.over)}（${Lc('展期费', 'fee')} ${csFmt(l.ext.fee)} + ${Lc('当期服务费', 'service fee')} ${csFmt(l.ext.svc)} + ${Lc('当期罚息', 'penalty')} ${csFmt(l.ext.pen)}）</span>
           <span>${Lc('生效时间', 'Effective')}：${l.ext.effAt}</span>
         </div>` : '';
-      const recs = l.recs.length ? `
-        <div class="cs-sub-title">${Lc('展期记录', 'Extension records')}${nw}<span class="cs-sub-hint">${Lc('按申请时间倒序；未生效的申请同样保留，不占展期次数', 'Newest first; failed attempts are kept and do not count')}</span></div>
-        <div class="table-wrap"><table class="list-table cs-sub">
-          <thead><tr>
-            <th>${Lc('延期订单号', 'Order No.')}</th><th>${Lc('CDS 名单批次', 'CDS batch')}</th><th>${Lc('申请时间', 'Applied at')}</th><th>${Lc('展期天数', 'Days')}</th>
-            <th>${Lc('当期应还时间（原 → 新）', 'Current due (old → new)')}</th><th>${Lc('展期费', 'Ext. fee')}</th><th>${Lc('当期服务费', 'Service fee')}</th>
-            <th>${Lc('当期罚息', 'Penalty')}</th><th>${Lc('应付合计', 'Payable')}</th><th>${Lc('实付金额', 'Paid')}</th><th>${Lc('多付冲抵', 'Overpaid → next bill')}</th>
-            <th>${Lc('支付渠道', 'Channel')}</th><th>${Lc('状态', 'Status')}</th><th>${Lc('生效时间', 'Effective at')}</th>
-          </tr></thead>
-          <tbody>${l.recs.map(r => `
-            <tr>
-              <td>${r.order}</td><td>${r.batch}</td><td>${r.applyAt}</td><td>${r.days}</td>
-              <td>${r.oldDue} → ${r.newDue}</td><td>${csFmt(r.fee)}</td><td>${csFmt(r.svc)}</td><td>${csFmt(r.pen)}</td>
-              <td>${csFmt(csPay(r))}</td><td>${r.ok ? csFmt(csPay(r) + r.over) : '0.00'}</td>
-              <td>${r.ok ? csFmt(r.over) : dash}</td><td>${r.channel || dash}</td>
-              <td>${csRecStatus(r)}</td><td>${r.ok ? r.effAt : dash}</td>
-            </tr>`).join('')}</tbody>
-        </table></div>` : '';
       const debts = l.debts.length ? `
         <div class="cs-sub-title">${Lc('债务明细', 'Debts')}${l.ext ? `<span class="cs-sub-hint">${Lc('应还时间为延期后的最新日期；被改期的期次底色标黄', 'Due date shows the latest date; shifted installments are highlighted')}</span>` : ''}</div>
         <div class="table-wrap"><table class="list-table cs-sub">
@@ -6295,7 +6277,7 @@
             </tr>`).join('')}</tbody>
         </table></div>`
         : `<div class="kv-empty" style="padding:12px 4px">${Lc('暂无债务（提现中）', 'No debts yet (withdrawing)')}</div>`;
-      return summary + recs + debts;
+      return summary + debts;
     }
 
     render();
