@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>SahodNow上线-资源依赖同步（11-03 更新）</title>
+<title>SahodNow上线-资源依赖同步（11-10 更新）</title>
 <style>
   :root { --teal:#018b8d; --ink:#14201f; --muted:#66706f; --line:#e4ebea; --done:#2e9e6b; --plan:#018b8d; --est:#d79a1e; --risk:#d0473a; }
   * { box-sizing:border-box; }
@@ -108,44 +108,46 @@
 <body>
 <div class="wrap">
   <h1>SahodNow上线-资源依赖同步</h1>
-  <p class="sub">更新于 2026-11-03｜目标：<b>11-10（周二）提审</b> · <b>11 月底展业</b><br>关联：《SahodNow 提审与发布规划》《菲律宾开发者账号认证方案》</p>
+  <p class="sub">更新于 2026-11-10｜目标：<b>~11-20 提审</b>（原 11-10，随 OLP 备案公示顺延）· <b>11 月底展业</b>（需按提审顺延重排）<br>关联：《SahodNow 提审与发布规划》《菲律宾开发者账号认证方案》</p>
 
   <div class="card">
     <h2>关键结论</h2>
     <div class="targets">
-      <div class="target t1"><b>11-10 提审</b><span>Google Play + App Store 提交审核<br>通过后先不发布（托管 / 手动发布）</span></div>
-      <div class="target t2"><b>11 月底展业</b><span>审核通过 + 支付 / 犁剑 / 客服就绪 + 第二轮试单通过<br>→ 11-24 灰度 1 周 → 开始投放</span></div>
+      <div class="target t1"><b>~11-20 提审</b><span>原 11-10；Play、App Store 都要 OLP 备案公示（~11-20），公示后两端同提<br>通过后先不发布（托管 / 手动发布）</span></div>
+      <div class="target t2"><b>11 月底展业（需重排）</b><span>审核通过 + 支付 / 犁剑 / 客服就绪 + 第二轮试单通过<br>提审顺延到 ~11-20、审核 1–2 周，原定 11-24 灰度需重排</span></div>
     </div>
     <div class="summary">
       <div class="sum ok"><b>已就绪</b>
         <ul>
           <li>COI\CA\AOI\By-Laws（10-22）</li>
-          <li>BIR 2303（10-28）</li>
+          <li>BIR 2303（10-27）</li>
+          <li>GIS、AMLC、CIC 已完成</li>
           <li>官网、域名、企业邮箱已上线</li>
-          <li>D-U-N-S 已提交（10-26，Apple 免费通道）</li>
+          <li>D-U-N-S 已拿到（11-6）</li>
           <li>开发者账号方案已定：授权代表、付款卡、手机号、邮箱</li>
         </ul>
       </div>
-      <div class="sum warn"><b>11-10 提审：卡在 D-U-N-S</b>
+      <div class="sum warn"><b>~11-20 提审：卡在 OLP 备案公示</b>
         <ul>
-          <li>D-U-N-S 预计 ~11-5 下发</li>
-          <li>Play 认证再要 3–5 个工作日 → 最快 11-10</li>
-          <li>Apple 等 D-U-N-S 同步（~2 个工作日）后注册</li>
-          <li>Play 财务声明要 <strong>OLP 备案公示</strong>：<br>登记 ~11-4 出结果 → 交 BP → 隔天公示</li>
-          <li>预案：哪端先就绪先提</li>
+          <li>开发者账号认证 11-12 提交</li>
+          <li>Play 认证 3–5 个工作日 → ~11-17 ～ 11-19</li>
+          <li>Apple 11-12 注册，电话核实后开通</li>
+          <li>Play、App Store 都要 <strong>OLP 备案公示</strong>：<br>最新预计 <strong>11-20</strong></li>
+          <li>预案：认证和商店资料先备齐，公示当天两端同提</li>
         </ul>
       </div>
       <div class="sum bad"><b>11 月底展业：三条硬门槛</b>
         <ul>
+          <li>提审顺延到 ~11-20，原定 11-24 灰度需重排</li>
           <li>支付、犁剑、客服 11 月底才就绪，几乎无缓冲</li>
           <li>Smart 收不到 OTP，不解决不发布</li>
           <li>二轮试单 P0 清零才发布（不做「能借不能还」）</li>
         </ul>
-        <p class="sh">材料缺口（都不需要 OLP）</p>
+        <p class="sh">材料缺口（卡点 Business Permit）</p>
         <ul>
-          <li>Sender ID：Permit、GIS、本地人员证件</li>
-          <li>支付：Permit、GIS、AMLC / NPC 最终证书、签字人、对公户</li>
-          <li>NPC 最终证书要先有 Permit</li>
+          <li>Sender ID：Permit（目标 11-19 获批）、本地人员证件</li>
+          <li>支付：Permit、NPC 证书、签字人、对公户（GIS、AMLC 已完成）</li>
+          <li>NPC 要在 Permit 下来后才启动</li>
         </ul>
       </div>
     </div>
@@ -174,32 +176,32 @@
       <span><i style="background:#e46a5f"></i>风险项</span>
     </div>
     <div class="gantt"><div class="grid" id="grid"></div></div>
-    <p class="note">灰色列为周末；黄 / 红条的结束时间为预估，以负责人反馈为准。<br>待机构更新：Business Permit 进度、AMLC / NPC / CIC 最终证书时间、OLP 备案公示时间。</p>
+    <p class="note">灰色列为周末；黄 / 红条的结束时间为预估，以负责人反馈为准。<br>待机构更新：Business Permit 获批时间（目标 11-19）、NPC 启动与出证时间、OLP 备案公示（预计 11-20）。</p>
   </div>
 
   <div class="card">
     <h2>风险评估</h2>
 
-    <h3>一、提审（目标 11-10）<span class="tag" style="background:var(--teal)">提审</span></h3>
+    <h3>一、提审（目标 ~11-20，原 11-10）<span class="tag" style="background:var(--teal)">提审</span></h3>
     <table>
       <tr><th style="width:15%">风险</th><th style="width:21%">现状</th><th style="width:17%">影响</th><th style="width:7%">可能性</th><th>预案</th><th style="width:11%">决策点 / 负责</th></tr>
-      <tr><td class="k">D-U-N-S 下发晚</td><td>10-26 提交，预计 ~11-5</td><td>两端认证都卡住，11-10 提不了</td><td><span class="lv h">高</span></td><td>下发当天提交两端认证<br>11-6 仍未下发 → 提审顺延，展业不变（审核仍有 2 周以上缓冲）</td><td>11-6 · 产品</td></tr>
-      <tr><td class="k">Play 组织账号认证</td><td>材料已齐，等 D-U-N-S</td><td>认证 3–5 个工作日，可能晚于 11-10</td><td><span class="lv h">高</span></td><td>名称、地址与 SEC / D-U-N-S 逐字一致，避免补件<br>哪端先就绪先提</td><td>11-6 · 产品</td></tr>
-      <tr><td class="k">Apple 组织账号</td><td>D-U-N-S 同步 ~2 个工作日<br>之后注册 + 电话核实</td><td>iOS 提审、TestFlight 延后<br>11-10 现场测不了 iOS</td><td><span class="lv m">中</span></td><td>Android 先提、先测<br>iOS 开通后远程补测</td><td>11-9 · 产品</td></tr>
-      <tr><td class="k">OLP 备案公示</td><td>登记 10-28 已提交，~11-4 出结果<br>→ 交 BP → 隔天公示（参考 Luvit）</td><td>Play 财务声明、Personal Loan App Declaration 缺文件</td><td><span class="lv m">中</span></td><td>先提 App Store<br>Play 资料备好，公示当天提交</td><td>11-5 · 机构</td></tr>
-      <tr><td class="k">商店资料 + 审核账号</td><td>待准备</td><td>缺披露、审核员登录不了 → 直接被拒</td><td><span class="lv m">中</span></td><td>描述写明公司名、SEC 号、CA 号、还款期、最高 APR、总成本示例<br>审核账号绕 OTP、绕地域、加白名单</td><td>11-9 · 产品 + 研发</td></tr>
-      <tr><td class="k">提审与第一轮试单同期</td><td>试单 11-10 → 11-12<br>提审 11-10</td><td>试单问题进不了提审包</td><td><span class="lv m">中</span></td><td>提审包用 11-9 版本<br>试单问题发布前出新版本再提（托管发布不会提前放出）</td><td>11-9 · 研发</td></tr>
+      <tr><td class="k">D-U-N-S</td><td>11-6 已拿到</td><td>—</td><td><span class="lv l">低</span></td><td>已解决；11-12 提交两端认证</td><td>— · 产品</td></tr>
+      <tr><td class="k">Play 组织账号认证</td><td>11-12 提交认证</td><td>认证 3–5 个工作日 → ~11-17 ～ 11-19</td><td><span class="lv h">高</span></td><td>名称、地址与 SEC / D-U-N-S 逐字一致，避免补件<br>认证先完成，等公示后提审</td><td>11-19 · 产品</td></tr>
+      <tr><td class="k">Apple 组织账号</td><td>11-12 注册<br>之后电话核实开通</td><td>iOS 提审、TestFlight 延后<br>本轮试单测不了 iOS</td><td><span class="lv m">中</span></td><td>Android 先提、先测<br>iOS 开通后远程补测</td><td>11-19 · 产品</td></tr>
+      <tr><td class="k">OLP 备案公示</td><td>登记 10-28 已提交，审核中<br>备案公示最新预计 <b>11-20</b></td><td>Play 财务声明、Personal Loan App Declaration、App Store 审核都缺文件；两端提审都顺延到公示后</td><td><span class="lv h">高</span></td><td>两端资料备好，公示当天同提</td><td>11-20 · 机构</td></tr>
+      <tr><td class="k">商店资料 + 审核账号</td><td>待准备</td><td>缺披露、审核员登录不了 → 直接被拒</td><td><span class="lv m">中</span></td><td>描述写明公司名、SEC 号、CA 号、还款期、最高 APR、总成本示例<br>审核账号绕 OTP、绕地域、加白名单</td><td>~11-19 · 产品 + 研发</td></tr>
+      <tr><td class="k">提审包版本</td><td>试单 11-11 → 11-12<br>提审 ~11-20</td><td>试单问题需进提审包</td><td><span class="lv l">低</span></td><td>试单问题在提审包冻结前修复<br>提审包 ~11-19 冻结</td><td>~11-19 · 研发</td></tr>
     </table>
 
     <h3>二、展业（目标 11 月底）<span class="tag" style="background:#0b3b3c">展业</span></h3>
     <table>
       <tr><th style="width:15%">风险</th><th style="width:21%">现状</th><th style="width:17%">影响</th><th style="width:7%">可能性</th><th>预案</th><th style="width:11%">决策点 / 负责</th></tr>
-      <tr><td class="k">Business Permit / GIS</td><td>Permit：待更新进度<br>GIS：法务本周提交，预计下周拿到</td><td>Sender ID、对公户、支付进件、NPC / CIC 最终文件都卡住</td><td><span class="lv h">高</span></td><td>跟进 Permit 进度<br>拿到当天同时提交 Sender ID 和支付进件</td><td>11-4 · 机构</td></tr>
-      <tr><td class="k">支付（放款 / 还款）</td><td>Skypay 新主体，联调排在 11 月<br>进件缺：AMLC / NPC 最终证书、签字人、对公户</td><td>放不了款或还不了款，不能展业</td><td><span class="lv h">高</span></td><td>跟进 AMLC / NPC 最终证书时间（NPC 要先有 Permit）<br>签字人提前定，完成 3 次签名<br>11-24 联调不足一周 → 展业顺延</td><td>11-24 · 支付 + 机构</td></tr>
+      <tr><td class="k">Business Permit</td><td>10-23 提交，审核中<br>目标 11-19 获批（GIS 已完成）</td><td>Sender ID、对公户、支付进件、NPC 都卡住</td><td><span class="lv h">高</span></td><td>跟进 Permit 进度<br>拿到当天同时提交 Sender ID 和支付进件</td><td>11-19 · 机构</td></tr>
+      <tr><td class="k">支付（放款 / 还款）</td><td>Skypay 新主体，联调排在 11 月<br>进件缺：Permit、NPC 证书、签字人、对公户（AMLC、GIS 已完成）</td><td>放不了款或还不了款，不能展业</td><td><span class="lv h">高</span></td><td>Permit 一到启动 NPC，确认出证周期<br>签字人提前定，完成 3 次签名<br>11-24 联调不足一周 → 展业顺延</td><td>11-24 · 支付 + 机构</td></tr>
       <tr><td class="k">犁剑（贷后）</td><td>账单制还款码（C12）、分案待对齐</td><td>逾期无法催收，还款码不一致</td><td><span class="lv m">中</span></td><td>11 月中完成 C12 对齐<br>首月逾期少可先人工，但还款码必须可用</td><td>11-24 · 贷后</td></tr>
       <tr><td class="k">客服系统 + 培训</td><td>系统 11 月底<br>培训材料《SahodNow Product INFO》已出</td><td>客诉、销户、核身无工具</td><td><span class="lv m">中</span></td><td>培训排在第二轮试单前<br>系统未就绪：邮箱 + Backend 查询兜底</td><td>11-24 · 客服</td></tr>
-      <tr><td class="k">Sender ID + OTP（Smart）</td><td>Sender ID 等 Permit、GIS、本地人员证件<br>Smart 号码收不到 OTP</td><td>大量用户无法注册</td><td><span class="lv h">高</span></td><td>材料齐当天提交 Sender ID<br>Smart 通道（新签约或其他方案）不解决不发布</td><td>11-24 · 消息中台</td></tr>
-      <tr><td class="k">审核被拒 / 多轮</td><td>11-10 提审，距 11 月底约 3 周</td><td>每被拒一次多 3–5 天</td><td><span class="lv m">中</span></td><td>提审前按准入清单自查<br>被拒 24 小时内修复重提</td><td>— · 产品 + 研发</td></tr>
+      <tr><td class="k">Sender ID + OTP（Smart）</td><td>Sender ID 等 Permit（目标 11-19）、本地人员证件<br>Smart 号码收不到 OTP</td><td>大量用户无法注册</td><td><span class="lv h">高</span></td><td>材料齐当天提交 Sender ID<br>Smart 通道（新签约或其他方案）不解决不发布</td><td>11-24 · 消息中台</td></tr>
+      <tr><td class="k">审核被拒 / 多轮</td><td>~11-20 提审，距 11 月底仅约 1.5 周</td><td>每被拒一次多 3–5 天</td><td><span class="lv h">高</span></td><td>提审前按准入清单自查<br>被拒 24 小时内修复重提</td><td>— · 产品 + 研发</td></tr>
       <tr><td class="k">第二轮生产试单</td><td>依赖支付、犁剑、客服就绪</td><td>P0 未清零不能发布</td><td><span class="lv m">中</span></td><td>三项就绪当天开始<br>沿用第一轮账号，2 天出结论</td><td>11 月底 · 产品</td></tr>
       <tr><td class="k">投放与触达合规</td><td>Meta 禁 payday 类广告<br>WhatsApp 禁催收</td><td>素材被拒、账号被封</td><td><span class="lv l">低</span></td><td>素材避开 payday / 工资预支表述<br>催收不走 WhatsApp</td><td>展业前 · 投放 / 贷后</td></tr>
     </table>
@@ -212,32 +214,32 @@
       <tr><th style="width:15%">事项</th><th style="width:25%">前置依赖</th><th style="width:13%">最早可开始</th><th style="width:14%">预计完成</th><th>影响节点</th><th style="width:10%">状态</th></tr>
       <tr><td colspan="6" class="grp-row">主体与牌照</td></tr>
       <tr><td class="k">COI\CA\AOI\By-Laws</td><td>—</td><td>—</td><td>10-22</td><td>全部</td><td><span class="st done">已完成</span></td></tr>
-      <tr><td class="k">BIR 2303</td><td>SEC Cert</td><td>10-23</td><td>10-28</td><td>Sender ID、对公户、支付进件</td><td><span class="st done">已完成</span></td></tr>
-      <tr><td class="k">Business Permit</td><td>COI + CA</td><td>10-23</td><td>待更新进度</td><td>Sender ID、对公户、支付进件<br>NPC / CIC 最终文件、展业</td><td><span class="st risk">待更新</span></td></tr>
-      <tr><td class="k">GIS</td><td>COI</td><td>本周提交</td><td>预计下周</td><td>Sender ID、支付进件<br>开发者认证（地址）</td><td><span class="st est">办理中</span></td></tr>
-      <tr><td class="k">AMLC</td><td>COI + CA</td><td>已提交注册<br>（注册号已填 BP）</td><td>最终证书待确认</td><td>支付进件（需最终证书）</td><td><span class="st est">等最终证书</span></td></tr>
-      <tr><td class="k">NPC</td><td>COI + CA<br>最终证书要先有 <b>Business Permit</b></td><td>已提交注册<br>（注册号已填 BP）</td><td>Permit 后出，周期较长</td><td>支付进件（NPC Certificate）</td><td><span class="st risk">等 Permit</span></td></tr>
-      <tr><td class="k">CIC</td><td>COI + CA<br>最终文件要先有 <b>Business Permit</b></td><td>已提交注册<br>（注册号已填 BP）</td><td>Permit 后出，周期较长</td><td>不影响 Sender ID、支付</td><td><span class="st est">等 Permit</span></td></tr>
-      <tr><td class="k">OLP 登记</td><td>COI\CA\AOI\By-Laws、官网</td><td>10-28 提交</td><td>~11-4 出结果</td><td>Business Plan 提交</td><td><span class="st est">审核中</span></td></tr>
-      <tr><td class="k">Business Plan</td><td>AMLC / NPC / CIC 注册号（已填）<br><b>OLP 登记出结果后才能交</b></td><td>~11-4</td><td>交后隔天公示</td><td>OLP 备案公示</td><td><span class="st est">待提交</span></td></tr>
-      <tr><td class="k">OLP 备案公示</td><td>OLP 登记通过 → 交 BP</td><td>~11-4</td><td>~11-5</td><td>提审（Play 财务声明）<br>展业（另需 Permit）</td><td><span class="st est">预计</span></td></tr>
+      <tr><td class="k">BIR 2303</td><td>SEC Cert</td><td>10-23</td><td>10-27</td><td>Sender ID、对公户、支付进件</td><td><span class="st done">已完成</span></td></tr>
+      <tr><td class="k">Business Permit</td><td>COI + CA</td><td>10-23 提交</td><td>目标 11-19 获批</td><td>Sender ID、对公户、支付进件<br>NPC、展业</td><td><span class="st risk">审核中</span></td></tr>
+      <tr><td class="k">GIS</td><td>COI</td><td>—</td><td>已完成</td><td>Sender ID、支付进件<br>开发者认证（地址）</td><td><span class="st done">已完成</span></td></tr>
+      <tr><td class="k">AMLC</td><td>COI + CA</td><td>已提交注册<br>（注册号已填 BP）</td><td>已完成</td><td>支付进件</td><td><span class="st done">已完成</span></td></tr>
+      <tr><td class="k">NPC</td><td>COI + CA<br>要先有 <b>Business Permit</b></td><td>Permit 后启动</td><td>周期较长，待确认</td><td>支付进件（NPC Certificate）</td><td><span class="st risk">等 Permit</span></td></tr>
+      <tr><td class="k">CIC</td><td>COI + CA</td><td>—</td><td>已完成</td><td>不影响 Sender ID、支付</td><td><span class="st done">已完成</span></td></tr>
+      <tr><td class="k">OLP 登记</td><td>COI\CA\AOI\By-Laws、官网</td><td>10-28 提交</td><td>审核中</td><td>Business Plan 提交</td><td><span class="st est">审核中</span></td></tr>
+      <tr><td class="k">Business Plan</td><td>AMLC / NPC / CIC 注册号（已填）<br><b>OLP 登记出结果后才能交</b></td><td>登记通过后</td><td>交后隔天公示</td><td>OLP 备案公示</td><td><span class="st est">待提交</span></td></tr>
+      <tr><td class="k">OLP 备案公示</td><td>OLP 登记通过 → 交 BP</td><td>BP 提交后</td><td><b>~11-20</b></td><td>提审（Play、App Store）<br>展业（另需 Permit）</td><td><span class="st est">预计</span></td></tr>
       <tr><td colspan="6" class="grp-row">提审</td></tr>
       <tr><td class="k">官网 + 域名 + 企业邮箱</td><td>—</td><td>—</td><td>10-23</td><td>OLP、开发者账号</td><td><span class="st done">已完成</span></td></tr>
-      <tr><td class="k">D-U-N-S</td><td>COI 名称、地址、电话</td><td>10-26</td><td>~11-5</td><td>提审</td><td><span class="st plan">已提交</span></td></tr>
-      <tr><td class="k">Play 组织账号认证</td><td>D-U-N-S、COI、授权代表证件<br>网站验证、付款卡、电话</td><td>D-U-N-S 下发当天</td><td>+3–5 个工作日</td><td>提审</td><td><span class="st risk">风险</span></td></tr>
-      <tr><td class="k">Apple 组织账号</td><td>D-U-N-S 同步（~2 个工作日）<br>Apple ID、官网</td><td>~11-9</td><td>最快 ~11-10</td><td>提审、TestFlight</td><td><span class="st risk">风险</span></td></tr>
-      <tr><td class="k">商店资料 + 审核账号</td><td>OLP 备案公示、隐私政策、白名单</td><td>现在</td><td>11-9</td><td>提审</td><td><span class="st est">待准备</span></td></tr>
-      <tr><td class="k">App 提审</td><td>以上全部</td><td>11-10</td><td>审核 1–2 周</td><td>展业</td><td><span class="st plan">目标 11-10</span></td></tr>
+      <tr><td class="k">D-U-N-S</td><td>COI 名称、地址、电话</td><td>10-26</td><td>11-6</td><td>提审</td><td><span class="st done">已拿到</span></td></tr>
+      <tr><td class="k">Play 组织账号认证</td><td>D-U-N-S、COI、授权代表证件<br>网站验证、付款卡、电话</td><td>11-12 提交</td><td>~11-17 ～ 11-19</td><td>提审</td><td><span class="st risk">风险</span></td></tr>
+      <tr><td class="k">Apple 组织账号</td><td>D-U-N-S 同步（~2 个工作日）<br>Apple ID、官网</td><td>11-12 注册</td><td>~11-17（电话核实后）</td><td>提审、TestFlight</td><td><span class="st risk">风险</span></td></tr>
+      <tr><td class="k">商店资料 + 审核账号</td><td>OLP 备案公示、隐私政策、白名单</td><td>现在</td><td>~11-19</td><td>提审</td><td><span class="st est">待准备</span></td></tr>
+      <tr><td class="k">App 提审</td><td>以上全部</td><td>~11-20</td><td>审核 1–2 周（~12-4）</td><td>展业</td><td><span class="st risk">顺延 ~11-20</span></td></tr>
       <tr><td colspan="6" class="grp-row">展业</td></tr>
       <tr><td class="k">对公账户</td><td>COI + BIR 2303 + Business Permit</td><td>Permit 后</td><td>待财务确认</td><td>支付进件（账户信息）</td><td><span class="st est">预估</span></td></tr>
-      <tr><td class="k">支付签约 / 进件</td><td>BIR 2303、GIS、Permit<br>SEC、AOI、By-Laws<br>AMLC、NPC 最终证书<br>签字人证件 + 3 次签名、对公户<br>（<b>不需要 OLP</b>）</td><td>材料齐后</td><td>11 月中</td><td>支付联调 → 展业</td><td><span class="st risk">风险</span></td></tr>
+      <tr><td class="k">支付签约 / 进件</td><td>BIR 2303、GIS、Permit<br>SEC、AOI、By-Laws<br>AMLC（已完成）、NPC 证书<br>签字人证件 + 3 次签名、对公户<br>（<b>不需要 OLP</b>）</td><td>Permit 后（~11-19）</td><td>待定（NPC 出证后）</td><td>支付联调 → 展业</td><td><span class="st risk">风险</span></td></tr>
       <tr><td class="k">支付联调</td><td>商户号</td><td>进件完成后</td><td>11 月底</td><td>第二轮试单、展业</td><td><span class="st est">预估</span></td></tr>
       <tr><td class="k">犁剑 / 客服系统</td><td>账单制还款码（C12）<br>新包独立实例</td><td>进行中</td><td>11 月底</td><td>第二轮试单、展业</td><td><span class="st est">预估</span></td></tr>
-      <tr><td class="k">Sender ID + OTP</td><td>Permit、SEC、BIR 2303、GIS<br>本地人员证件、AOI、COI<br>（<b>不需要 OLP</b>）</td><td>材料齐后</td><td>提交后 1–2 周<br>Smart 待定</td><td>试单（临时通道）、展业</td><td><span class="st risk">风险</span></td></tr>
-      <tr><td class="k">第一轮生产试单</td><td>Android 包、TestFlight<br>白名单、OTP 临时通道</td><td>11-10</td><td>11-12</td><td>发布前修复版本</td><td><span class="st plan">已排期</span></td></tr>
+      <tr><td class="k">Sender ID + OTP</td><td>Permit、SEC、BIR 2303、GIS<br>本地人员证件、AOI、COI<br>（<b>不需要 OLP</b>）</td><td>Permit 后（~11-19）</td><td>提交后 1–2 周（~12-3）<br>Smart 待定</td><td>试单（临时通道）、展业</td><td><span class="st risk">风险</span></td></tr>
+      <tr><td class="k">第一轮生产试单</td><td>Android 包、TestFlight<br>白名单、OTP 临时通道</td><td>11-11</td><td>11-12</td><td>提审包修复版本</td><td><span class="st plan">进行中</span></td></tr>
       <tr><td class="k">第二轮生产试单</td><td>支付、犁剑、客服就绪</td><td>11 月底</td><td>+2 天</td><td>展业</td><td><span class="st est">预估</span></td></tr>
-      <tr><td class="k">灰度</td><td>审核通过、展业能力就绪</td><td>11-24</td><td>1 周（~11-30）</td><td>投放</td><td><span class="st est">预估</span></td></tr>
-      <tr><td class="k">开始投放</td><td>灰度 1 周结束</td><td>~12-1</td><td>—</td><td>—</td><td><span class="st est">预估</span></td></tr>
+      <tr><td class="k">灰度</td><td>审核通过、展业能力就绪</td><td>原定 11-24</td><td>需重排</td><td>投放</td><td><span class="st risk">受提审顺延影响</span></td></tr>
+      <tr><td class="k">开始投放</td><td>灰度 1 周结束</td><td>需重排</td><td>—</td><td>—</td><td><span class="st est">预估</span></td></tr>
     </table>
   </div>
 
@@ -246,22 +248,19 @@
     <table>
       <tr><th style="width:17%">事项</th><th>要做什么</th><th style="width:11%">截止</th><th style="width:14%">负责人</th></tr>
       <tr><td colspan="4" class="grp-row">提审</td></tr>
-      <tr><td class="k">D-U-N-S</td><td>下发当天提交 Google、Apple 认证</td><td>~11-5</td><td>产品</td></tr>
-      <tr><td class="k">OLP</td><td>跟进登记结果（~11-4）<br>通过后立即交 BP，确认公示时间<br>公示后交给产品上传 Play</td><td>11-4</td><td>机构</td></tr>
-      <tr><td class="k">提审决策</td><td>11-6 看 D-U-N-S 和认证进度：<br>两端齐 → 11-10 同提<br>只有一端 → 先提这一端<br>都没有 → 顺延到认证完成当天</td><td>11-6</td><td>业务负责人</td></tr>
-      <tr><td class="k">提审物料</td><td>商店描述、截图、隐私标签、Data safety、内容分级<br>审核账号：绕 OTP、绕地域、白名单</td><td>11-9</td><td>产品 + 研发</td></tr>
-      <tr><td class="k">提审包</td><td>11-9 冻结；借款提交关闭或仅白名单<br>开启托管 / 手动发布</td><td>11-9</td><td>研发</td></tr>
+      <tr><td class="k">开发者账号认证</td><td>D-U-N-S 已拿到（11-6），提交 Google、Apple 组织账号认证</td><td>11-12</td><td>产品</td></tr>
+      <tr><td class="k">OLP</td><td>跟进登记结果，通过后立即交 BP<br>备案公示最新预计 11-20，公示后交给产品上传 Play 和 App Store</td><td>11-20</td><td>机构</td></tr>
+      <tr><td class="k">提审决策</td><td>两端认证完成 + OLP 备案公示（~11-20）后同提<br>公示文件同时用于 Play 财务声明和 App Store 审核</td><td>~11-20</td><td>业务负责人</td></tr>
+      <tr><td class="k">提审物料</td><td>商店描述、截图、隐私标签、Data safety、内容分级<br>审核账号：绕 OTP、绕地域、白名单</td><td>~11-19</td><td>产品 + 研发</td></tr>
+      <tr><td class="k">提审包</td><td>~11-19 冻结；借款提交关闭或仅白名单<br>开启托管 / 手动发布</td><td>~11-19</td><td>研发</td></tr>
       <tr><td colspan="4" class="grp-row">主体材料</td></tr>
-      <tr><td class="k">BIR 2303 / Permit</td><td>BIR 扫描件先发消息中台和支付<br>跟进 Permit 进度，到手后同步</td><td>11-4</td><td>机构</td></tr>
-      <tr><td class="k">GIS</td><td>本周提交，预计下周拿到<br>拿到后同步消息中台和支付</td><td>本周提交</td><td>机构</td></tr>
-      <tr><td class="k">AMLC</td><td>确认最终证书时间，拿到后同步支付</td><td>尽快</td><td>机构</td></tr>
+      <tr><td class="k">BIR 2303 / Permit</td><td>BIR、GIS、AMLC 扫描件发消息中台和支付<br>跟进 Permit（目标 11-19），到手后同步</td><td>11-19</td><td>机构</td></tr>
       <tr><td class="k">NPC</td><td>Permit 一到就推进 NPC Registration Certificate<br>拿到后同步支付</td><td>Permit 当天</td><td>机构</td></tr>
-      <tr><td class="k">CIC</td><td>Permit 一到就推进 CIC 确认函（Sender ID、支付都不需要）</td><td>Permit 后</td><td>机构</td></tr>
       <tr><td class="k">签字人 + 本地人员证件</td><td>定支付签字人（证件 + 3 次签名）<br>定 Sender ID 用的菲律宾本地人员证件</td><td>11-6</td><td>机构</td></tr>
       <tr><td colspan="4" class="grp-row">展业</td></tr>
       <tr><td class="k">支付 / 犁剑 / 客服</td><td>11-24 统一检查；任一项距就绪超过一周 → 展业顺延，同步投放</td><td>11-24</td><td>支付 / 贷后 / 客服</td></tr>
       <tr><td class="k">Smart OTP 通道</td><td>定方案和上线时间（发布硬门槛）</td><td>11-24</td><td>消息中台 / 采购</td></tr>
-      <tr><td class="k">灰度 + 投放</td><td>11-24 灰度，跑 1 周<br>灰度结束后才开始投放（~12-1）</td><td>11-24</td><td>业务负责人</td></tr>
+      <tr><td class="k">灰度 + 投放</td><td>提审顺延到 ~11-20，原定 11-24 灰度需重排<br>灰度 1 周后才开始投放</td><td>待定</td><td>业务负责人</td></tr>
     </table>
   </div>
 
@@ -278,9 +277,9 @@
     <table>
       <tr><th style="width:4%">#</th><th style="width:20%">资料</th><th>要求 / 最终方案</th><th style="width:15%">状态</th><th style="width:12%">负责人</th></tr>
       <tr><td colspan="5" class="grp-row">主体与身份</td></tr>
-      <tr><td>1</td><td class="k">D-U-N-S 编码</td><td>9 位数字，名称、地址与 SEC 一致<br>拿到后再开始注册</td><td><span class="st plan">10-26 已提交</span></td><td>产品</td></tr>
+      <tr><td>1</td><td class="k">D-U-N-S 编码</td><td>9 位数字，名称、地址与 SEC 一致<br>拿到后再开始注册</td><td><span class="st done">11-6 已拿到</span></td><td>产品</td></tr>
       <tr><td>2</td><td class="k">法定名称 + 地址</td><td>以 SEC COI / GIS / AOI 原文为准<br>统一用于 D-U-N-S、付款资料、官网页脚</td><td><span class="st est">待核对地址口径</span></td><td>产品 + 机构</td></tr>
-      <tr><td>3</td><td class="k">组织注册文件</td><td>COI + 最新 GIS（含地址）</td><td><span class="st done">COI 已有</span> <span class="st est">GIS 办理中</span></td><td>产品 + 机构</td></tr>
+      <tr><td>3</td><td class="k">组织注册文件</td><td>COI + 最新 GIS（含地址）</td><td><span class="st done">COI、GIS 已有</span></td><td>产品 + 机构</td></tr>
       <tr><td>4</td><td class="k">授权代表证件</td><td>coco（LendWise 法人）本人证件<br>变更走内部流程</td><td><span class="st done">已确定</span></td><td>coco</td></tr>
       <tr><td>5</td><td class="k">授权证明</td><td>Board Resolution / Secretary's Certificate（备 Google 追加）</td><td><span class="st est">待准备</span></td><td>机构</td></tr>
       <tr><td colspan="5" class="grp-row">账号与联系方式</td></tr>
@@ -293,19 +292,19 @@
       <tr><td>11</td><td class="k">官网</td><td>公开可访问<br>展示主体名称、地址、SEC 号、CA 号、联系方式</td><td><span class="st done">已上线</span></td><td>产品</td></tr>
       <tr><td>12</td><td class="k">注册费付款卡</td><td>25 美元一次性<br>秋奕老师的 Visa（非预付卡，只用于本主体）</td><td><span class="st done">已确定</span></td><td>秋奕老师</td></tr>
       <tr><td colspan="5" class="grp-row">认证通过后、提审前</td></tr>
-      <tr><td>13</td><td class="k">牌照文件</td><td>财务功能声明：SEC 证书、CA<br>OLP 文件公示后补传</td><td><span class="st done">CA 已有</span> <span class="st est">OLP ~11-5</span></td><td>产品</td></tr>
+      <tr><td>13</td><td class="k">牌照文件</td><td>财务功能声明：SEC 证书、CA<br>OLP 文件公示后补传</td><td><span class="st done">CA 已有</span> <span class="st est">OLP ~11-20</span></td><td>产品</td></tr>
       <tr><td>14</td><td class="k">商店资料</td><td>包名（定稿后不可改）、隐私政策 URL<br>商店描述：公司名、商号、SEC 号、CA 号、最短 / 最长还款期、最高 APR、总成本示例</td><td><span class="st est">待准备</span></td><td>产品</td></tr>
       <tr><td>15</td><td class="k">审核测试账号</td><td>英文、可重复用、长期有效<br>不受 OTP 和地域限制</td><td><span class="st est">待准备</span></td><td>研发 + 产品</td></tr>
     </table>
 
     <h3>二、短信 Sender ID（SahodNow）<span class="tag" style="background:#0b3b3c">展业</span></h3>
-    <p class="note" style="margin:-2px 0 8px">均为 LendWise Financing Corp. 的文件，<b>不需要 OLP</b>。<br>还差：Business Permit、GIS、本地人员证件。拿齐当天提交，审批预留 1–2 周。</p>
+    <p class="note" style="margin:-2px 0 8px">均为 LendWise Financing Corp. 的文件，<b>不需要 OLP</b>。<br>还差：Business Permit（目标 11-19 获批）、本地人员证件。拿齐当天提交，审批预留 1–2 周。</p>
     <table>
       <tr><th style="width:4%">#</th><th style="width:24%">材料</th><th>说明</th><th style="width:15%">状态</th><th style="width:12%">负责人</th></tr>
-      <tr><td>1</td><td class="k">Business Permit</td><td>当前有效的营业执照</td><td><span class="st est">待更新进度</span></td><td>机构</td></tr>
+      <tr><td>1</td><td class="k">Business Permit</td><td>当前有效的营业执照</td><td><span class="st est">审核中 · 目标 11-19</span></td><td>机构</td></tr>
       <tr><td>2</td><td class="k">SEC Registration</td><td>SEC 注册文件</td><td><span class="st done">已有</span></td><td>机构</td></tr>
-      <tr><td>3</td><td class="k">BIR 2303</td><td>报税登记证（Certificate of Registration）</td><td><span class="st done">已有（10-28）</span></td><td>机构</td></tr>
-      <tr><td>4</td><td class="k">General Information Sheet (GIS)</td><td>当前有效的公司基本信息表（董事、高管、地址）</td><td><span class="st est">本周提交 · 预计下周</span></td><td>机构</td></tr>
+      <tr><td>3</td><td class="k">BIR 2303</td><td>报税登记证（Certificate of Registration）</td><td><span class="st done">已有（10-27）</span></td><td>机构</td></tr>
+      <tr><td>4</td><td class="k">General Information Sheet (GIS)</td><td>当前有效的公司基本信息表（董事、高管、地址）</td><td><span class="st done">已有</span></td><td>机构</td></tr>
       <tr><td>5</td><td class="k">Philippine local personal ID</td><td>菲律宾本地人员有效证件<br>建议与授权代表 / 签字人为同一人</td><td><span class="st est">待指定</span></td><td>机构</td></tr>
       <tr><td>6</td><td class="k">Articles of Incorporation (AOI)</td><td>公司章程</td><td><span class="st done">已有</span></td><td>机构</td></tr>
       <tr><td>7</td><td class="k">Certificate of Incorporation (COI)</td><td>公司注册证书</td><td><span class="st done">已有</span></td><td>机构</td></tr>
@@ -313,14 +312,14 @@
     <p class="note">品牌名 SahodNow 与主体名不同，服务商可能要品牌关联说明（官网、CA 上的商号），提前备好。</p>
 
     <h3>三、支付渠道进件（Skypay 新主体）<span class="tag" style="background:#0b3b3c">展业</span></h3>
-    <p class="note" style="margin:-2px 0 8px">均为 LendWise Financing Corp. 的文件，<b>不需要 OLP</b>。<br>还差：Business Permit、GIS、AMLC / NPC 最终证书、签字人、对公账户。<br>AMLC、NPC 只有注册回执不能用于审核；NPC 最终文件要先有 Business Permit。</p>
+    <p class="note" style="margin:-2px 0 8px">均为 LendWise Financing Corp. 的文件，<b>不需要 OLP</b>。<br>还差：Business Permit（目标 11-19）、NPC 证书、签字人、对公账户。<br>NPC 要在 Business Permit 下来后才能启动，周期较长。</p>
     <table>
       <tr><th style="width:4%">#</th><th style="width:24%">材料</th><th>说明</th><th style="width:15%">状态</th><th style="width:12%">负责人</th></tr>
-      <tr><td>1</td><td class="k">BIR 2303</td><td>报税登记证</td><td><span class="st done">已有（10-28）</span></td><td>机构</td></tr>
-      <tr><td>2</td><td class="k">GIS</td><td>当前有效的公司基本信息表</td><td><span class="st est">本周提交 · 预计下周</span></td><td>机构</td></tr>
-      <tr><td>3</td><td class="k">Business Permit</td><td>当前有效的营业执照</td><td><span class="st est">待更新进度</span></td><td>机构</td></tr>
+      <tr><td>1</td><td class="k">BIR 2303</td><td>报税登记证</td><td><span class="st done">已有（10-27）</span></td><td>机构</td></tr>
+      <tr><td>2</td><td class="k">GIS</td><td>当前有效的公司基本信息表</td><td><span class="st done">已有</span></td><td>机构</td></tr>
+      <tr><td>3</td><td class="k">Business Permit</td><td>当前有效的营业执照</td><td><span class="st est">审核中 · 目标 11-19</span></td><td>机构</td></tr>
       <tr><td>4</td><td class="k">SEC Registration、AOI、By-Laws</td><td>公司注册文件、公司章程、董事会章程</td><td><span class="st done">已有</span></td><td>机构</td></tr>
-      <tr><td>5</td><td class="k">AMLC 注册文件</td><td>反洗钱登记，须为最终证书</td><td><span class="st est">等最终证书</span></td><td>机构</td></tr>
+      <tr><td>5</td><td class="k">AMLC 注册文件</td><td>反洗钱登记，须为最终证书</td><td><span class="st done">已完成</span></td><td>机构</td></tr>
       <tr><td>6</td><td class="k">NPC Certificate</td><td>国家隐私委员会 Registration Certificate<br>最终文件要先有 Permit</td><td><span class="st risk">等 Permit</span></td><td>机构</td></tr>
       <tr><td>7</td><td class="k">签字人有效证件 + 3 次签名</td><td>被授权签字人的有效证件 + 3 次样本签名</td><td><span class="st est">待指定签字人</span></td><td>机构</td></tr>
       <tr><td>8</td><td class="k">银行账户信息</td><td>对公账户信息，签字并附照片</td><td><span class="st est">待开户</span></td><td>财务</td></tr>
@@ -341,32 +340,32 @@ const COLS = [
 const N = {
   coi:    [0, 20,  "done", "COI\\CA\\AOI\\By-Laws", "10-22 ✓"],
   domain: [0, 110, "done", "域名 + 企业邮箱", "10-23 ✓"],
-  bir:    [0, 250, "done", "BIR 2303", "10-28 ✓"],
-  permit: [0, 330, "risk",  "Business Permit", "待更新进度"],
-  gis:    [0, 405, "est",  "GIS", "法务本周提交 · 预计下周"],
-  aml:    [0, 480, "est",  "AMLC", "已提交注册 · 等最终证书"],
-  duns:   [1, 20,  "plan", "D-U-N-S", "10-26 已提交 · ~11-5"],
+  bir:    [0, 250, "done", "BIR 2303", "10-27 ✓"],
+  permit: [0, 330, "risk",  "Business Permit", "10-23 提交 · 目标 11-19"],
+  gis:    [0, 405, "done", "GIS", "已完成 ✓"],
+  aml:    [0, 480, "done", "AMLC", "已完成 ✓"],
+  duns:   [1, 20,  "done", "D-U-N-S", "11-6 ✓"],
   site:   [1, 110, "done", "官网正式上线", "10-23 ✓"],
   gacct:  [1, 190, "plan", "开发者账号方案", "授权代表 / 卡 / 电话已定"],
   bank:   [1, 310, "est",  "对公银行账户", "Permit 后"],
-  npc:    [1, 400, "risk", "NPC 最终证书", "已提交注册 · 需 Permit"],
+  npc:    [1, 400, "risk", "NPC 证书", "Permit 后启动"],
   bp:     [1, 490, "est",  "提交 Business Plan", "OLP 登记通过后"],
-  olpreg: [0, 560, "est",  "OLP 登记", "10-28 提交 · ~11-4 出结果"],
-  play:   [2, 20,  "risk", "Play 组织账号认证", "D-U-N-S 后 3–5 工作日"],
-  apple:  [2, 100, "risk", "Apple 组织账号", "D-U-N-S 同步后"],
-  olp:    [2, 200, "est",  "OLP 备案公示", "提交 BP 后隔天 · ~11-5"],
-  sid:    [2, 330, "risk",  "Sender ID", "等 Permit / GIS / 本地证件"],
-  pay:    [2, 430, "risk",  "支付签约 / 进件", "需 AMLC / NPC / 对公户"],
-  store:  [3, 60,  "est",  "商店资料 + 审核账号", "11-9 前"],
-  trial1: [3, 200, "plan", "第一轮生产试单", "11-10 → 11-12"],
+  olpreg: [0, 560, "est",  "OLP 登记", "10-28 提交 · 审核中"],
+  play:   [2, 20,  "risk", "Play 组织账号认证", "11-12 提交 · 3–5 工作日"],
+  apple:  [2, 100, "risk", "Apple 组织账号", "11-12 注册"],
+  olp:    [2, 200, "risk", "OLP 备案公示", "最新预计 11-20"],
+  sid:    [2, 330, "risk",  "Sender ID", "等 Permit（~11-19）/ 本地证件"],
+  pay:    [2, 430, "risk",  "支付签约 / 进件", "等 Permit / NPC / 对公户"],
+  store:  [3, 60,  "est",  "商店资料 + 审核账号", "~11-19 前"],
+  trial1: [3, 200, "plan", "第一轮生产试单", "11-11 → 11-12"],
   otp:    [3, 330, "est", "OTP 正式通道", "Smart 未解决"],
   payint: [3, 430, "est", "支付联调", "11 月底"],
   cs:     [4, 300, "est",  "客服系统 + 培训", "11 月底"],
   lj:     [4, 380, "est",  "犁剑（贷后）", "账单制还款码 C12"],
   trial2: [4, 470, "est",  "第二轮生产试单", "11 月底"],
-  submit: [5, 80,  "goal", "提审 11-10", "Play + App Store · 托管发布"],
-  gray:   [5, 250, "est",  "灰度 11-24", "1 周 · 结束后才能投放"],
-  launch: [5, 400, "goal2", "展业 11 月底", "灰度 1 周后开始投放"],
+  submit: [5, 80,  "goal", "提审 ~11-20", "原 11-10 · 随 OLP 公示顺延"],
+  gray:   [5, 250, "risk", "灰度（需重排）", "原定 11-24 · 1 周"],
+  launch: [5, 400, "goal2", "展业 11 月底", "提审顺延 · 待重排"],
 };
 const E = [
   ["coi","duns"],["coi","permit"],["coi","olpreg"],["olpreg","bp"],["coi","pay"],["coi","sid"],["coi","play"],
@@ -429,7 +428,10 @@ requestAnimationFrame(() => {
     const A = boxes[a], B = boxes[b];
     const path = document.createElementNS(ns, "path");
     const y1 = A.offsetTop + A.offsetHeight / 2, y2 = B.offsetTop + B.offsetHeight / 2;
-    if (N[a][0] === N[b][0]) {
+    if (N[a][0] === N[b][0] && N[a][0] === COLS.length - 1) {
+      const cx = A.offsetLeft + A.offsetWidth / 2;
+      path.setAttribute("d", `M${cx},${A.offsetTop + A.offsetHeight + 2} L${cx},${B.offsetTop - 3}`);
+    } else if (N[a][0] === N[b][0]) {
       const xr = A.offsetLeft + A.offsetWidth, bulge = 28 + 16 * sameColIdx++;
       path.setAttribute("d", `M${xr + 2},${y1} C${xr + bulge},${y1} ${xr + bulge},${y2} ${xr + 3},${y2}`);
     } else {
@@ -484,34 +486,34 @@ const idx = (m, d) => days.findIndex(x => x.getMonth() === m - 1 && x.getDate() 
 // group rows: ["#", title]; task rows: [lane, sub, fm, fd, tm, td, type, label]
 const rows = [
   ["#", "主体与牌照"],
-  ["BIR 2303", "已拿到", 10, 23, 10, 28, "done", "10-28 ✓"],
-  ["Business Permit", "待更新进度", 10, 23, 11, 6, "risk", "待更新进度"],
-  ["GIS", "法务办理", 11, 3, 11, 14, "est", "本周提交 · 预计下周拿到"],
-  ["AMLC", "已提交注册", 10, 26, 11, 6, "est", "等最终证书"],
-  ["NPC / CIC", "已提交 · 最终文件需 Permit", 10, 26, 11, 13, "risk", "Permit 后出最终文件 · 时间待更新"],
-  ["Business Plan 准备", "注册号已填", 10, 26, 11, 3, "plan", "正在准备，等 OLP 登记通过提交"],
-  ["OLP 登记", "已提交，审核中", 10, 28, 11, 4, "est", "10-28 提交 → ~11-4 出结果"],
-  ["提交 BP → OLP 备案公示", "登记通过后提交", 11, 4, 11, 5, "est", "预期隔天公示"],
-  ["#", "提审（目标 11-10）"],
-  ["D-U-N-S", "Apple 免费通道", 10, 26, 11, 5, "plan", "10-26 已提交 → ~11-5"],
-  ["Play 组织账号认证", "D-U-N-S 后", 11, 5, 11, 10, "risk", "3–5 个工作日"],
-  ["Apple 组织账号", "D-U-N-S 同步后", 11, 9, 11, 10, "risk", "~11-10"],
-  ["商店资料 + 审核账号", "描述 / 截图 / 隐私标签", 11, 2, 11, 9, "est", "11-9 前完成"],
-  ["提审包冻结", "借款提交关闭", 11, 9, 11, 9, "plan", "冻结"],
-  ["提审 + 审核期", "托管 / 手动发布", 11, 10, 11, 24, "est", "11-10 提审 · 审核按 1–2 周预留"],
+  ["BIR 2303", "已拿到", 10, 23, 10, 27, "done", "10-27 ✓"],
+  ["Business Permit", "10-23 提交 · 审核中", 10, 23, 11, 19, "risk", "目标 11-19 获批"],
+  ["GIS", "已完成", 11, 3, 11, 10, "done", "已完成（截至 11-10）"],
+  ["AMLC", "已完成", 10, 26, 11, 10, "done", "已完成（截至 11-10）"],
+  ["NPC", "Permit 后启动", 11, 19, 12, 5, "risk", "Permit 后启动 · 周期待确认"],
+  ["Business Plan 准备", "注册号已填", 10, 26, 11, 18, "plan", "正在准备，等 OLP 登记通过提交"],
+  ["OLP 登记", "已提交，审核中", 10, 28, 11, 18, "est", "10-28 提交 · 审核中"],
+  ["提交 BP → OLP 备案公示", "登记通过后提交", 11, 19, 11, 20, "risk", "公示最新预计 11-20"],
+  ["#", "提审（目标 ~11-20）"],
+  ["D-U-N-S", "11-6 已拿到", 10, 26, 11, 6, "done", "10-26 提交 → 11-6 ✓"],
+  ["Play 组织账号认证", "11-12 提交", 11, 12, 11, 19, "risk", "3–5 个工作日"],
+  ["Apple 组织账号", "11-12 注册", 11, 12, 11, 17, "risk", "注册 + 电话核实"],
+  ["商店资料 + 审核账号", "描述 / 截图 / 隐私标签", 11, 2, 11, 19, "est", "~11-19 前完成"],
+  ["提审包冻结", "借款提交关闭", 11, 19, 11, 19, "plan", "冻结"],
+  ["提审 + 审核期", "托管 / 手动发布", 11, 20, 12, 4, "risk", "~11-20 提审 · 审核 1–2 周"],
   ["#", "生产试单"],
   ["报名 / 选人", "5 人 + 2 候补", 11, 2, 11, 6, "plan", "11-5 截止 · 11-6 选人"],
-  ["第一轮（借款页前）", "Eton 现场 · 11-10 → 11-12", 11, 10, 11, 12, "plan", "现场"],
-  ["第二轮（全链路）", "支付 / 犁剑 / 客服就绪后", 11, 25, 11, 27, "est", "放款 → 还款 → 贷后"],
+  ["第一轮（放款前）", "Eton 现场 · 11-11 → 11-12", 11, 11, 11, 12, "plan", "现场"],
+  ["第二轮（全链路）", "支付 / 犁剑 / 客服就绪后", 11, 25, 11, 27, "risk", "待重排"],
   ["#", "展业（目标 11 月底）"],
-  ["对公户 + 支付进件", "需 AMLC / NPC / 签字人", 10, 30, 11, 13, "risk", "材料齐后进件（NPC 可能拖后）"],
-  ["支付联调", "放款 / 还款通道", 11, 13, 11, 21, "est", "进件后联调"],
+  ["对公户 + 支付进件", "需 Permit / NPC / 签字人", 11, 19, 12, 5, "risk", "Permit 后进件 · NPC 出证后完成"],
+  ["支付联调", "放款 / 还款通道", 11, 23, 12, 5, "risk", "进件后联调 · 待重排"],
   ["犁剑（贷后）", "账单制还款码 C12", 11, 9, 11, 21, "est", "C12 对齐 → 联调"],
   ["客服系统 + 培训", "Product INFO 已出", 11, 9, 11, 21, "est", "系统就绪 · 培训在二轮前"],
-  ["Sender ID", "等 Permit / GIS / 本地证件", 11, 9, 11, 21, "risk", "材料齐后提交 · 审批 1–2 周"],
+  ["Sender ID", "等 Permit / 本地证件", 11, 19, 12, 3, "risk", "~11-19 提交 · 审批 1–2 周"],
   ["Smart OTP 通道", "发布硬门槛", 11, 9, 11, 21, "est", "方案待定"],
-  ["灰度", "审核通过后小流量发布", 11, 24, 11, 30, "est", "11-24 灰度 · 1 周"],
-  ["开始投放", "灰度结束后", 12, 1, 12, 1, "plan", "~12-1 投放"],
+  ["灰度", "审核通过后小流量发布", 11, 24, 11, 30, "risk", "原定 11-24 · 需重排"],
+  ["开始投放", "灰度结束后", 12, 1, 12, 1, "risk", "需重排"],
 ];
 const grid = document.getElementById("grid");
 grid.style.gridTemplateColumns = `190px repeat(${days.length}, minmax(24px, 1fr))`;
@@ -551,9 +553,9 @@ const vline = (m, d, cls, text) => {
     el.style.left = (cell.offsetLeft + (cls === "today" ? 0 : cell.offsetWidth / 2)) + "px";
   });
 };
-vline(11, 3, "today", "今天 11-03");
-vline(11, 10, "submit", "提审 11-10");
-vline(11, 24, "gray", "灰度 11-24");
+vline(11, 10, "today", "今天 11-10");
+vline(11, 20, "submit", "提审 ~11-20");
+vline(11, 24, "gray", "原定灰度 11-24");
 vline(11, 30, "launch", "展业 11 月底");
 </script>
 </body>
