@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>11月月会 · 产品路径</title>
+<style>
+  :root {
+    --ink: #1c1917;
+    --muted: #57534e;
+    --line: #e6dfd4;
+    --paper: #f6f3ee;
+    --card: #fffdfb;
+    --done: #1f7a4d;
+    --done-bg: #e7f5ee;
+    --next: #9a4d12;
+    --next-bg: #fff3e8;
+    --wait: #78716c;
+    --wait-bg: #f0ede8;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    color: var(--ink);
+    background: var(--paper);
+    font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    line-height: 1.5;
+  }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 36px 24px 72px; }
+  .eyebrow { font-size: 12px; letter-spacing: 0.08em; color: var(--next); font-weight: 650; }
+  h1 { margin: 6px 0 8px; font-size: 30px; letter-spacing: -0.03em; }
+  h2 { margin: 36px 0 12px; font-size: 18px; }
+  h3.sub { margin: 20px 0 10px; font-size: 15px; }
+  h3.sub small { font-size: 13px; font-weight: 500; color: var(--muted); margin-left: 6px; }
+
+  .types { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .type {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 18px 16px;
+  }
+  .type b { display: block; font-size: 16px; font-weight: 650; }
+  .type p { margin: 6px 0 0; font-size: 14px; color: var(--muted); }
+
+  .tag {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 650;
+    border-radius: 999px;
+    padding: 2px 8px;
+    background: var(--next-bg);
+    color: var(--next);
+    white-space: nowrap;
+  }
+  .tag.done { background: var(--done-bg); color: var(--done); }
+  .tag.wait { background: var(--wait-bg); color: var(--wait); }
+
+  .resource {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--next);
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-size: 14px;
+  }
+  .resource b { font-weight: 650; }
+
+  .board {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 16px;
+  }
+  .topics { display: grid; gap: 10px; }
+  .topics.two { grid-template-columns: 1fr 1fr; }
+  .topic {
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 12px 14px;
+    background: #fff;
+  }
+  .topic-top { display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+  .topic h4 { margin: 0; font-size: 15px; }
+  .topic .path-name { font-size: 12px; color: var(--muted); margin-right: 6px; font-weight: 500; }
+  .topic .problem { margin: 6px 0 0; font-size: 14px; color: var(--muted); }
+  .topic ul { margin: 8px 0 0; padding-left: 18px; }
+  .topic li { margin: 4px 0; font-size: 14px; }
+
+  .group-label { font-size: 13px; color: var(--muted); margin-bottom: 8px; }
+  .paths { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .path {
+    text-align: left;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 12px;
+    cursor: pointer;
+    font: inherit;
+    color: inherit;
+    min-height: 92px;
+  }
+  .path.on { border-color: #1c1917; box-shadow: inset 0 0 0 1px #1c1917; }
+  .path .when { font-size: 12px; color: var(--muted); }
+  .path strong { display: block; margin: 4px 0; font-size: 16px; }
+  .path .tag { white-space: normal; line-height: 1.45; border-radius: 10px; }
+  .detail { margin-top: 14px; border-top: 1px solid var(--line); padding-top: 14px; }
+
+  @media (max-width: 900px) {
+    .types, .paths, .topics.two { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Kidlat Peso · 2026-11 月会</div>
+  <h1>产品路径</h1>
+
+  <h2>1. 需求分类</h2>
+  <div class="types">
+    <article class="type">
+      <b>重点专题</b>
+      <p>围绕业务核心问题，按月规划路径推进</p>
+    </article>
+    <article class="type">
+      <b>日常迭代</b>
+      <p>一线随时提出、快速上线，解决具体场景与效率问题</p>
+    </article>
+  </div>
+
+  <h2>2. 已完成内容</h2>
+  <div class="resource">
+    <b>产品资源进展：</b>10 月产品资源同时支撑 SahodNow 新包启动，重点专题优先保障「降低逾期率」，人审质检、提费展示、裂变佣金顺延至 11 月；同期以日常迭代为主，持续解决一线关键卡点。
+  </div>
+
+  <h3 class="sub">重点专题<small>3 项上线 · 1 项方案评审完成</small></h3>
+  <div class="board">
+    <div class="topics two">
+      <article class="topic">
+        <div class="topic-top">
+          <h4><span class="path-name">降低逾期率</span>地址证明</h4>
+          <span class="tag done">已上线 10/29</span>
+        </div>
+        <p class="problem">收集 Co-maker 住址证明，人审可录借款人与 Co-maker 双地址，贷后找得到人</p>
+      </article>
+      <article class="topic">
+        <div class="topic-top">
+          <h4><span class="path-name">降低逾期率</span>定位收集</h4>
+          <span class="tag done">已上线 10/29</span>
+        </div>
+        <p class="problem">采集用户定位，按本土 / 海外区分作业与催收策略</p>
+      </article>
+      <article class="topic">
+        <div class="topic-top">
+          <h4><span class="path-name">降低逾期率</span>延期</h4>
+          <span class="tag">方案评审 11/06</span>
+        </div>
+        <p class="problem">用户付延期费顺延还款日，原标直接改期；已与资产、贷后、风险评审</p>
+      </article>
+      <article class="topic">
+        <div class="topic-top">
+          <h4><span class="path-name">进件跟单</span>OCR 填资</h4>
+          <span class="tag done">已上线 10/15</span>
+        </div>
+        <p class="problem">证件、材料自动识别核对，减少人工对图和错填驳回</p>
+      </article>
+    </div>
+  </div>
+
+  <h3 class="sub">日常迭代 · 一线关键卡点<small>6 项上线</small></h3>
+  <div class="board">
+    <div class="topics two">
+      <article class="topic">
+        <div class="topic-top"><h4>渠道绑定跟进销售</h4><span class="tag done">已上线 10/29</span></div>
+        <p class="problem">渠道可指定负责销售，跟进和业绩归属更清楚</p>
+      </article>
+      <article class="topic">
+        <div class="topic-top"><h4>渠道联系人手机号可修改</h4><span class="tag done">已上线 11/10</span></div>
+        <p class="problem">联系人换号后可直接更新，无需技术修数</p>
+      </article>
+      <article class="topic">
+        <div class="topic-top"><h4>额度过期可重新预审</h4><span class="tag done">已上线 11/10</span></div>
+        <p class="problem">预审通过但额度过期的用户可再次进入流程，减少流失</p>
+      </article>
+      <article class="topic">
+        <div class="topic-top"><h4>改名同步收款姓名</h4><span class="tag done">已上线 10/29</span></div>
+        <p class="problem">用户修改姓名后，收款卡姓名同步更新，减少放款失败</p>
+      </article>
+      <article class="topic">
+        <div class="topic-top"><h4>客服可查看 PDF 工作合同</h4><span class="tag done">已上线 11/05</span></div>
+        <p class="problem">客服后台直接查看用户上传的 PDF 合同，回复更快</p>
+      </article>
+      <article class="topic">
+        <div class="topic-top"><h4>本土 / 海外身份补全</h4><span class="tag done">已上线 11/05</span></div>
+        <p class="problem">用注册定位补齐未进填资首页用户的身份，分配和流程判定更准</p>
+      </article>
+    </div>
+  </div>
+
+  <h2>3. 未来规划</h2>
+  <div class="board">
+    <div class="group-label">11月 · 接下来</div>
+    <div class="paths" id="next-paths"></div>
+    <div class="detail" id="detail"></div>
+  </div>
+
+</div>
+<script>
+const paths = [
+  {
+    id: "overdue",
+    name: "降低逾期率",
+    aim: "用户还款更从容，后续跟进更顺",
+    topics: [
+      {
+        name: "延期（延长 Due Day）",
+        problem: "临时资金错配的用户付费顺延还款日，减少早期逾期",
+        progress: "方案已评审，待排期",
+        items: [
+          { text: "资产校验与报价：延期费公式、一倍本金上限、延期后不再逾期的兜底", progress: "11月确认" },
+          { text: "名单与还款码：数仓 T+1 名单对接；菲律宾延期专用还款码可行性", progress: "11月确认" },
+          { text: "研发排期：PRD 与原型已就绪，规则确认后排期", progress: "待排期" }
+        ]
+      },
+      {
+        name: "Co-maker 放款",
+        problem: "收款和后续跟进落在同一个人身上",
+        progress: "暂停",
+        items: ["款放到担保人账户"]
+      }
+    ]
+  },
+  {
+    id: "revenue",
+    name: "业务收益",
+    aim: "提费之后，借款意愿和收益仍然稳住",
+    topics: [
+      {
+        name: "提费与费率展示",
+        problem: "费用更好理解，提费后用户仍愿意借",
+        progress: "11月出方案",
+        items: ["还款页拆开本金和费用", "砍头费以权益包呈现"]
+      }
+    ]
+  },
+  {
+    id: "scale",
+    name: "扩大业务规模",
+    aim: "服务更多客群，老用户带新用户，佣金支撑规模增长",
+    topics: [
+      {
+        name: "新增 BM 客群",
+        problem: "扩大服务人群，承接 BM 客群借款",
+        progress: "11月出方案",
+        items: ["BM 客群接入"]
+      },
+      {
+        name: "用户分享裂变",
+        problem: "老用户带来新用户",
+        progress: "11月出方案",
+        items: ["用户邀请好友"]
+      },
+      {
+        name: "佣金体系改造",
+        problem: "佣金能配置、能加、能补，支撑用户裂变",
+        progress: "11月出方案",
+        items: ["佣金规则和发放节点可配置", "活动加佣", "少发漏发可补"]
+      },
+      {
+        name: "iOS 版本",
+        problem: "补齐 iOS 获客入口",
+        progress: "12月",
+        items: ["iOS 上架"]
+      }
+    ]
+  },
+  {
+    id: "audit",
+    name: "人审质检",
+    aim: "拒绝和退回原因清楚，过程可回看，办单更高效",
+    topics: [
+      {
+        name: "人审销售工作流质检",
+        problem: "原因清楚，过程可回看，办单更高效",
+        progress: "11月出方案",
+        items: [
+          "原因展示：拒绝原因映射，用户和销售分别看到可理解的说明",
+          "过程记录：退回历史、认领人、停留时长"
+        ]
+      }
+    ]
+  }
+];
+
+const nextEl = document.getElementById("next-paths");
+const detailEl = document.getElementById("detail");
+let current = "overdue";
+
+function badge(progress) {
+  const wait = progress.includes("暂停") || progress.includes("待排期");
+  return `<span class="tag ${wait ? "wait" : ""}">${progress}</span>`;
+}
+
+function renderPaths() {
+  nextEl.innerHTML = paths.map(p => `
+    <button class="path ${p.id === current ? "on" : ""}" data-id="${p.id}">
+      <span class="when">11月</span>
+      <strong>${p.name}</strong>
+      <span class="tag">${p.aim}</span>
+    </button>
+  `).join("");
+}
+
+function renderDetail() {
+  const path = paths.find(p => p.id === current);
+  detailEl.innerHTML = `
+    <div class="topics">
+      ${path.topics.map(t => `
+        <article class="topic">
+          <div class="topic-top">
+            <h4>${t.name}</h4>
+            ${badge(t.progress)}
+          </div>
+          <p class="problem">期望效果：${t.problem}</p>
+          <ul>${t.items.map(item => {
+            const text = typeof item === "string" ? item : item.text;
+            const mark = typeof item === "string" ? "" : ` ${badge(item.progress)}`;
+            return `<li>${text}${mark}</li>`;
+          }).join("")}</ul>
+        </article>
+      `).join("")}
+    </div>
+  `;
+}
+
+function select(id) {
+  current = id;
+  renderPaths();
+  renderDetail();
+}
+
+document.body.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-id]");
+  if (!button) return;
+  select(button.dataset.id);
+});
+
+select("overdue");
+</script>
+</body>
+</html>
