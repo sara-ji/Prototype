@@ -225,7 +225,7 @@
 
   <h2>3. 未来规划</h2>
   <div class="board">
-    <div class="group-label">11月 · 接下来</div>
+    <div class="group-label">接下来</div>
     <div class="paths" id="next-paths"></div>
     <div class="detail" id="detail"></div>
   </div>
@@ -241,11 +241,11 @@ const paths = [
       {
         name: "延期（延长 Due Day）",
         problem: "临时资金错配的用户付费顺延还款日，减少早期逾期",
-        progress: "方案已评审，待排期",
+        progress: "预期11月底/12月初上线",
         items: [
-          { text: "资产校验与报价：延期费公式、一倍本金上限、延期后不再逾期的兜底", progress: "11月确认" },
-          { text: "名单与还款码：数仓 T+1 名单对接；菲律宾延期专用还款码可行性", progress: "11月确认" },
-          { text: "研发排期：PRD 与原型已就绪，规则确认后排期", progress: "待排期" }
+          "资产校验与报价：延期费公式、一倍本金上限、延期后不再逾期的兜底",
+          "名单与还款码：数仓 T+1 名单对接；菲律宾延期专用还款码可行性",
+          "研发：PRD 与原型已就绪，规则确认后进入开发"
         ]
       },
       {
@@ -264,7 +264,7 @@ const paths = [
       {
         name: "提费与费率展示",
         problem: "费用更好理解，提费后用户仍愿意借",
-        progress: "11月出方案",
+        progress: "待出方案",
         items: ["还款页拆开本金和费用", "砍头费以权益包呈现"]
       }
     ]
@@ -277,25 +277,25 @@ const paths = [
       {
         name: "新增 BM 客群",
         problem: "扩大服务人群，承接 BM 客群借款",
-        progress: "11月出方案",
+        progress: "待出方案",
         items: ["BM 客群接入"]
       },
       {
         name: "用户分享裂变",
         problem: "老用户带来新用户",
-        progress: "11月出方案",
+        progress: "待出方案",
         items: ["用户邀请好友"]
       },
       {
         name: "佣金体系改造",
         problem: "佣金能配置、能加、能补，支撑用户裂变",
-        progress: "11月出方案",
+        progress: "待出方案",
         items: ["佣金规则和发放节点可配置", "活动加佣", "少发漏发可补"]
       },
       {
         name: "iOS 版本",
         problem: "补齐 iOS 获客入口",
-        progress: "12月",
+        progress: "规划中",
         items: ["iOS 上架"]
       }
     ]
@@ -308,7 +308,7 @@ const paths = [
       {
         name: "人审销售工作流质检",
         problem: "原因清楚，过程可回看，办单更高效",
-        progress: "11月出方案",
+        progress: "待出方案",
         items: [
           "原因展示：拒绝原因映射，用户和销售分别看到可理解的说明",
           "过程记录：退回历史、认领人、停留时长"
@@ -330,7 +330,6 @@ function badge(progress) {
 function renderPaths() {
   nextEl.innerHTML = paths.map(p => `
     <button class="path ${p.id === current ? "on" : ""}" data-id="${p.id}">
-      <span class="when">11月</span>
       <strong>${p.name}</strong>
       <span class="tag">${p.aim}</span>
     </button>
