@@ -109,6 +109,29 @@
   @media (max-width: 900px) {
     .types, .paths, .topics.two { grid-template-columns: 1fr; }
   }
+
+  .streams { display: grid; gap: 12px; }
+  .stream { border: 1px solid var(--line); border-radius: 12px; background: #fff; padding: 14px 16px; }
+  .stream-head { display: flex; align-items: center; gap: 10px; }
+  .stream-no {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--ink); color: #fff;
+    font-size: 12px; font-weight: 650;
+    display: grid; place-items: center; flex: none;
+  }
+  .stream-head h4 { margin: 0; font-size: 16px; }
+  .stream-goal { margin: 8px 0 10px; font-size: 14px; color: var(--muted); }
+  .stream-goal .label {
+    display: inline-block; margin-right: 8px;
+    font-size: 12px; font-weight: 650; color: var(--next);
+    background: var(--next-bg); border-radius: 6px; padding: 1px 6px;
+  }
+  .steps { margin: 0; padding-left: 20px; display: grid; gap: 8px; }
+  .steps li { font-size: 14px; padding-left: 4px; }
+  .steps li::marker { color: var(--muted); font-weight: 650; }
+  .step-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .step-top b { font-weight: 650; }
+  .steps p { margin: 2px 0 0; color: var(--muted); }
 </style>
 </head>
 <body>
@@ -135,35 +158,42 @@
 
   <h3 class="sub">重点专题<small>3 项上线 · 1 项方案评审完成</small></h3>
   <div class="board">
-    <div class="topics two">
-      <article class="topic">
-        <div class="topic-top">
-          <h4><span class="path-name">降低逾期率</span>地址证明</h4>
-          <span class="tag done">已上线</span>
+    <div class="streams">
+      <section class="stream">
+        <div class="stream-head">
+          <span class="stream-no">1</span>
+          <h4>进件与展业效率提升</h4>
         </div>
-        <p class="problem">收集 Co-maker 住址证明，人审可录借款人与 Co-maker 双地址，贷后找得到人</p>
-      </article>
-      <article class="topic">
-        <div class="topic-top">
-          <h4><span class="path-name">降低逾期率</span>定位收集</h4>
-          <span class="tag done">已上线</span>
+        <p class="stream-goal"><span class="label">目标</span>进件和跟单更顺，缩短用户成交周期</p>
+        <ol class="steps">
+          <li>
+            <div class="step-top"><b>OCR 填资</b><span class="tag done">已上线</span></div>
+            <p>证件、材料自动识别核对，减少人工对图和错填驳回</p>
+          </li>
+        </ol>
+      </section>
+
+      <section class="stream">
+        <div class="stream-head">
+          <span class="stream-no">2</span>
+          <h4>降低逾期率</h4>
         </div>
-        <p class="problem">采集用户定位，新增定位流程属性</p>
-      </article>
-      <article class="topic">
-        <div class="topic-top">
-          <h4><span class="path-name">降低逾期率</span>延期</h4>
-          <span class="tag">已评审</span>
-        </div>
-        <p class="problem">用户付延期费顺延还款日，原标直接改期；已与资产、贷后、风险评审</p>
-      </article>
-      <article class="topic">
-        <div class="topic-top">
-          <h4><span class="path-name">进件跟单</span>OCR 填资</h4>
-          <span class="tag done">已上线</span>
-        </div>
-        <p class="problem">证件、材料自动识别核对，减少人工对图和错填驳回</p>
-      </article>
+        <p class="stream-goal"><span class="label">目标</span>贷后找得到人，用户还款更从容</p>
+        <ol class="steps">
+          <li>
+            <div class="step-top"><b>地址证明</b><span class="tag done">已上线</span></div>
+            <p>收集 Co-maker 住址证明，人审可录借款人与 Co-maker 双地址，贷后找得到人</p>
+          </li>
+          <li>
+            <div class="step-top"><b>定位收集</b><span class="tag done">已上线</span></div>
+            <p>采集用户定位，新增定位流程属性</p>
+          </li>
+          <li>
+            <div class="step-top"><b>延期</b><span class="tag">已评审</span></div>
+            <p>用户付延期费顺延还款日，原标直接改期；已与资产、贷后、风险评审</p>
+          </li>
+        </ol>
+      </section>
     </div>
   </div>
 
