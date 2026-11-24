@@ -3742,7 +3742,7 @@
       if (isDomestic) {
         const bm = isBmUser(user);
         const bmExtra = bm ? [
-          img('p_return_flight', 'return_flight', 'Return Flight Ticket', 'borrower', bp, f.return_flight || ''),
+          img('p_return_flight', 'return_flight', 'Return Flight Itinerary', 'borrower', bp, f.return_flight || ''),
           decisionTextItem('p_return_date', 'return_date', 'Return Date', bp, f.return_date, 'borrower'),
           img('p_proof_income', 'proof_income', 'Proof of income (last 3 months before return date)', 'borrower', bp, f.proof_income || MOCK_IMG.proof_income),
         ] : [];
@@ -3755,7 +3755,7 @@
           img('p_visa', 'valid_visa', 'Valid Visa', 'borrower', bp, f.valid_visa || MOCK_IMG.valid_visa),
           img('p_oec', 'oec', 'Valid OEC', 'borrower', bp, f.oec || MOCK_IMG.oec),
           decisionTextItem('p_oec_duration', 'oec_duration', 'Contract Duration on OEC', bp, f.oec_duration, 'borrower'),
-          img('p_flight', 'flight', bm ? 'Outbound Flight Ticket（原名 Flight Itinerary）' : 'Flight Itinerary', 'borrower', bp, f.flight || MOCK_IMG.flight),
+          img('p_flight', 'flight', bm ? 'Outbound Flight Itinerary' : 'Flight Itinerary', 'borrower', bp, f.flight || MOCK_IMG.flight),
           decisionTextItem('p_departure', 'departure_date', 'Departure Date', bp, f.departure_date, 'borrower'),
           ...bmExtra,
           img('p_contract', 'employer_contract', 'Contract with Employer', 'borrower', bp, f.employer_contract || MOCK_IMG.employer_contract),
@@ -3927,14 +3927,14 @@
         rf('Occupation', f.occupation, 'occupation', 'rename'),
         rf('Monthly income', f.monthly_income, 'monthly_income', null),
         rf(
-          isBmUser(user) ? 'Outbound Flight Ticket（原名 Flight Itinerary）' : 'Flight Itinerary',
+          isBmUser(user) ? 'Outbound Flight Itinerary' : 'Flight Itinerary',
           f.flight ? 'Uploaded' : '—',
           'flight',
           isBmUser(user) ? 'rename' : null
         ),
         rf('Departure Date', f.departure_date, 'departure_date', null),
         ...(isBmUser(user) ? [
-          rf('Return Flight Ticket', f.return_flight ? 'Uploaded' : '—', 'return_flight', 'new'),
+          rf('Return Flight Itinerary', f.return_flight ? 'Uploaded' : '—', 'return_flight', 'new'),
           rf('Return Date', f.return_date, 'return_date', 'new'),
           rf('Proof of income (last 3 months before return date)', f.proof_income ? 'Uploaded' : '—', 'proof_income', 'new'),
         ] : []),
@@ -4015,11 +4015,11 @@
         { key: 'b_live', label: t('rv_liveness'), url: f.liveness_photo || MOCK_IMG.passport_photo, fieldKey: 'liveness_photo', tip: null },
         { key: 'b_oec', label: 'Valid OEC', url: f.oec || MOCK_IMG.oec, fieldKey: 'oec', tip: 'rename' },
         { key: 'b_visa', label: 'Valid Visa', url: f.valid_visa || MOCK_IMG.valid_visa, fieldKey: 'valid_visa', tip: 'rename' },
-        { key: 'b_flight', label: bm ? 'Outbound Flight Ticket（原名 Flight Itinerary）' : 'Flight Itinerary', url: f.flight || MOCK_IMG.flight, fieldKey: 'flight', tip: bm ? 'rename' : null },
+        { key: 'b_flight', label: bm ? 'Outbound Flight Itinerary' : 'Flight Itinerary', url: f.flight || MOCK_IMG.flight, fieldKey: 'flight', tip: bm ? 'rename' : null },
       ];
       if (bm) {
         list.push(
-          { key: 'b_return_flight', label: 'Return Flight Ticket', url: f.return_flight || '', fieldKey: 'return_flight', tip: 'new', placeholder: lang === 'zh' ? '未上传（选填）' : 'Not uploaded (optional)' },
+          { key: 'b_return_flight', label: 'Return Flight Itinerary', url: f.return_flight || '', fieldKey: 'return_flight', tip: 'new', placeholder: lang === 'zh' ? '未上传（选填）' : 'Not uploaded (optional)' },
           { key: 'b_income', label: 'Proof of income (last 3 months before return date)', url: f.proof_income || MOCK_IMG.proof_income, fieldKey: 'proof_income', tip: 'new' },
         );
       }
@@ -4278,7 +4278,7 @@
           { key: 'oec_duration', label: 'Contract Duration on OEC', type: 'text', placeholder: 'Months, e.g. 24', tip: 'new' },
           { key: 'flight', label: 'Flight Itinerary', type: 'file' },
           { key: 'departure_date', label: 'Departure Date', type: 'date' },
-          { key: 'return_flight', label: 'Return Flight Ticket', type: 'file', tip: 'new', bmOnly: true, required: false },
+          { key: 'return_flight', label: 'Return Flight Itinerary', type: 'file', tip: 'new', bmOnly: true, required: false },
           { key: 'return_date', label: 'Return Date', type: 'date', tip: 'new', bmOnly: true },
           { key: 'proof_income', label: 'Proof of income (last 3 months before return date)', type: 'file', tip: 'new', bmOnly: true },
           { key: 'employer_name', label: 'Employer Name', type: 'text' },
@@ -4530,7 +4530,10 @@
           .map(f => {
             if (!bm) return f;
             if (f.key === 'flight') {
-              return { ...f, label: 'Outbound Flight Ticket（原名 Flight Itinerary）', tip: 'rename' };
+              return { ...f, label: 'Outbound Flight Itinerary', tip: 'rename' };
+            }
+            if (f.key === 'return_flight') {
+              return { ...f, label: 'Return Flight Itinerary' };
             }
             return f;
           }),

@@ -1339,7 +1339,7 @@
         ],
       },
       return_flight: {
-        title: 'Return Flight Ticket',
+        title: 'Return Flight Itinerary',
         intro: 'Upload your flight ticket / itinerary for returning to the Philippines (optional).',
         images: [{ src: 'samples/flight.png' }],
         must: [
@@ -1564,7 +1564,7 @@
         proof_income: 'Proof of income',
         flight: 'Flight Itinerary',
         departure_date: 'Departure Date',
-        return_flight: 'Return Flight Ticket',
+        return_flight: 'Return Flight Itinerary',
         return_date: 'Return Date',
         valid_visa: isOvw() ? residenceUploadLabel() : 'Valid Visa',
         visa_expiry: isOvw() ? residenceExpiryLabel() : 'Visa Expiration Date',
@@ -1882,7 +1882,7 @@
         if (!uploaded('proof_income')) miss.push({ key: 'proof_income', label: 'Proof of income' });
       } else {
         if (!positiveIntFilled('oec_duration')) miss.push({ key: 'oec_duration', label: 'Contract Duration on OEC' });
-        if (!uploaded('flight')) miss.push({ key: 'flight', label: isBm() ? 'Outbound Flight Ticket' : 'Flight Itinerary' });
+        if (!uploaded('flight')) miss.push({ key: 'flight', label: isBm() ? 'Outbound Flight Itinerary' : 'Flight Itinerary' });
         if (!dateFilled('departure_date')) miss.push({ key: 'departure_date', label: 'Departure Date' });
         if (!uploaded('oec')) miss.push({ key: 'oec', label: 'Valid OEC' });
         if (!filled('employer_name')) miss.push({ key: 'employer_name', label: 'Employer Name' });
@@ -3747,14 +3747,13 @@
         const flightBlock = isBm() ? `
           <div class="bm-circle" data-bm-annotate="reuse">
             <span class="bm-circle-badge">BM</span>
-            ${uploadField('flight', 'Outbound Flight Ticket')}
-            <p class="bm-orig">原名 · <em>Flight Itinerary</em></p>
+            ${uploadField('flight', 'Outbound Flight Itinerary')}
             ${dateField('departure_date', 'Departure Date')}
             <p class="hint-muted">Apply within 30 days of departure date.</p>
           </div>
           <div class="bm-circle" data-bm-annotate="new">
             <span class="bm-circle-badge">BM · New</span>
-            ${uploadField('return_flight', 'Return Flight Ticket', { required: false })}
+            ${uploadField('return_flight', 'Return Flight Itinerary', { required: false })}
             <p class="hint-muted">Optional — upload if you still have the ticket / itinerary.</p>
             ${dateField('return_date', 'Return Date')}
             <p class="hint-muted">Date you entered the Philippines for this home leave. Used as the anchor for income proof.</p>
