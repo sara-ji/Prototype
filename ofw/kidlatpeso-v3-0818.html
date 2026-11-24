@@ -120,28 +120,27 @@
     .field label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 4px; }
     .field label .req { color: var(--danger); }
     .field label .opt { color: var(--text-muted); font-weight: 400; font-size: 12px; }
-    /* Prototype annotation: circle BM fields for review */
+    /* BM annotation blocks — match adjusted Figma Work info */
     .bm-circle {
       position: relative;
-      margin: 10px 0 14px;
-      padding: 12px 10px 8px;
-      border: 2px dashed #ea580c;
-      border-radius: 14px;
+      margin: 14px 0 16px;
+      padding: 14px 12px 10px;
+      border: 1.5px dashed #f97316;
+      border-radius: 12px;
       background: #fff7ed;
     }
     .bm-circle-badge {
-      position: absolute; top: -10px; left: 12px;
+      position: absolute; top: -11px; left: 14px;
       display: inline-flex; align-items: center; justify-content: center;
-      min-width: 28px; height: 22px; padding: 0 8px;
-      border-radius: 999px; border: 2px solid #ea580c;
-      background: #fff; color: #c2410c; font-size: 11px; font-weight: 700;
-      letter-spacing: .02em;
+      min-width: 28px; height: 22px; padding: 0 10px;
+      border-radius: 999px; border: none;
+      background: #ea580c; color: #fff; font-size: 11px; font-weight: 700;
+      letter-spacing: .02em; line-height: 1;
+      box-shadow: 0 0 0 2px #fff7ed;
     }
-    .bm-orig {
-      display: block; font-size: 11px; font-weight: 400; color: #9a3412;
-      margin-top: 2px;
-    }
-    .bm-orig em { font-style: normal; font-weight: 600; }
+    .bm-circle .field { margin-bottom: 10px; }
+    .bm-circle .field:last-child { margin-bottom: 4px; }
+    .bm-circle .hint-muted { margin: 2px 0 6px; }
     .field input[type="text"], .field input[type="email"], .field input[type="tel"] {
       width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px;
       font-size: 14px; background: var(--surface); font-family: inherit;
@@ -2153,10 +2152,13 @@
                 <input type="file" accept="${esc(accept)}" multiple />
               </div>`
         ) : '';
-        const countHint = count
+        const hideMeta = opts.hideUploadMeta === true;
+        const countHint = (!hideMeta && count)
           ? `<p class="photo-multi-hint">${count} file${count > 1 ? 's' : ''} uploaded</p>`
           : '';
-        const formatHint = `<p class="photo-multi-hint">${esc(opts.formatHint || 'Photos or PDF')}</p>`;
+        const formatHint = hideMeta
+          ? ''
+          : `<p class="photo-multi-hint">${esc(opts.formatHint || 'Photos or PDF')}</p>`;
       return `<div class="field" data-field="${key}">
           <div class="photo-field-head">
             <span class="photo-field-label">${fieldLabel(label, required)}</span>
@@ -2169,6 +2171,7 @@
         </div>`;
       }
       const has = count > 0;
+      const doneText = opts.shortUploaded ? 'Uploaded' : 'Uploaded · tap to replace';
       if (guided) {
         return `<div class="field" data-field="${key}">
           <div class="photo-field-head">
@@ -2176,7 +2179,7 @@
           </div>
           <div class="photo-capture${has ? ' has-file' : ''}" data-guided-upload="${esc(key)}" role="button" tabindex="0">
             ${camIconHtml()}
-            <span class="cam-text">${has ? 'Uploaded · tap to replace' : 'Upload'}</span>
+            <span class="cam-text">${has ? doneText : 'Upload'}</span>
           </div>
           <div class="err-msg">Please upload a file</div>
         </div>`;
@@ -2188,7 +2191,7 @@
         </div>
         <div class="photo-capture${has ? ' has-file' : ''}" data-upload="${key}">
           ${camIconHtml()}
-          <span class="cam-text">${has ? 'Uploaded · tap to replace' : 'Upload'}</span>
+          <span class="cam-text">${has ? doneText : 'Upload'}</span>
           <input type="file" accept="${esc(opts.accept || 'image/*,.pdf')}" />
         </div>
         ${opts.formatHint ? `<p class="photo-multi-hint">${esc(opts.formatHint)}</p>` : ''}
@@ -3747,20 +3750,18 @@
         const flightBlock = isBm() ? `
           <div class="bm-circle" data-bm-annotate="reuse">
             <span class="bm-circle-badge">BM</span>
-            ${uploadField('flight', 'Outbound Flight Itinerary')}
+            ${uploadField('flight', 'Outbound Flight Itinerary', { shortUploaded: true })}
             ${dateField('departure_date', 'Departure Date')}
-            <p class="hint-muted">Apply within 30 days of departure date.</p>
           </div>
           <div class="bm-circle" data-bm-annotate="new">
             <span class="bm-circle-badge">BM · New</span>
-            ${uploadField('return_flight', 'Return Flight Itinerary', { required: false })}
-            <p class="hint-muted">Optional — upload if you still have the ticket / itinerary.</p>
+            ${uploadField('return_flight', 'Return Flight Itinerary', { required: false, shortUploaded: true })}
             ${dateField('return_date', 'Return Date')}
-            <p class="hint-muted">Date you entered the Philippines for this home leave. Used as the anchor for income proof.</p>
             ${uploadField('proof_income', 'Proof of income (last 3 months before return date)', {
               multiple: true,
               max: 6,
-              reqHint: '≥3 files · before return date',
+              reqHint: 'before return date',
+              hideUploadMeta: true,
             })}
             <p class="hint-muted">Must cover the 3 months ending at Return Date (e.g. return Nov 1 → about Aug–Oct). No 90-day issuance rule.</p>
           </div>
