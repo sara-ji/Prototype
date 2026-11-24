@@ -2646,6 +2646,22 @@
           mkCm('cm_bm1', 'Elena Dela Cruz', '+63 919 888 7766', { rel: 'Spouse', gender: 'Female' }),
         ],
       },
+      /* 销售代填演示：BM + 预审通过，可代填回国三材料 */
+      {
+        id: 'U10BMf', name: 'Nina Reyes', mobile: '+63 900 111 0098',
+        registeredAt: '2026-11-21 10:00', channel: 'BM Agency', salesRep: 'sarah_lim',
+        flow: 'domestic', segment: 'bm', statusCode: 'PRE_APPROVED',
+        starterLimit: 5000, finalLimit: null, loan: null, selectedComakerId: 'cm_bmf1',
+        fields: baseBm({
+          first_name: 'Nina', last_name: 'Reyes', middle_name: 'A.', mother_maiden: 'Santos',
+          gender: 'Female', dob: '1991-03-18', passport_number: 'P1999BM02',
+          email: 'nina.bm@email.com', occupation: 'Domestic Helper',
+          monthly_income: 'P30,000 - P40,000', destination: 'Hong Kong',
+        }),
+        comakers: [
+          mkCm('cm_bmf1', 'Paolo Reyes', '+63 919 777 6655', { rel: 'Sibling', gender: 'Male' }),
+        ],
+      },
       {
         id: 'U1005', name: 'Diego Lim', mobile: '+63 900 111 0005',
         registeredAt: '2026-07-28 09:30', channel: 'Agency B', salesRep: 'sarah_lim',
@@ -2972,7 +2988,7 @@
     let selectedUserId = null;
     let detailTab = 'profile';
     let listFilter = { q: '', flow: '', segment: '', profileStatus: '', salesRep: '' };
-    let reviewFilter = { owner: '', q: '' };
+    let reviewFilter = { owner: '', q: '', flow: '', segment: '' };
     let reviewSelected = new Set();
     let reviewAssignTarget = '';
     let reviewClaimCount = 1;
@@ -4406,7 +4422,7 @@
       view = 'list';
       selectedUserId = null;
       reviewSelected.clear();
-      reviewFilter = { owner: '', q: '' };
+      reviewFilter = { owner: '', q: '', flow: '', segment: '' };
       reviewAssignTarget = '';
       toastNotifIds = [];
       document.getElementById('role-select').value = r;
@@ -4595,6 +4611,8 @@
       return auditCases.filter(c => {
         const u = getUser(c.userId);
         if (!u) return false;
+        if (reviewFilter.flow && u.flow !== reviewFilter.flow) return false;
+        if (reviewFilter.segment && userSegment(u) !== reviewFilter.segment) return false;
         if (reviewFilter.q) {
           const q = reviewFilter.q.toLowerCase();
           if (!u.id.toLowerCase().includes(q) && !(u.name && u.name.toLowerCase().includes(q))) return false;
@@ -4732,10 +4750,23 @@
           </table>
         </div>` : '';
 
+      const flowSegFilter = `
+            <select onchange="reviewFilter.flow=this.value;render()">
+              <option value="">${t('all_flows')}</option>
+              <option value="domestic"${reviewFilter.flow==='domestic'?' selected':''}>${t('flow_domestic')}</option>
+              <option value="oversea"${reviewFilter.flow==='oversea'?' selected':''}>${t('flow_oversea')}</option>
+            </select>
+            <select onchange="reviewFilter.segment=this.value;render()">
+              <option value="">${t('all_segments')}</option>
+              <option value="new_hire"${reviewFilter.segment==='new_hire'?' selected':''}>${t('segment_new_hire')}</option>
+              <option value="bm"${reviewFilter.segment==='bm'?' selected':''}>${t('segment_bm')}</option>
+              <option value="abroad"${reviewFilter.segment==='abroad'?' selected':''}>${t('segment_abroad')}</option>
+            </select>`;
       return `
         <div class="review-toolbar">
           <div class="review-toolbar-left">
             ${ownerFilter}
+            ${flowSegFilter}
             <input type="search" placeholder="${esc(t('review_search_ph'))}" value="${esc(reviewFilter.q)}"
               oninput="reviewFilter.q=this.value" onkeydown="if(event.key==='Enter')render()" />
             <button type="button" class="btn-sm primary" onclick="render()">${t('btn_search')}</button>
@@ -6254,20 +6285,36 @@
     }
     function csToggle(id) { csOpen[id] = !csOpen[id]; render(); }
 
+    let csListFilter = { flow: '', segment: '' };
+
     function renderCsSearch() {
-      const list = csUsers();
+      let list = csUsers();
+      if (csListFilter.flow) list = list.filter(u => u.flow === csListFilter.flow);
+      if (csListFilter.segment) list = list.filter(u => userSegment(u) === csListFilter.segment);
       const opt = (v, l) => `<option value="${v}" ${csQuery.type === v ? 'selected' : ''}>${l}</option>`;
       return `
         <div class="breadcrumb">${Lc('客服相关', 'Customer service')} <span>/</span> ${Lc('用户查询', 'User Search')}</div>
         <div class="toolbar">
           <select id="cs-q-type">${opt('userId', 'User ID')}${opt('mobile', Lc('手机号', 'Mobile'))}${opt('listingId', 'Listing ID')}${opt('name', Lc('姓名', 'Name'))}</select>
           <input id="cs-q" placeholder="${Lc('请输入', 'Enter keyword')}" value="${esc(csQuery.q)}" onkeydown="if(event.key==='Enter')runCsSearch()" />
+          <select onchange="csListFilter.flow=this.value;render()">
+            <option value="">${t('all_flows')}</option>
+            <option value="domestic"${csListFilter.flow==='domestic'?' selected':''}>${t('flow_domestic')}</option>
+            <option value="oversea"${csListFilter.flow==='oversea'?' selected':''}>${t('flow_oversea')}</option>
+          </select>
+          <select onchange="csListFilter.segment=this.value;render()">
+            <option value="">${t('all_segments')}</option>
+            <option value="new_hire"${csListFilter.segment==='new_hire'?' selected':''}>${t('segment_new_hire')}</option>
+            <option value="bm"${csListFilter.segment==='bm'?' selected':''}>${t('segment_bm')}</option>
+            <option value="abroad"${csListFilter.segment==='abroad'?' selected':''}>${t('segment_abroad')}</option>
+          </select>
           <button type="button" class="btn-sm primary" style="height:32px" onclick="runCsSearch()">${Lc('搜索', 'Search')}</button>
-          <span class="cs-demo-tip">${Lc('演示数据：U1012 Rico Yu 名下标的 78982532 已延期', 'Demo: listing 78982532 of U1012 Rico Yu is extended')}</span>
+          <span class="cs-demo-tip">${Lc('演示数据：U1012 Rico Yu 名下标的 78982532 已延期；BM 销售代填看 U10BMf', 'Demo: U1012 listing 78982532 extended; BM sales fill → U10BMf')}</span>
         </div>
         <div class="card table-wrap"><table class="list-table">
           <thead><tr>
-            <th>User ID</th><th>${Lc('姓名', 'Name')}</th><th>${Lc('注册手机', 'Mobile')}</th><th>${t('user_version')}</th>
+            <th>User ID</th><th>${Lc('姓名', 'Name')}</th><th>${Lc('注册手机', 'Mobile')}</th>
+            <th>${t('user_version')}</th><th>${t('col_segment')}</th>
             <th>${Lc('注册时间', 'Registered')}</th><th>${Lc('在贷笔数', 'Active loans')}</th><th>${Lc('延期标的', 'Extended listings')}${fieldTipMark('new')}</th>
           </tr></thead>
           <tbody>${list.length ? list.map(u => {
@@ -6276,11 +6323,12 @@
             const ext = ls.filter(l => l.ext).length;
             return `<tr>
               <td><button type="button" class="cs-link" onclick="openUser('${u.id}')">${esc(u.id)}</button></td>
-              <td class="name-cell">${esc(u.name)}</td><td>${esc(u.mobile)}</td><td>${flowBadge(u.flow)}</td>
+              <td class="name-cell">${esc(u.name)}</td><td>${esc(u.mobile)}</td>
+              <td>${flowBadge(u.flow)}</td><td>${segmentBadge(u)}</td>
               <td>${esc(u.registeredAt)}</td><td>${active}</td>
               <td>${ext ? `<span class="tag tag-warning">${ext}</span>` : '<span class="kv-empty">0</span>'}</td>
             </tr>`;
-          }).join('') : `<tr><td colspan="7" class="kv-empty" style="padding:24px">${Lc('无匹配结果', 'No results')}</td></tr>`}</tbody>
+          }).join('') : `<tr><td colspan="8" class="kv-empty" style="padding:24px">${Lc('无匹配结果', 'No results')}</td></tr>`}</tbody>
         </table></div>`;
     }
 
