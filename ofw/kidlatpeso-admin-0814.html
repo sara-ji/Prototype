@@ -716,9 +716,14 @@
         alert_auto_assign: '已自动分配跟进销售为自己（原型演示）。',
         sales_unassigned: '未分配',
         row_attention: '需处理',
-        all_flows: '全部流程',
+        all_flows: '全部流程属性',
         flow_domestic: '本土版',
         flow_oversea: '海外版',
+        all_segments: '全部客群',
+        segment_new_hire: 'New Hire',
+        segment_abroad: 'Abroad',
+        segment_bm: 'BM',
+        col_segment: '客群标签',
         all_profile_status: '全部填资状态',
         all_sales_rep: '全部跟进销售',
         filter_sales_rep: '跟进填资的销售名字',
@@ -1152,6 +1157,11 @@
         all_flows: 'All versions',
         flow_domestic: 'Domestic',
         flow_oversea: 'Overseas',
+        all_segments: 'All segments',
+        segment_new_hire: 'New Hire',
+        segment_abroad: 'Abroad',
+        segment_bm: 'BM',
+        col_segment: 'Segment',
         all_profile_status: 'All fill status',
         all_sales_rep: 'All sales reps',
         filter_sales_rep: 'Following sales name',
@@ -2497,6 +2507,16 @@
         ...extra,
       };
     }
+    function baseBm(extra = {}) {
+      return baseDom({
+        departure_date: '2026-12-05',
+        est_start: '2026-12-12',
+        return_flight: MOCK_IMG.flight,
+        return_date: '2026-08-20',
+        proof_income: MOCK_IMG.proof_income,
+        ...extra,
+      });
+    }
     function baseOvw(extra = {}) {
       return {
         ...packPreOvw(),
@@ -2575,14 +2595,14 @@
       {
         id: 'U1001', name: '—', mobile: '+63 900 111 0001',
         registeredAt: '2026-08-05 09:00', channel: 'Walk-in', salesRep: 'sarah_lim',
-        flow: 'domestic', statusCode: 'FILLING_PRE',
+        flow: 'domestic', segment: 'new_hire', statusCode: 'FILLING_PRE',
         starterLimit: null, finalLimit: null, loan: null, selectedComakerId: null,
         fields: {}, comakers: [],
       },
       {
         id: 'U1002', name: 'Ben Rivera', mobile: '+63 900 111 0002',
         registeredAt: '2026-08-04 10:00', channel: 'LC Manila', salesRep: 'sarah_lim',
-        flow: 'domestic', statusCode: 'PRE_REVIEWING',
+        flow: 'domestic', segment: 'new_hire', statusCode: 'PRE_REVIEWING',
         starterLimit: null, finalLimit: null, loan: null, selectedComakerId: null,
         fields: packPreDom({ first_name: 'Ben', last_name: 'Rivera', passport_number: 'P1000002A' }),
         comakers: [],
@@ -2590,7 +2610,7 @@
       {
         id: 'U1003', name: 'Cathy Ong', mobile: '+63 900 111 0003',
         registeredAt: '2026-08-03 11:00', channel: 'Ops', salesRep: 'sarah_lim',
-        flow: 'oversea', statusCode: 'PRE_REJECTED',
+        flow: 'oversea', segment: 'abroad', statusCode: 'PRE_REJECTED',
         starterLimit: null, finalLimit: null, loan: null, selectedComakerId: null,
         fields: packPreOvw({ first_name: 'Cathy', last_name: 'Ong', passport_number: 'P1000003B' }),
         comakers: [],
@@ -2598,7 +2618,7 @@
       {
         id: 'U1004', name: 'Ana Reyes', mobile: '+63 900 111 0004',
         registeredAt: '2026-07-18 14:05', channel: 'Pedro Cruz', salesRep: 'sarah_lim',
-        flow: 'domestic', statusCode: 'PRE_APPROVED',
+        flow: 'domestic', segment: 'new_hire', statusCode: 'PRE_APPROVED',
         starterLimit: 5000, finalLimit: null, loan: null, selectedComakerId: 'cm_a1',
         fields: packPreDom({
           first_name: 'Ana', last_name: 'Reyes', middle_name: 'L.', mother_maiden: 'Garcia',
@@ -2608,6 +2628,22 @@
         comakers: [
           mkCm('cm_a1', 'Pedro Reyes', '+63 919 333 4455', { rel: 'Parent', gender: 'Male' }),
           { id: 'cm_a2', status: 'draft', fields: { cm_first: 'Rosa', cm_last: 'Villanueva', cm_phone: '+63 917 222 3333', cm_full_rel: 'Relative' } },
+        ],
+      },
+      {
+        id: 'U10BM', name: 'Marco Dela Cruz', mobile: '+63 900 111 0099',
+        registeredAt: '2026-11-20 08:30', channel: 'BM Agency', salesRep: 'sarah_lim',
+        flow: 'domestic', segment: 'bm', statusCode: 'LOAN_REVIEWING',
+        starterLimit: 5000, finalLimit: 15000, loan: { amount: 9000, term: '12 Months', bank: 'GCash' },
+        selectedComakerId: 'cm_bm1',
+        fields: baseBm({
+          first_name: 'Marco', last_name: 'Dela Cruz', middle_name: 'S.', mother_maiden: 'Reyes',
+          gender: 'Male', dob: '1988-05-10', passport_number: 'P1999BM01',
+          email: 'marco.bm@email.com', occupation: 'Construction Worker',
+          monthly_income: 'P40,000 - P50,000', destination: 'Saudi Arabia',
+        }),
+        comakers: [
+          mkCm('cm_bm1', 'Elena Dela Cruz', '+63 919 888 7766', { rel: 'Spouse', gender: 'Female' }),
         ],
       },
       {
@@ -2933,7 +2969,7 @@
     let view = 'list';
     let selectedUserId = null;
     let detailTab = 'profile';
-    let listFilter = { q: '', flow: '', profileStatus: '', salesRep: '' };
+    let listFilter = { q: '', flow: '', segment: '', profileStatus: '', salesRep: '' };
     let reviewFilter = { owner: '', q: '' };
     let reviewSelected = new Set();
     let reviewAssignTarget = '';
@@ -2980,7 +3016,7 @@
 
     const AUDIT_FIELD_MAP = {
       b_id: 'passport_photo', b_live: 'liveness_photo', b_oec: 'oec', b_visa: 'valid_visa',
-      b_flight: 'flight', b_contract: 'employer_contract', b_income: 'proof_income',
+      b_flight: 'flight', b_return_flight: 'return_flight', b_contract: 'employer_contract', b_income: 'proof_income',
       b_gov: 'gov_id', b_emp: 'proof_emp',
       c_id: 'cm_id_photo', c_id_back: 'cm_id_photo_back', c_rel: 'cm_rel_cert', c_val: 'cm_validation', c_ecom: 'cm_ecom_proof', c_door: 'cm_door_video', c_live: 'cm_liveness',
     };
@@ -3295,7 +3331,7 @@
       const cm = getSelectedComaker(user);
       const cmf = cm?.fields || {};
       const isOversea = user.flow === 'oversea';
-      const borrower = (isOversea ? overseaBorrowerMaterials(f) : domesticBorrowerMaterials(f)).map(it => ({
+      const borrower = (isOversea ? overseaBorrowerMaterials(f) : domesticBorrowerMaterials(f, user)).map(it => ({
         ...it,
         person: 'borrower',
         personLabel: t('dec_person_borrower'),
@@ -3580,6 +3616,9 @@
         decisionTextItem('t_b_ph_complete', 'ph_address', t('rv_ph_complete'), bp, f.ph_address, 'borrower'),
         ...(user.flow !== 'oversea' ? [
           decisionTextItem('t_b_departure', 'departure_date', t('rv_departure'), bp, f.departure_date, 'borrower'),
+          ...(isBmUser(user) ? [
+            decisionTextItem('t_b_return_date', 'return_date', 'Return Date', bp, f.return_date, 'borrower'),
+          ] : []),
           decisionTextItem('t_b_est', 'est_start', t('rv_est_work'), bp, f.est_start, 'borrower'),
         ] : []),
         decisionTextItem('t_b_oec_dur', 'oec_duration', 'Contract Duration on OEC', bp, f.oec_duration, 'borrower'),
@@ -3683,6 +3722,12 @@
       ] : [];
 
       if (isDomestic) {
+        const bm = isBmUser(user);
+        const bmExtra = bm ? [
+          img('p_return_flight', 'return_flight', 'Return Flight Ticket', 'borrower', bp, f.return_flight || ''),
+          decisionTextItem('p_return_date', 'return_date', 'Return Date', bp, f.return_date, 'borrower'),
+          img('p_proof_income', 'proof_income', 'Proof of income (last 3 months before return date)', 'borrower', bp, f.proof_income || MOCK_IMG.proof_income),
+        ] : [];
         return [
           decisionTextItem('p_mother', 'mother_maiden', "Mother's Maiden Name", bp, f.mother_maiden, 'borrower'),
           img('p_passport', 'passport_photo', 'Philippine Passport Photo', 'borrower', bp, f.passport_photo || MOCK_IMG.passport_photo),
@@ -3692,8 +3737,9 @@
           img('p_visa', 'valid_visa', 'Valid Visa', 'borrower', bp, f.valid_visa || MOCK_IMG.valid_visa),
           img('p_oec', 'oec', 'Valid OEC', 'borrower', bp, f.oec || MOCK_IMG.oec),
           decisionTextItem('p_oec_duration', 'oec_duration', 'Contract Duration on OEC', bp, f.oec_duration, 'borrower'),
-          img('p_flight', 'flight', 'Flight Itinerary', 'borrower', bp, f.flight || MOCK_IMG.flight),
+          img('p_flight', 'flight', bm ? 'Outbound Flight Ticket' : 'Flight Itinerary', 'borrower', bp, f.flight || MOCK_IMG.flight),
           decisionTextItem('p_departure', 'departure_date', 'Departure Date', bp, f.departure_date, 'borrower'),
+          ...bmExtra,
           img('p_contract', 'employer_contract', 'Contract with Employer', 'borrower', bp, f.employer_contract || MOCK_IMG.employer_contract),
           decisionTextItem('p_est_start', 'est_start', 'Estimated Start Date of Work', bp, f.est_start, 'borrower'),
           ...contactCore,
@@ -3862,7 +3908,13 @@
         rf(t('rv_ofw_country'), f.destination || f.visa_country, 'destination', null),
         rf('Occupation', f.occupation, 'occupation', 'rename'),
         rf('Monthly income', f.monthly_income, 'monthly_income', null),
+        rf(isBmUser(user) ? 'Outbound Flight Ticket' : 'Flight Itinerary', f.flight ? 'Uploaded' : '—', 'flight', null),
         rf('Departure Date', f.departure_date, 'departure_date', null),
+        ...(isBmUser(user) ? [
+          rf('Return Flight Ticket', f.return_flight ? 'Uploaded' : '—', 'return_flight', 'new'),
+          rf('Return Date', f.return_date, 'return_date', 'new'),
+          rf('Proof of income (last 3 months before return date)', f.proof_income ? 'Uploaded' : '—', 'proof_income', 'new'),
+        ] : []),
         rf('Visa Expiration Date', f.visa_expiry, 'visa_expiry', 'new'),
         rf(t('rv_est_work'), f.est_start, 'est_start', null),
         rf('Contract Duration on OEC', f.oec_duration, 'oec_duration', 'new'),
@@ -3933,15 +3985,23 @@
       ];
     }
 
-    function domesticBorrowerMaterials(f) {
-      return [
+    function domesticBorrowerMaterials(f, user) {
+      const bm = user && isBmUser(user);
+      const list = [
         { key: 'b_id', label: 'Philippine Passport Photo', url: f.passport_photo || MOCK_IMG.passport_photo, fieldKey: 'passport_photo', tip: 'rename' },
         { key: 'b_live', label: t('rv_liveness'), url: f.liveness_photo || MOCK_IMG.passport_photo, fieldKey: 'liveness_photo', tip: null },
         { key: 'b_oec', label: 'Valid OEC', url: f.oec || MOCK_IMG.oec, fieldKey: 'oec', tip: 'rename' },
         { key: 'b_visa', label: 'Valid Visa', url: f.valid_visa || MOCK_IMG.valid_visa, fieldKey: 'valid_visa', tip: 'rename' },
-        { key: 'b_flight', label: 'Flight Itinerary', url: f.flight || MOCK_IMG.flight, fieldKey: 'flight', tip: 'rename' },
-        { key: 'b_contract', label: 'Contract with Employer', url: f.employer_contract || MOCK_IMG.employer_contract, fieldKey: 'employer_contract', tip: 'rename' },
+        { key: 'b_flight', label: bm ? 'Outbound Flight Ticket' : 'Flight Itinerary', url: f.flight || MOCK_IMG.flight, fieldKey: 'flight', tip: 'rename' },
       ];
+      if (bm) {
+        list.push(
+          { key: 'b_return_flight', label: 'Return Flight Ticket', url: f.return_flight || '', fieldKey: 'return_flight', tip: 'new', placeholder: lang === 'zh' ? '未上传（选填）' : 'Not uploaded (optional)' },
+          { key: 'b_income', label: 'Proof of income (last 3 months before return date)', url: f.proof_income || MOCK_IMG.proof_income, fieldKey: 'proof_income', tip: 'new' },
+        );
+      }
+      list.push({ key: 'b_contract', label: 'Contract with Employer', url: f.employer_contract || MOCK_IMG.employer_contract, fieldKey: 'employer_contract', tip: 'rename' });
+      return list;
     }
 
     function overseaBorrowerMaterials(f) {
@@ -4003,7 +4063,7 @@
       const visaSub = isOversea
         ? renderReviewSub(t('rv_visa_details'), renderReviewGrid(overseaVisaFields(f), user.id))
         : '';
-      const borrowerMaterials = isOversea ? overseaBorrowerMaterials(f) : domesticBorrowerMaterials(f);
+      const borrowerMaterials = isOversea ? overseaBorrowerMaterials(f) : domesticBorrowerMaterials(f, user);
 
       const contacts = [];
       if (f.c1_name || f.c1_phone) {
@@ -4091,7 +4151,7 @@
           <button type="button" onclick="goList()">${t('menu_review')}</button>
           <span>/</span>
           <span>${t('rv_detail_title')}</span>
-          ${flowBadge(user.flow)}
+          ${flowSegmentBadges(user)}
         </div>
         ${renderTipLegend()}
         ${borrowerModule}
@@ -4193,8 +4253,11 @@
           { key: 'visa_expiry', label: 'Visa Expiration Date', type: 'date', tip: 'new' },
           { key: 'oec', label: 'Valid OEC', type: 'file', tip: 'rename' },
           { key: 'oec_duration', label: 'Contract Duration on OEC', type: 'text', placeholder: 'Months, e.g. 24', tip: 'new' },
-          { key: 'flight', label: 'Flight Itinerary', type: 'file' },
+          { key: 'flight', label: 'Outbound Flight Ticket / Flight Itinerary', type: 'file' },
           { key: 'departure_date', label: 'Departure Date', type: 'date' },
+          { key: 'return_flight', label: 'Return Flight Ticket', type: 'file', tip: 'new', bmOnly: true, required: false },
+          { key: 'return_date', label: 'Return Date', type: 'date', tip: 'new', bmOnly: true },
+          { key: 'proof_income', label: 'Proof of income (last 3 months before return date)', type: 'file', tip: 'new', bmOnly: true },
           { key: 'employer_name', label: 'Employer Name', type: 'text' },
           { key: 'employer_address', label: 'Employer Address', type: 'text' },
           { key: 'employer_phone', label: 'Employer Phone Number', type: 'tel' },
@@ -4298,6 +4361,25 @@
       const cls = flow === 'domestic' ? 'tag-info' : 'tag-warning';
       return `<span class="tag ${cls}">${label}</span>`;
     }
+    function userSegment(user) {
+      if (!user) return 'new_hire';
+      if (user.segment === 'bm' || user.segment === 'abroad' || user.segment === 'new_hire') return user.segment;
+      return user.flow === 'oversea' ? 'abroad' : 'new_hire';
+    }
+    function isBmUser(user) { return userSegment(user) === 'bm'; }
+    function segmentBadge(userOrSeg) {
+      const seg = typeof userOrSeg === 'object' ? userSegment(userOrSeg) : (userOrSeg || 'new_hire');
+      const map = {
+        new_hire: { label: t('segment_new_hire'), cls: 'tag-info' },
+        abroad: { label: t('segment_abroad'), cls: 'tag-warning' },
+        bm: { label: t('segment_bm'), cls: 'tag-success' },
+      };
+      const m = map[seg] || map.new_hire;
+      return `<span class="tag ${m.cls}">${m.label}</span>`;
+    }
+    function flowSegmentBadges(user) {
+      return `${flowBadge(user.flow)} ${segmentBadge(user)}`;
+    }
 
     function openLightbox(url) {
       document.getElementById('lightbox-img').src = url;
@@ -4364,6 +4446,7 @@
 
       let list = users.filter(u => {
         if (listFilter.flow && u.flow !== listFilter.flow) return false;
+        if (listFilter.segment && userSegment(u) !== listFilter.segment) return false;
         if (listFilter.salesRep && isMgmt && u.salesRep !== listFilter.salesRep) return false;
 
         const st = userStatus(u);
@@ -4415,7 +4498,18 @@
     }
 
     function visibleSections(user) {
-      return FIELD_SECTIONS[user.flow] || [];
+      const sections = FIELD_SECTIONS[user.flow] || [];
+      const bm = isBmUser(user);
+      return sections.map(sec => ({
+        ...sec,
+        fields: (sec.fields || [])
+          .filter(f => !f.bmOnly || bm)
+          .map(f => {
+            if (!bm) return f;
+            if (f.key === 'flight') return { ...f, label: 'Outbound Flight Ticket' };
+            return f;
+          }),
+      }));
     }
 
     function showComakerSection(user) {
@@ -4590,6 +4684,7 @@
           <td style="white-space:nowrap;font-size:12px">${esc(c.appliedAt)}</td>
           <td><a href="#" class="link-id" onclick="event.stopPropagation();openUser('${u.id}')">${esc(u.id)}</a></td>
           <td>${flowBadge(u.flow)}</td>
+          <td>${segmentBadge(u)}</td>
           <td class="name-cell"><strong>${esc(u.name)}</strong></td>
           <td>${auditStatusBadge(c.auditStatus)}</td>
           <td style="font-size:12px;color:var(--text-muted)">${c.lastCallAt ? esc(c.lastCallAt) : '—'}</td>
@@ -4598,7 +4693,7 @@
         </tr>`;
       }).join('');
 
-      const colSpan = admin ? 10 : 9;
+      const colSpan = admin ? 11 : 10;
       const stats = admin ? `
         <div class="review-assign-bar">
           <select class="assign-select" onchange="reviewAssignTarget=this.value">
@@ -4650,6 +4745,7 @@
               <th>${t('review_col_applied')}</th>
               <th>${t('col_user_id')}</th>
               <th>${t('col_version')}</th>
+              <th>${t('col_segment')}</th>
               <th>${t('col_name')}</th>
               <th>${t('review_col_audit_status')}</th>
               <th>${t('review_col_last_call')}</th>
@@ -4695,6 +4791,7 @@
           <td class="name-cell"><strong>${esc(u.name)}</strong></td>
           <td>${esc(u.id)}</td>
           <td>${flowBadge(u.flow)}</td>
+          <td>${segmentBadge(u)}</td>
           <td style="white-space:nowrap;font-size:12px">${esc(u.registeredAt)}</td>
           <td style="font-size:12px">${esc(u.channel)}</td>
           <td>${esc(salesRepDisplay(u))}</td>
@@ -4720,6 +4817,12 @@
             <option value="domestic"${listFilter.flow==='domestic'?' selected':''}>${t('flow_domestic')}</option>
             <option value="oversea"${listFilter.flow==='oversea'?' selected':''}>${t('flow_oversea')}</option>
           </select>
+          <select onchange="listFilter.segment=this.value;render()">
+            <option value="">${t('all_segments')}</option>
+            <option value="new_hire"${listFilter.segment==='new_hire'?' selected':''}>${t('segment_new_hire')}</option>
+            <option value="bm"${listFilter.segment==='bm'?' selected':''}>${t('segment_bm')}</option>
+            <option value="abroad"${listFilter.segment==='abroad'?' selected':''}>${t('segment_abroad')}</option>
+          </select>
           <select onchange="listFilter.profileStatus=this.value;render()">
             <option value="">${esc(isMgmt ? t('status_filter_default_mgmt') : t('status_filter_default_sales'))}</option>
             <option value="__ALL__"${listFilter.profileStatus==='__ALL__'?' selected':''}>${esc(t('status_filter_all'))}</option>
@@ -4735,10 +4838,10 @@
           <table class="list-table">
             <thead><tr>
               <th>${t('col_no')}</th><th>${t('col_mobile')}</th><th>${t('col_name')}</th><th>${t('col_user_id')}</th>
-              <th>${t('col_version')}</th><th>${t('col_registered')}</th>
+              <th>${t('col_version')}</th><th>${t('col_segment')}</th><th>${t('col_registered')}</th>
               <th>${t('col_channel')}</th><th>${t('col_sales')}</th><th>${t('col_profile_status')}</th><th>${t('col_action')}</th>
             </tr></thead>
-            <tbody>${rows || `<tr><td colspan="10" style="text-align:center;color:var(--text-muted)">${t('no_users')}</td></tr>`}</tbody>
+            <tbody>${rows || `<tr><td colspan="11" style="text-align:center;color:var(--text-muted)">${t('no_users')}</td></tr>`}</tbody>
           </table>
         </div>
       `;
@@ -5206,12 +5309,17 @@
             <tr>
               <th class="kv-label">${t('registered_at')}</th><td class="kv-value">${esc(user.registeredAt)}</td>
               <th class="kv-label">${t('user_version')}${fieldTipMark('new')}</th><td class="kv-value">${flowBadge(user.flow)}</td>
-              <th class="kv-label">${t('profile_status')}${fieldTipMark('new')}</th><td class="kv-value">${profileStatusBadge(user)}</td>
+              <th class="kv-label">${t('col_segment')}${fieldTipMark('new')}</th><td class="kv-value">${segmentBadge(user)}</td>
             </tr>
             <tr>
+              <th class="kv-label">${t('profile_status')}${fieldTipMark('new')}</th><td class="kv-value">${profileStatusBadge(user)}</td>
               <th class="kv-label">${t('name')}${fieldTipMark('new')}</th><td class="kv-value">${esc(user.name)}</td>
               <th class="kv-label">${t('attr_channel')}${fieldTipMark('new')}</th><td class="kv-value">${esc(user.channel)}</td>
+            </tr>
+            <tr>
               <th class="kv-label">${t('sales_rep')}${fieldTipMark('rename')}</th><td class="kv-value">${esc(user.salesRep)}</td>
+              <th class="kv-label kv-pad"></th><td class="kv-value kv-pad"></td>
+              <th class="kv-label kv-pad"></th><td class="kv-value kv-pad"></td>
             </tr>
           </tbody></table>
         </div>`;
