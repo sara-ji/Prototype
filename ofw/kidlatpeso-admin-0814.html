@@ -3926,17 +3926,10 @@
         rf(t('rv_ofw_country'), f.destination || f.visa_country, 'destination', null),
         rf('Occupation', f.occupation, 'occupation', 'rename'),
         rf('Monthly income', f.monthly_income, 'monthly_income', null),
-        rf(
-          isBmUser(user) ? 'Outbound Flight Itinerary' : 'Flight Itinerary',
-          f.flight ? 'Uploaded' : '—',
-          'flight',
-          isBmUser(user) ? 'rename' : null
-        ),
         rf('Departure Date', f.departure_date, 'departure_date', null),
+        // 图片材料（机票 / 工资单等）只在下方材料卡审阅打标，不在字段表用 Uploaded 重复展示
         ...(isBmUser(user) ? [
-          rf('Return Flight Itinerary', f.return_flight ? 'Uploaded' : '—', 'return_flight', 'new'),
           rf('Return Date', f.return_date, 'return_date', 'new'),
-          rf('Proof of income (last 3 months before return date)', f.proof_income ? 'Uploaded' : '—', 'proof_income', 'new'),
         ] : []),
         rf('Visa Expiration Date', f.visa_expiry, 'visa_expiry', 'new'),
         rf(t('rv_est_work'), f.est_start, 'est_start', null),
