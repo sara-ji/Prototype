@@ -415,6 +415,8 @@
         reviewerPhones: ["9777823691"],
         otp: "0000"
       };
+      var DELETED_KEY = "sahodnow_h5_deleted_phones";
+      var MSG_NOT_REGISTERED = "This mobile number is not registered with SahodNow.";
 
       var step = 0;
       var phoneEl = document.getElementById("phone");
@@ -437,6 +439,24 @@
       function validPhone(v) { return /^9\d{9}$/.test(v); }
       function isReviewer(v) { return CONFIG.reviewerPhones.indexOf(v) !== -1; }
       function maskPhone(v) { return "+63 " + v.slice(0, 1) + "** *** " + v.slice(-4); }
+
+      function readDeleted() {
+        try {
+          var raw = localStorage.getItem(DELETED_KEY);
+          var list = raw ? JSON.parse(raw) : [];
+          return Array.isArray(list) ? list : [];
+        } catch (e) {
+          return [];
+        }
+      }
+      function isDeleted(v) { return readDeleted().indexOf(v) !== -1; }
+      function markDeleted(v) {
+        var list = readDeleted();
+        if (list.indexOf(v) === -1) {
+          list.push(v);
+          try { localStorage.setItem(DELETED_KEY, JSON.stringify(list)); } catch (e) {}
+        }
+      }
 
       function otpValue() {
         return otpInputs.map(function (i) { return i.value; }).join("");
@@ -474,9 +494,10 @@
           phoneError.textContent = "Enter a valid mobile number (9XXXXXXXXX).";
           return;
         }
-        if (!isReviewer(v)) {
+        // 已注销过 / 非审核号：同一「账号不存在」提示，避免重复走注销
+        if (!isReviewer(v) || isDeleted(v)) {
           phoneError.hidden = false;
-          phoneError.textContent = "This mobile number is not registered with SahodNow.";
+          phoneError.textContent = MSG_NOT_REGISTERED;
           return;
         }
         phoneError.hidden = true;
@@ -526,7 +547,9 @@
       });
 
       btnDelete.addEventListener("click", function () {
-        document.getElementById("successPhone").textContent = maskPhone(phoneEl.value.trim());
+        var v = phoneEl.value.trim();
+        markDeleted(v);
+        document.getElementById("successPhone").textContent = maskPhone(v);
         show(4);
       });
     })();

@@ -8,9 +8,12 @@
 | 输入 | 结果 |
 | --- | --- |
 | 非审核手机号 → Continue | 提示：账号未注册 |
-| 审核手机号 → Continue | 进入 OTP 页（不发短信） |
+| **本机已注销过的审核号** → Continue | 同上（账号未注册），防重复注销 |
+| 审核手机号（未注销过）→ Continue | 进入 OTP 页（不发短信） |
 | OTP ≠ `0000` → Verify | 提示：验证码错误 |
-| 审核号 + `0000` | 进入确认页 → 可点 Delete → 成功页 |
+| 审核号 + `0000` | 进入确认页 → Delete → 成功页，并写入 `localStorage` |
+
+> 已注销状态存在浏览器 `localStorage`（键 `sahodnow_h5_deleted_phones`），同设备再次进入该号会当「账号不存在」。换浏览器 / 清站点数据后可再走一遍。
 
 ## 配置（改 `index.html` 顶部 CONFIG）
 
