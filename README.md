@@ -13,6 +13,7 @@ https://sara-ji.github.io/Prototype/
 | SahodNow APP | https://sara-ji.github.io/Prototype/sahodnow/app/index.html |
 | SahodNow 官网 | https://sara-ji.github.io/Prototype/sahodnow/official/index.html |
 | SahodNow Backend | https://sara-ji.github.io/Prototype/sahodnow/backend.html |
+| SahodNow H5 账号注销 | https://sara-ji.github.io/Prototype/sahodnow/h5-account-deletion/ |
 | SahodNow 业务邮箱说明 | https://sara-ji.github.io/Prototype/wiki/sahodnow-business-email.html |
 | Google Play 开发者账号注册与认证全流程 | https://sara-ji.github.io/Prototype/wiki/google-play-verification/index.html |
 | 菲律宾开发者账号认证 · 最终方案与材料清单 | https://sara-ji.github.io/Prototype/wiki/google-play-verification/ph-account-plan.html |
