@@ -3741,9 +3741,11 @@
 
       if (isDomestic) {
         const bm = isBmUser(user);
-        const bmExtra = bm ? [
+        const bmTravel = bm ? [
           img('p_return_flight', 'return_flight', 'Return Flight Itinerary', 'borrower', bp, f.return_flight || ''),
           decisionTextItem('p_return_date', 'return_date', 'Return Date', bp, f.return_date, 'borrower'),
+        ] : [];
+        const bmIncome = bm ? [
           img('p_proof_income', 'proof_income', 'Proof of income (last 3 months before return date)', 'borrower', bp, f.proof_income || MOCK_IMG.proof_income),
         ] : [];
         return [
@@ -3757,9 +3759,10 @@
           decisionTextItem('p_oec_duration', 'oec_duration', 'Contract Duration on OEC', bp, f.oec_duration, 'borrower'),
           img('p_flight', 'flight', bm ? 'Outbound Flight Itinerary' : 'Flight Itinerary', 'borrower', bp, f.flight || MOCK_IMG.flight),
           decisionTextItem('p_departure', 'departure_date', 'Departure Date', bp, f.departure_date, 'borrower'),
-          ...bmExtra,
+          ...bmTravel,
           img('p_contract', 'employer_contract', 'Contract with Employer', 'borrower', bp, f.employer_contract || MOCK_IMG.employer_contract),
           decisionTextItem('p_est_start', 'est_start', 'Estimated Start Date of Work', bp, f.est_start, 'borrower'),
+          ...bmIncome,
           ...contactCore,
           ...comakerPendingCommon,
         ];
@@ -4013,10 +4016,14 @@
       if (bm) {
         list.push(
           { key: 'b_return_flight', label: 'Return Flight Itinerary', url: f.return_flight || '', fieldKey: 'return_flight', tip: 'new', placeholder: lang === 'zh' ? '未上传（选填）' : 'Not uploaded (optional)' },
-          { key: 'b_income', label: 'Proof of income (last 3 months before return date)', url: f.proof_income || MOCK_IMG.proof_income, fieldKey: 'proof_income', tip: 'new' },
         );
       }
       list.push({ key: 'b_contract', label: 'Contract with Employer', url: f.employer_contract || MOCK_IMG.employer_contract, fieldKey: 'employer_contract', tip: 'rename' });
+      if (bm) {
+        list.push(
+          { key: 'b_income', label: 'Proof of income (last 3 months before return date)', url: f.proof_income || MOCK_IMG.proof_income, fieldKey: 'proof_income', tip: 'new' },
+        );
+      }
       return list;
     }
 
@@ -4273,7 +4280,6 @@
           { key: 'departure_date', label: 'Departure Date', type: 'date' },
           { key: 'return_flight', label: 'Return Flight Itinerary', type: 'file', tip: 'new', bmOnly: true, required: false },
           { key: 'return_date', label: 'Return Date', type: 'date', tip: 'new', bmOnly: true },
-          { key: 'proof_income', label: 'Proof of income (last 3 months before return date)', type: 'file', tip: 'new', bmOnly: true },
           { key: 'employer_name', label: 'Employer Name', type: 'text' },
           { key: 'employer_address', label: 'Employer Address', type: 'text' },
           { key: 'employer_phone', label: 'Employer Phone Number', type: 'tel' },
@@ -4281,6 +4287,7 @@
           { key: 'payroll', label: 'Payroll Period', type: 'select', options: ['Daily', 'Weekly', 'Twice per month', 'Once a month'] },
           { key: 'expected_payday', label: 'Expected Payday', type: 'text', placeholder: 'e.g. 15th or Monday · Friday · …', tip: 'rename' },
           { key: 'est_start', label: 'Estimated Start Date of Work', type: 'date' },
+          { key: 'proof_income', label: 'Proof of income (last 3 months before return date)', type: 'file', tip: 'new', bmOnly: true },
         ]},
         { id: 'contacts', title: 'Contacts', titleTip: 'new', phase: '终审前', fields: [
           { key: 'c1_name', label: 'Contact 1 · Name', type: 'text', tip: 'new' },

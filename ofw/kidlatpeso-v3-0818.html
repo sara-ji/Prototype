@@ -1893,7 +1893,7 @@
         if (!dateFilled('est_start')) miss.push({ key: 'est_start', label: 'Estimated Start Date of Work' });
         if (isBm()) {
           if (!dateFilled('return_date')) miss.push({ key: 'return_date', label: 'Return Date' });
-          if (uploadCount('proof_income') < 3) {
+          if (!uploaded('proof_income')) {
             miss.push({ key: 'proof_income', label: 'Proof of income (last 3 months before return date)' });
           }
         }
@@ -3326,7 +3326,7 @@
           sd('return_date_d', '20', force);
           sd('return_date_y', '2026', force);
           sdu('return_flight', force);
-          if (force || uploadCount('proof_income') < 3) formData.proof_income = '3';
+          if (force || !uploaded('proof_income')) formData.proof_income = '1';
         }
       } else {
         sd('nationality', 'Philippines', force);
@@ -3757,18 +3757,23 @@
             <span class="bm-circle-badge">BM · New</span>
             ${uploadField('return_flight', 'Return Flight Itinerary', { required: false, shortUploaded: true })}
             ${dateField('return_date', 'Return Date')}
-            ${uploadField('proof_income', 'Proof of income (last 3 months before return date)', {
-              multiple: true,
-              max: 6,
-              reqHint: 'before return date',
-              hideUploadMeta: true,
-            })}
-            <p class="hint-muted">Must cover the 3 months ending at Return Date (e.g. return Nov 1 → about Aug–Oct). No 90-day issuance rule.</p>
           </div>
         ` : `
           ${uploadField('flight', 'Flight Itinerary')}
           ${dateField('departure_date', 'Departure Date')}
         `;
+        const bmIncomeBlock = isBm() ? `
+          <div class="bm-circle" data-bm-annotate="new">
+            <span class="bm-circle-badge">BM · New</span>
+            ${uploadField('proof_income', 'Proof of income (last 3 months before return date)', {
+              multiple: true,
+              max: 6,
+              reqHint: 'up to 6 photos or 1 PDF',
+              hideUploadMeta: true,
+            })}
+            <p class="hint-muted">Must cover the 3 months ending at Return Date (e.g. return Nov 1 → about Aug–Oct). Same as existing multi-page materials: max 6 images or 1 PDF. No minimum image count.</p>
+          </div>
+        ` : '';
         return `
           ${journeyBar('post', 1)}
           <div class="section-title">Travel Documents</div>
@@ -3785,6 +3790,7 @@
           ${selectField('payroll', 'Payroll Period', O.payrollPeriod)}
           ${expectedPaydayFieldsHtml()}
           ${dateField('est_start', 'Estimated Start Date of Work')}
+          ${bmIncomeBlock}
           <button type="button" class="btn-primary" onclick="goTo('contacts')">Next</button>
         `;
       }
